@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Sparkfolio - Empowered Creativity</title>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Plus+Jakarta+Sans:wght@700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Tailwind Config -->
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-secondary-fixed": "#270058",
+                    "on-secondary": "#ffffff",
+                    "primary-fixed-dim": "#3cdae2",
+                    "on-secondary-container": "#faf1ff",
+                    "surface-container-low": "#f6f3f2",
+                    "secondary-container": "#8b3dff",
+                    "primary": "#00696e",
+                    "on-error": "#ffffff",
+                    "error": "#ba1a1a",
+                    "primary-container": "#00c4cc",
+                    "surface-tint": "#00696e",
+                    "outline": "#6c7a7a",
+                    "surface-container-high": "#eae7e7",
+                    "inverse-surface": "#303030",
+                    "tertiary-fixed-dim": "#ffaed8",
+                    "on-background": "#1b1b1c",
+                    "surface-container-highest": "#e5e2e1",
+                    "surface-variant": "#e5e2e1",
+                    "on-primary": "#ffffff",
+                    "surface-dim": "#dcd9d9",
+                    "surface": "#fcf9f8",
+                    "on-tertiary": "#ffffff",
+                    "on-error-container": "#93000a",
+                    "inverse-on-surface": "#f3f0ef",
+                    "on-primary-container": "#004c4f",
+                    "surface-bright": "#fcf9f8",
+                    "primary-fixed": "#63f7ff",
+                    "secondary-fixed": "#ebdcff",
+                    "on-secondary-fixed-variant": "#5d00c2",
+                    "tertiary": "#ad1d7f",
+                    "tertiary-container": "#ff8acc",
+                    "on-tertiary-fixed-variant": "#890063",
+                    "on-tertiary-container": "#84005f",
+                    "background": "#fcf9f8",
+                    "on-tertiary-fixed": "#3c0029",
+                    "on-surface-variant": "#3c494a",
+                    "surface-container-lowest": "#ffffff",
+                    "on-surface": "#1b1b1c",
+                    "outline-variant": "#bbc9ca",
+                    "on-primary-fixed-variant": "#004f53",
+                    "on-primary-fixed": "#002021",
+                    "secondary": "#710fe5",
+                    "secondary-fixed-dim": "#d4bbff",
+                    "error-container": "#ffdad6",
+                    "tertiary-fixed": "#ffd8e9",
+                    "surface-container": "#f0eded",
+                    "inverse-primary": "#3cdae2"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "sm": "8px",
+                    "xl": "48px",
+                    "base": "4px",
+                    "xs": "4px",
+                    "gutter": "16px",
+                    "md": "16px",
+                    "container-margin": "24px",
+                    "lg": "24px"
+            },
+            "fontFamily": {
+                    "headline-md": [
+                            "Plus Jakarta Sans"
+                    ],
+                    "label-md": [
+                            "Inter"
+                    ],
+                    "label-sm": [
+                            "Inter"
+                    ],
+                    "body-lg": [
+                            "Inter"
+                    ],
+                    "headline-lg": [
+                            "Plus Jakarta Sans"
+                    ],
+                    "body-sm": [
+                            "Inter"
+                    ],
+                    "headline-lg-mobile": [
+                            "Plus Jakarta Sans"
+                    ],
+                    "headline-xl": [
+                            "Plus Jakarta Sans"
+                    ],
+                    "body-md": [
+                            "Inter"
+                    ]
+            },
+            "fontSize": {
+                    "headline-md": [
+                            "24px",
+                            {
+                                    "lineHeight": "1.3",
+                                    "fontWeight": "700"
+                            }
+                    ],
+                    "label-md": [
+                            "14px",
+                            {
+                                    "lineHeight": "1",
+                                    "letterSpacing": "0.01em",
+                                    "fontWeight": "600"
+                            }
+                    ],
+                    "label-sm": [
+                            "12px",
+                            {
+                                    "lineHeight": "1",
+                                    "fontWeight": "500"
+                            }
+                    ],
+                    "body-lg": [
+                            "18px",
+                            {
+                                    "lineHeight": "1.6",
+                                    "fontWeight": "400"
+                            }
+                    ],
+                    "headline-lg": [
+                            "32px",
+                            {
+                                    "lineHeight": "1.2",
+                                    "letterSpacing": "-0.01em",
+                                    "fontWeight": "700"
+                            }
+                    ],
+                    "body-sm": [
+                            "14px",
+                            {
+                                    "lineHeight": "1.5",
+                                    "fontWeight": "400"
+                            }
+                    ],
+                    "headline-lg-mobile": [
+                            "28px",
+                            {
+                                    "lineHeight": "1.2",
+                                    "fontWeight": "700"
+                            }
+                    ],
+                    "headline-xl": [
+                            "48px",
+                            {
+                                    "lineHeight": "1.1",
+                                    "letterSpacing": "-0.02em",
+                                    "fontWeight": "800"
+                            }
+                    ],
+                    "body-md": [
+                            "16px",
+                            {
+                                    "lineHeight": "1.5",
+                                    "fontWeight": "400"
+                            }
+                    ]
+            }
+    },
+        },
+      }
+    </script>
+<style>
+        .gradient-text {
+            background: linear-gradient(135deg, theme('colors.primary'), theme('colors.secondary'));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .hero-bg {
+            background: linear-gradient(135deg, theme('colors.surface'), theme('colors.primary-fixed'));
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background font-body-md min-h-screen flex flex-col relative pt-16">
+<!-- TopAppBar -->
+<header class="fixed top-0 w-full z-50 bg-surface/80 dark:bg-surface-container/80 backdrop-blur-md bg-surface/40 dark:bg-surface-container/40 shadow-sm transition-all duration-200">
+<div class="flex justify-between items-center h-16 px-gutter max-w-7xl mx-auto w-full">
+<div class="flex items-center gap-sm cursor-pointer active:scale-95 transition-transform duration-200">
+<span class="material-symbols-outlined text-primary dark:text-primary-fixed" data-icon="auto_awesome">auto_awesome</span>
+<span class="font-headline-md text-headline-md font-bold text-primary dark:text-primary-fixed">Sparkfolio</span>
+</div>
+<!-- Desktop Nav (Hidden on mobile) -->
+<nav class="hidden md:flex items-center gap-lg">
+<a class="font-label-md text-label-md text-primary dark:text-primary-fixed font-bold border-b-2 border-primary dark:border-primary-fixed pb-1 transition-colors duration-200" href="#">Home</a>
+<a class="font-label-md text-label-md text-on-surface-variant dark:text-outline-variant font-medium hover:text-primary dark:hover:text-primary-fixed transition-colors duration-200" href="#">Drafts</a>
+<a class="font-label-md text-label-md text-on-surface-variant dark:text-outline-variant font-medium hover:text-primary dark:hover:text-primary-fixed transition-colors duration-200" href="#">AI Import</a>
+</nav>
+<div class="flex items-center">
+<div class="w-8 h-8 rounded-full bg-surface-variant overflow-hidden cursor-pointer active:scale-95 transition-transform duration-200 shadow-sm" title="User profile photo">
+<img class="w-full h-full object-cover" data-alt="A small, stylized avatar portrait of a creative professional with a warm smile, wearing a casual modern outfit, set against a vibrant turquoise and white background reflecting a light, optimistic UI aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBg3w_o5egRI1AcjhxzuzxhyLlj0wpt1zYx31YuyjDaEm1Ebr12yTIeSIq1ATPmfdRK7BNZQUCkOs2R9W2rmGWKr-_dgNY9Ryp7cDWxZRFrbqvFEh2pPhQynOTlJN-uzrY-IqvUzDFNtkfEj2ubYH0ceoabMPzf-Qv-6wYrJXSSJdT8Nhe2YW0LkX-vVgAUwazrGclQZp-JE1Jn_09gH8PTWQE2ax9bXs_j8LBK84-DQdBgdqP8zmu-"/>
+</div>
+</div>
+</div>
+</header>
+<!-- Main Content -->
+<main class="flex-grow flex flex-col">
+<!-- Hero Section -->
+<section class="hero-bg relative overflow-hidden py-24 md:py-32 flex items-center justify-center min-h-[716px]">
+<!-- Decorative Background Elements -->
+<div class="absolute top-10 left-10 w-64 h-64 bg-white/30 rounded-full blur-3xl"></div>
+<div class="absolute bottom-10 right-10 w-80 h-80 bg-secondary/10 rounded-full blur-3xl"></div>
+<div class="max-w-7xl mx-auto px-container-margin md:px-lg relative z-10 text-center flex flex-col items-center">
+<div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/50 backdrop-blur-sm border border-white/20 mb-8 shadow-sm">
+<span class="material-symbols-outlined text-sm text-secondary" data-icon="sparkles">arrow_back_ios_new</span>
+<span class="font-label-sm text-label-sm text-on-surface font-medium">Empowered Creativity v2.0 is here</span>
+</div>
+<h1 class="font-headline-xl text-headline-xl md:text-[64px] font-extrabold leading-tight tracking-tight mb-6 max-w-4xl">
+                    Craft Your Future <br class="hidden md:block"/>with <span class="gradient-text">AI Magic</span>
+</h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant max-w-2xl mb-10">
+                    Lower the barrier to professional-grade design. Sparkfolio combines intuitive tools with powerful AI to bring your creative vision to life instantly.
+                </p>
+<div class="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
+<button class="bg-primary text-on-primary font-label-md text-label-md px-8 py-4 rounded-full shadow-[0_8px_16px_rgba(0,0,0,0.08)] hover:-translate-y-0.5 hover:shadow-[0_12px_32px_rgba(0,0,0,0.12)] transition-all duration-200 flex items-center justify-center gap-2 min-h-[48px]">
+                        Start Creating
+                        <span class="material-symbols-outlined" data-icon="arrow_forward">arrow_forward</span>
+</button>
+<button class="bg-surface/50 backdrop-blur-sm text-primary border-2 border-primary/20 font-label-md text-label-md px-8 py-4 rounded-full hover:bg-surface-variant hover:border-primary/40 transition-all duration-200 flex items-center justify-center gap-2 min-h-[48px]">
+<span class="material-symbols-outlined" data-icon="play_circle">play_circle</span>
+                        Watch Demo
+                    </button>
+</div>
+</div>
+</section>
+<!-- Bento Grid Feature Showcase -->
+<section class="py-xl max-w-7xl mx-auto px-container-margin md:px-lg w-full">
+<div class="text-center mb-xl">
+<h2 class="font-headline-lg text-headline-lg text-on-surface mb-4">Everything you need to create</h2>
+<p class="font-body-md text-body-md text-on-surface-variant">Powerful features wrapped in a delightfully simple interface.</p>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-md md:gap-lg auto-rows-[300px]">
+<!-- Bento Item 1: Large Span -->
+<div class="md:col-span-2 bg-surface rounded-xl p-lg shadow-[0_2px_4px_rgba(0,0,0,0.05)] hover:shadow-[0_8px_16px_rgba(0,0,0,0.08)] transition-shadow duration-300 flex flex-col justify-between overflow-hidden relative group border border-outline-variant/30">
+<div class="relative z-10">
+<div class="w-12 h-12 rounded-full bg-primary-container text-on-primary-container flex items-center justify-center mb-4">
+<span class="material-symbols-outlined" data-icon="auto_fix_high">auto_fix_high</span>
+</div>
+<h3 class="font-headline-md text-headline-md mb-2">Instant AI Generation</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant max-w-sm">Describe your vision, and watch as our AI creates stunning layouts, images, and copy in seconds.</p>
+</div>
+<div class="absolute -bottom-10 -right-10 w-2/3 h-2/3 rounded-tl-2xl overflow-hidden shadow-lg group-hover:-translate-y-2 group-hover:-translate-x-2 transition-transform duration-500">
+<img class="w-full h-full object-cover" data-alt="A sleek digital workspace showing an abstract, modern UI dashboard interface on a screen, bathed in soft, diffused light mode illumination with white backgrounds and crisp teal and purple accents. The interface displays playful geometric shapes and smooth data visualizations, conveying a high-tech yet approachable creative tool environment." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCOvL-9SUuiII7JhJJZNGmwa54OQ1wDMv0_wY8YLdsAnXZ2kOtl4-gw4kqrLwkjzt2NtQCulaes6_tRJdlN3o72doF9w_6SrYKCJ_qlD6Yh50-7SjsWOO-yUT7oDFgcmZabEvhb5G6j_KsMTK4KEvcBgW8Y-IxyHqM-vD0l_QTMQpc_9cdLMUsPiCKMlwsOUXY5ANFmeFFDMP9o-ZCJG88ItbOBjW5KtMH6u3Brmu3iyapgR2EDLJl0"/>
+</div>
+</div>
+<!-- Bento Item 2: Small -->
+<div class="bg-surface rounded-xl p-lg shadow-[0_2px_4px_rgba(0,0,0,0.05)] hover:shadow-[0_8px_16px_rgba(0,0,0,0.08)] transition-shadow duration-300 flex flex-col justify-between border border-outline-variant/30">
+<div>
+<div class="w-12 h-12 rounded-full bg-secondary-fixed text-on-secondary-fixed flex items-center justify-center mb-4">
+<span class="material-symbols-outlined" data-icon="palette">palette</span>
+</div>
+<h3 class="font-headline-md text-headline-md text-xl mb-2">Smart Themes</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Apply cohesive color palettes and typography across your entire project instantly.</p>
+</div>
+<div class="flex gap-2 mt-4">
+<div class="h-8 flex-1 rounded-full bg-primary"></div>
+<div class="h-8 flex-1 rounded-full bg-secondary"></div>
+<div class="h-8 flex-1 rounded-full bg-tertiary"></div>
+</div>
+</div>
+<!-- Bento Item 3: Small -->
+<div class="bg-surface rounded-xl p-lg shadow-[0_2px_4px_rgba(0,0,0,0.05)] hover:shadow-[0_8px_16px_rgba(0,0,0,0.08)] transition-shadow duration-300 flex flex-col justify-between border border-outline-variant/30">
+<div>
+<div class="w-12 h-12 rounded-full bg-tertiary-fixed text-on-tertiary-fixed flex items-center justify-center mb-4">
+<span class="material-symbols-outlined" data-icon="devices">devices</span>
+</div>
+<h3 class="font-headline-md text-headline-md text-xl mb-2">Responsive by Default</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Your designs automatically adapt to look perfect on desktop, tablet, and mobile.</p>
+</div>
+</div>
+<!-- Bento Item 4: Medium Span -->
+<div class="md:col-span-2 bg-gradient-to-br from-surface to-surface-variant rounded-xl p-lg shadow-[0_2px_4px_rgba(0,0,0,0.05)] hover:shadow-[0_8px_16px_rgba(0,0,0,0.08)] transition-shadow duration-300 flex items-center overflow-hidden border border-outline-variant/30 relative">
+<div class="w-1/2 pr-8 z-10">
+<h3 class="font-headline-md text-headline-md mb-2">Seamless Collaboration</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant mb-6">Work together in real-time. Leave comments, share drafts, and iterate faster than ever.</p>
+<button class="font-label-md text-label-md text-primary font-semibold hover:underline flex items-center gap-1">
+                            Invite Team <span class="material-symbols-outlined text-sm" data-icon="arrow_forward">arrow_forward</span>
+</button>
+</div>
+<div class="absolute right-0 top-0 bottom-0 w-1/2">
+<img class="w-full h-full object-cover object-left opacity-90" data-alt="A bright, minimalist collage showing diverse, smiling professional avatars interconnected by flowing lines and small UI 'comment' bubbles. The aesthetic uses soft white backgrounds, pastel teal and purple accents, and diffused lighting to convey a sense of modern, friendly digital teamwork in a light mode setting." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDoaGu-MWRfkGeCW3jDQJpVFs2T8z1Op-DAVXu2mjDQjGliw7TR0ou7Rg4Qk8fJPpgVn5Edle1wG3SXAbMMdczwzIQgxEwLFIsJBVhpVGbgkC9EOuJStSpyrJtB_uNOlint2wjLdRChlB43UD1jOhjuBcTZdIGYHHyOjfcZI1Hs2HevzeY3SRT6vKsRzXXJhG6a-dRUkIN8vlsXz1XHMUBtG0WONjtgj8uVnoSi5WNB0MzHbo2kWrBF"/>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- BottomNavBar (Mobile Only) -->
+<nav class="fixed bottom-0 left-0 w-full flex justify-around items-center py-2 px-4 md:hidden bg-surface dark:bg-surface-container-highest rounded-t-xl shadow-[0px_-2px_10px_rgba(0,0,0,0.05)] z-50">
+<a class="flex flex-col items-center justify-center bg-primary-container dark:bg-primary text-on-primary-container dark:text-on-primary rounded-full px-4 py-1 active:scale-90 transition-transform duration-150" href="#">
+<span class="material-symbols-outlined" data-icon="home" style="font-variation-settings: 'FILL' 1;">home</span>
+<span class="font-label-sm text-label-sm mt-1">Home</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-outline-variant hover:bg-surface-variant dark:hover:bg-on-surface-variant/10 rounded-full px-4 py-1 active:scale-90 transition-transform duration-150" href="#">
+<span class="material-symbols-outlined" data-icon="description">description</span>
+<span class="font-label-sm text-label-sm mt-1">Drafts</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-outline-variant hover:bg-surface-variant dark:hover:bg-on-surface-variant/10 rounded-full px-4 py-1 active:scale-90 transition-transform duration-150" href="#">
+<span class="material-symbols-outlined" data-icon="auto_fix_high">auto_fix_high</span>
+<span class="font-label-sm text-label-sm mt-1">AI Import</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-outline-variant hover:bg-surface-variant dark:hover:bg-on-surface-variant/10 rounded-full px-4 py-1 active:scale-90 transition-transform duration-150" href="#">
+<span class="material-symbols-outlined" data-icon="person">person</span>
+<span class="font-label-sm text-label-sm mt-1">Profile</span>
+</a>
+</nav>
+<!-- Footer -->
+<footer class="w-full py-xl bg-surface-container-low dark:bg-surface-dim mt-auto mb-16 md:mb-0">
+<div class="flex flex-col md:flex-row justify-between items-center px-gutter max-w-7xl mx-auto space-y-md md:space-y-0">
+<div class="flex flex-col items-center md:items-start gap-2">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary dark:text-primary-fixed" data-icon="auto_awesome">auto_awesome</span>
+<span class="font-headline-md text-headline-md font-bold text-primary dark:text-primary-fixed">Sparkfolio</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant">© 2024 Sparkfolio AI. Empowering creators worldwide.</p>
+</div>
+<nav class="flex flex-wrap justify-center gap-x-6 gap-y-2">
+<a class="font-label-md text-label-md text-on-surface-variant dark:text-outline-variant hover:text-primary dark:hover:text-primary-fixed underline decoration-2 transition-all cursor-pointer" href="#">Privacy Policy</a>
+<a class="font-label-md text-label-md text-on-surface-variant dark:text-outline-variant hover:text-primary dark:hover:text-primary-fixed underline decoration-2 transition-all cursor-pointer" href="#">Terms of Service</a>
+<a class="font-label-md text-label-md text-on-surface-variant dark:text-outline-variant hover:text-primary dark:hover:text-primary-fixed underline decoration-2 transition-all cursor-pointer" href="#">Help Center</a>
+<a class="font-label-md text-label-md text-on-surface-variant dark:text-outline-variant hover:text-primary dark:hover:text-primary-fixed underline decoration-2 transition-all cursor-pointer" href="#">Feedback</a>
+</nav>
+</div>
+</footer>
+</body></html>

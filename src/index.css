@@ -1,0 +1,146 @@
+@tailwind base;
+  @tailwind components;
+  @tailwind utilities;
+
+  .material-symbols-outlined {
+    font-family: 'Material Symbols Outlined';
+    font-weight: normal;
+    font-style: normal;
+    font-size: 24px;
+    line-height: 1;
+    letter-spacing: normal;
+    text-transform: none;
+    display: inline-block;
+    white-space: nowrap;
+    word-wrap: normal;
+    direction: ltr;
+    -webkit-font-feature-settings: 'liga';
+    -webkit-font-smoothing: antialiased;
+  }
+
+  @media print{
+    #no-print{
+      display: none;
+    }
+
+    #print-area{
+      display: block;
+    }
+
+    body{
+      margin: 0;
+      padding: 0;
+      box-shadow: none;
+    }
+  }
+
+  @page{
+    size: auto;
+    margin: 0mm;
+  }
+
+  
+
+  .rsw-ce ul {
+    list-style: disc;
+    padding-left: 2em;
+  }
+  
+  .rsw-ce ol {
+    list-style: decimal;
+    padding-left: 2em;
+  }
+
+  ol, ul, menu {
+    list-style: disc;
+    margin: 0;
+    padding: 0;
+  }
+
+  /* Focus Rings for Accessibility */
+  *:focus-visible {
+    outline: 2px solid #573199;
+    outline-offset: 2px;
+  }
+
+  @layer base {
+    :root {
+      /* Colors - Resume.io Theme */
+      --color-ink: #1e2532;
+      --color-carbon: #0f141e;
+      --color-pencil: #656e83;
+      --color-fog: #828ba2;
+      --color-haze: #9fa6bb;
+      --color-paper: #ffffff;
+      --color-mist: #f7f9fc;
+      --color-lavender-wash: #f1f2ff;
+      --color-chalk: #d9deeb;
+      --color-ash: #e7eaf4;
+      --color-signal-blue: #1a91f0;
+      --color-deep-signal: #016fd0;
+      --color-iris: #5660e8;
+      --color-midnight: #1a1c6a;
+      --color-mint-whisper: #e7f4ed;
+      --color-blush-whisper: #ffebe4;
+      --color-rose-whisper: #edd7df;
+
+      /* Shadcn original vars mapped for compatibility */
+      --background: 0 0% 100%;
+      --foreground: 0 0% 12%;
+      --card: 0 0% 100%;
+      --card-foreground: 0 0% 12%;
+      --popover: 0 0% 100%;
+      --popover-foreground: 0 0% 12%;
+      --primary: 207 90% 52%; /* Signal Blue */
+      --primary-foreground: 0 0% 100%;
+      --secondary: 220 33% 98%;
+      --secondary-foreground: 220 20% 45%;
+      --muted: 220 33% 98%;
+      --muted-foreground: 220 20% 45%;
+      --accent: 220 33% 98%;
+      --accent-foreground: 220 20% 12%;
+      --destructive: 0 84.2% 60.2%;
+      --destructive-foreground: 0 0% 98%;
+      --border: 226 31% 89%; /* Chalk */
+      --input: 226 31% 89%;
+      --ring: 207 90% 52%;
+      --radius: 0.25rem; /* 4px for inputs, but we'll override buttons directly */
+    }
+
+    .dark {
+      /* Remove dark mode, force everything to light */
+    }
+  }
+
+  @layer base {
+    * {
+      @apply border-border;
+    }
+    body {
+      background-color: var(--color-paper);
+      color: var(--color-ink);
+    }
+  }
+
+/* Custom Webkit Scrollbar */
+.custom-scrollbar::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+    background: #dcd9d9;
+    border-radius: 9999px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: #bbc9ca;
+}
+
+/* Hardware Acceleration */
+.hardware-accelerated {
+  will-change: transform, opacity;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+}

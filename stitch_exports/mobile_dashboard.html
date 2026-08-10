@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Sparkfolio - Workspace</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Plus+Jakarta+Sans:wght@700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-tint": "#00696e",
+                        "secondary-fixed": "#ebdcff",
+                        "on-primary-fixed-variant": "#004f53",
+                        "surface-dim": "#dcd9d9",
+                        "primary-container": "#00c4cc",
+                        "secondary-container": "#8b3dff",
+                        "surface-variant": "#e5e2e1",
+                        "outline-variant": "#bbc9ca",
+                        "inverse-on-surface": "#f3f0ef",
+                        "surface-container-highest": "#e5e2e1",
+                        "on-tertiary-fixed-variant": "#890063",
+                        "on-primary-container": "#004c4f",
+                        "primary-fixed-dim": "#3cdae2",
+                        "on-surface-variant": "#3c494a",
+                        "primary-fixed": "#63f7ff",
+                        "on-secondary-fixed-variant": "#5d00c2",
+                        "on-error": "#ffffff",
+                        "error-container": "#ffdad6",
+                        "surface-container": "#f0eded",
+                        "inverse-surface": "#303030",
+                        "on-tertiary": "#ffffff",
+                        "inverse-primary": "#3cdae2",
+                        "on-secondary-fixed": "#270058",
+                        "surface": "#fcf9f8",
+                        "surface-container-low": "#f6f3f2",
+                        "surface-bright": "#fcf9f8",
+                        "error": "#ba1a1a",
+                        "on-tertiary-fixed": "#3c0029",
+                        "secondary": "#710fe5",
+                        "on-primary": "#ffffff",
+                        "surface-container-high": "#eae7e7",
+                        "on-background": "#1b1b1c",
+                        "on-secondary": "#ffffff",
+                        "primary": "#00696e",
+                        "surface-container-lowest": "#ffffff",
+                        "tertiary-container": "#ff8acc",
+                        "outline": "#6c7a7a",
+                        "background": "#fcf9f8",
+                        "on-tertiary-container": "#84005f",
+                        "on-primary-fixed": "#002021",
+                        "tertiary-fixed": "#ffd8e9",
+                        "on-secondary-container": "#faf1ff",
+                        "on-error-container": "#93000a",
+                        "on-surface": "#1b1b1c",
+                        "secondary-fixed-dim": "#d4bbff",
+                        "tertiary-fixed-dim": "#ffaed8",
+                        "tertiary": "#ad1d7f"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "xl": "48px",
+                        "md": "16px",
+                        "gutter": "16px",
+                        "container-margin": "24px",
+                        "sm": "8px",
+                        "xs": "4px",
+                        "lg": "24px",
+                        "base": "4px"
+                    },
+                    "fontFamily": {
+                        "label-sm": ["Inter"],
+                        "headline-xl": ["Plus Jakarta Sans"],
+                        "label-md": ["Inter"],
+                        "headline-lg-mobile": ["Plus Jakarta Sans"],
+                        "headline-lg": ["Plus Jakarta Sans"],
+                        "headline-md": ["Plus Jakarta Sans"],
+                        "body-md": ["Inter"],
+                        "body-sm": ["Inter"],
+                        "body-lg": ["Inter"]
+                    },
+                    "fontSize": {
+                        "label-sm": ["12px", { "lineHeight": "1", "fontWeight": "500" }],
+                        "headline-xl": ["48px", { "lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "800" }],
+                        "label-md": ["14px", { "lineHeight": "1", "letterSpacing": "0.01em", "fontWeight": "600" }],
+                        "headline-lg-mobile": ["28px", { "lineHeight": "1.2", "fontWeight": "700" }],
+                        "headline-lg": ["32px", { "lineHeight": "1.2", "letterSpacing": "-0.01em", "fontWeight": "700" }],
+                        "headline-md": ["24px", { "lineHeight": "1.3", "fontWeight": "700" }],
+                        "body-md": ["16px", { "lineHeight": "1.5", "fontWeight": "400" }],
+                        "body-sm": ["14px", { "lineHeight": "1.5", "fontWeight": "400" }],
+                        "body-lg": ["18px", { "lineHeight": "1.6", "fontWeight": "400" }]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .material-symbols-outlined[data-weight="fill"] {
+            font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-background min-h-screen font-body-md">
+<!-- TopAppBar -->
+<header class="fixed top-0 w-full z-50 bg-surface/80 dark:bg-surface-container/80 backdrop-blur-md bg-surface/40 dark:bg-surface-container/40 shadow-sm transition-all duration-200">
+<div class="flex justify-between items-center h-16 px-gutter max-w-7xl mx-auto w-full">
+<div class="flex items-center gap-sm">
+<span class="material-symbols-outlined text-primary dark:text-primary-fixed" data-icon="auto_awesome">auto_awesome</span>
+<span class="font-headline-md text-headline-md font-bold text-primary dark:text-primary-fixed">Sparkfolio</span>
+</div>
+<!-- Desktop Nav -->
+<nav class="hidden md:flex gap-md items-center font-label-md text-label-md">
+<a class="text-primary dark:text-primary-fixed font-bold border-b-2 border-primary dark:border-primary-fixed pb-1 hover:text-primary dark:hover:text-primary-fixed transition-colors active:scale-95" href="#">Home</a>
+<a class="text-on-surface-variant dark:text-outline-variant font-medium hover:text-primary dark:hover:text-primary-fixed transition-colors active:scale-95" href="#">Drafts</a>
+<a class="text-on-surface-variant dark:text-outline-variant font-medium hover:text-primary dark:hover:text-primary-fixed transition-colors active:scale-95" href="#">AI Import</a>
+<a class="text-on-surface-variant dark:text-outline-variant font-medium hover:text-primary dark:hover:text-primary-fixed transition-colors active:scale-95" href="#">Profile</a>
+</nav>
+<div class="flex items-center">
+<img alt="User profile photo" class="w-8 h-8 rounded-full object-cover" data-alt="A small circular profile picture of a young professional smiling warmly, bathed in soft, natural daylight against a neutral grey studio background. The style is modern, approachable, and corporate-casual, fitting a minimalist UI design system." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDyBfe70H4PqfHO6NeuncufRZdlNAgKTfCV1uYMy3-fsEVU4mBPjAm97npz5XXPXNlnCzT9e1AA55gkIi1TtdFkaT5Nif8l1zlCxflgvD01dR-_S-C6iMk9b1rJL_a2rplvS7IqEn84zV5x7hPiNo81Ba7RtOyo_zfjlFIJ2ubPJRLfpt_Hv9-JgtjHSqnk7ljIgZTwYeHH4w3LA74fW-DbY8mCJdTTAAluELRamHap09a8BDDZdp-8"/>
+</div>
+</div>
+</header>
+<!-- Main Content -->
+<main class="pt-[80px] pb-[80px] md:pb-xl px-gutter md:px-container-margin max-w-7xl mx-auto min-h-screen">
+<!-- Welcome Section -->
+<section class="mt-lg mb-xl">
+<h1 class="font-headline-xl text-headline-xl text-primary mb-sm">Welcome back, Alex!</h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant">Let's create something amazing today.</p>
+</section>
+<!-- Quick Actions (Bento Grid Style) -->
+<section class="grid grid-cols-1 md:grid-cols-2 gap-md mb-xl">
+<!-- New Resume Action Card -->
+<button class="group flex flex-col items-center justify-center p-xl bg-surface-container-low hover:bg-white rounded-xl shadow-[0px_2px_4px_rgba(0,0,0,0.05)] hover:shadow-[0px_8px_16px_rgba(0,0,0,0.08)] transition-all duration-300 border border-transparent hover:border-primary-container text-center h-48 active:scale-95">
+<div class="w-16 h-16 rounded-full bg-primary-container/20 flex items-center justify-center mb-md group-hover:bg-primary-container transition-colors">
+<span class="material-symbols-outlined text-primary group-hover:text-on-primary-container text-4xl" data-icon="article">article</span>
+</div>
+<span class="font-headline-md text-headline-md text-on-surface">New Resume</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant mt-xs">Start from scratch or template</span>
+</button>
+<!-- New Portfolio Action Card -->
+<button class="group flex flex-col items-center justify-center p-xl bg-surface-container-low hover:bg-white rounded-xl shadow-[0px_2px_4px_rgba(0,0,0,0.05)] hover:shadow-[0px_8px_16px_rgba(0,0,0,0.08)] transition-all duration-300 border border-transparent hover:border-secondary-container text-center h-48 active:scale-95">
+<div class="w-16 h-16 rounded-full bg-secondary-container/20 flex items-center justify-center mb-md group-hover:bg-secondary-container transition-colors">
+<span class="material-symbols-outlined text-secondary group-hover:text-white text-4xl" data-icon="web">web</span>
+</div>
+<span class="font-headline-md text-headline-md text-on-surface">New Portfolio</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant mt-xs">Showcase your best work</span>
+</button>
+</section>
+<!-- Recent Projects Section -->
+<section>
+<div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-md gap-md">
+<h2 class="font-headline-lg text-headline-lg text-on-surface">Recent Projects</h2>
+<!-- Search & Filter -->
+<div class="flex items-center gap-sm w-full md:w-auto">
+<div class="relative w-full md:w-64">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline" data-icon="search">search</span>
+<input class="w-full bg-[#F4F7F7] focus:bg-white border-none focus:ring-2 focus:ring-primary rounded-lg py-2 pl-10 pr-4 font-body-sm text-body-sm transition-all h-10 shadow-[0px_2px_4px_rgba(0,0,0,0.05)] focus:shadow-[0px_8px_16px_rgba(0,0,0,0.08)]" placeholder="Search projects..." type="text"/>
+</div>
+<button class="h-10 px-4 rounded-lg bg-surface-container-low hover:bg-surface-variant text-on-surface-variant font-label-md text-label-md flex items-center gap-sm shadow-[0px_2px_4px_rgba(0,0,0,0.05)] transition-all">
+<span class="material-symbols-outlined text-sm" data-icon="filter_list">filter_list</span>
+                        Filter
+                    </button>
+</div>
+</div>
+<!-- Tabs -->
+<div class="flex gap-md border-b border-surface-variant mb-lg overflow-x-auto pb-xs">
+<button class="font-label-md text-label-md text-primary font-bold border-b-2 border-primary pb-2 px-sm whitespace-nowrap">All Projects</button>
+<button class="font-label-md text-label-md text-on-surface-variant hover:text-primary transition-colors pb-2 px-sm whitespace-nowrap">Resumes</button>
+<button class="font-label-md text-label-md text-on-surface-variant hover:text-primary transition-colors pb-2 px-sm whitespace-nowrap">Portfolios</button>
+</div>
+<!-- Project Grid -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-md">
+<!-- Project Card 1 -->
+<div class="group bg-white rounded-xl shadow-[0px_2px_4px_rgba(0,0,0,0.05)] hover:shadow-[0px_8px_16px_rgba(0,0,0,0.08)] transition-all duration-300 overflow-hidden flex flex-col cursor-pointer border border-surface-container-low">
+<div class="h-32 bg-surface-variant relative">
+<div class="bg-cover bg-center w-full h-full opacity-80 group-hover:opacity-100 transition-opacity" data-alt="A minimalist digital mockup of a modern professional resume on a pristine white canvas, featuring clean typography and subtle soft teal accent headers, sitting on a soft grey gradient background with diffused lighting." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuBB2UE1eVvs5q0gDWcvjbsY_dYZ6Ah2IfO7pR2cmZU_48FWiEzU6Yfd4XF-UvBmCch9HKnRkmNniUMK_Y7op73Rlc7QZxtt6lSwAOrq-MlVlGzpFNxtRKz7TybHz4KFFCzQjXxiEOQNNNdWToJH_MN1N7HRcnrTmUrbltrW2T3rs637K6YpSLBfb86xkkYMYa3eP0_kLh-0NJamABLf9CJKArwarLKoL3eIg_YTzu5TGjxNhfwG9YD7')"></div>
+<div class="absolute top-2 right-2 flex gap-xs">
+<span class="bg-surface/80 backdrop-blur-sm px-2 py-1 rounded-full font-label-sm text-label-sm text-on-surface">Resume</span>
+</div>
+</div>
+<div class="p-md flex-1 flex flex-col">
+<h3 class="font-headline-md text-headline-md text-on-surface mb-xs group-hover:text-primary transition-colors">Tech Lead Resume 2024</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant mb-sm">Edited 2 hours ago</p>
+<div class="mt-auto flex justify-between items-center">
+<span class="inline-flex items-center gap-xs text-xs font-label-sm text-label-sm bg-primary/10 text-primary px-2 py-1 rounded-full">
+<span class="material-symbols-outlined text-[14px]" data-icon="check_circle">check_circle</span> Complete
+                            </span>
+<button class="text-outline hover:text-primary transition-colors">
+<span class="material-symbols-outlined" data-icon="more_vert">more_vert</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Project Card 2 -->
+<div class="group bg-white rounded-xl shadow-[0px_2px_4px_rgba(0,0,0,0.05)] hover:shadow-[0px_8px_16px_rgba(0,0,0,0.08)] transition-all duration-300 overflow-hidden flex flex-col cursor-pointer border border-surface-container-low">
+<div class="h-32 bg-surface-variant relative">
+<div class="bg-cover bg-center w-full h-full opacity-80 group-hover:opacity-100 transition-opacity" data-alt="A modern web portfolio layout mockup featuring a clean, dark mode hero section with an abstract vibrant purple geometric graphic, displayed neatly on a flat light grey studio surface." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCxSYgLGbnSe7Mtv7x9EsPHoRkOnVO3D1BExSuNFR4FKrOAaBzYcZRariSRuqPcMFADTwsqNRyWMeRdUhvFYJgJaAlVLYX7AlPwcsPRvMEHs8bU6qrSRLVCeYk-3iwnOhvjfC7U-NqgIqwDz9YZOfySsJzdjYRr6BkH-FN0S1ZdD_Bl5_Ad0fVM2dIL0mFWUkkIatSpWcf-OXt-_qTlNHO0mRtPXx8prERv-1376d2sM-OnBTOnzhEF')"></div>
+<div class="absolute top-2 right-2 flex gap-xs">
+<span class="bg-surface/80 backdrop-blur-sm px-2 py-1 rounded-full font-label-sm text-label-sm text-on-surface">Portfolio</span>
+</div>
+</div>
+<div class="p-md flex-1 flex flex-col">
+<h3 class="font-headline-md text-headline-md text-on-surface mb-xs group-hover:text-primary transition-colors">Creative Director Site</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant mb-sm">Edited yesterday</p>
+<div class="mt-auto flex justify-between items-center">
+<span class="inline-flex items-center gap-xs text-xs font-label-sm text-label-sm bg-secondary/10 text-secondary px-2 py-1 rounded-full">
+<span class="material-symbols-outlined text-[14px]" data-icon="edit">edit</span> Draft
+                            </span>
+<button class="text-outline hover:text-primary transition-colors">
+<span class="material-symbols-outlined" data-icon="more_vert">more_vert</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Project Card 3 (Empty State / Create New inline) -->
+<div class="group bg-surface-container-lowest border-2 border-dashed border-outline-variant hover:border-primary-container rounded-xl flex flex-col items-center justify-center p-md cursor-pointer transition-colors active:scale-95 h-full min-h-[240px]">
+<div class="w-12 h-12 rounded-full bg-surface-container flex items-center justify-center mb-sm group-hover:bg-primary-container/20 transition-colors">
+<span class="material-symbols-outlined text-outline group-hover:text-primary transition-colors" data-icon="add">add</span>
+</div>
+<span class="font-label-md text-label-md text-on-surface-variant group-hover:text-primary transition-colors">Create blank project</span>
+</div>
+</div>
+</section>
+</main>
+<!-- FAB for Create New (Mobile) -->
+<button class="fixed bottom-[88px] right-gutter md:hidden w-14 h-14 bg-primary text-white rounded-full shadow-[0px_12px_32px_rgba(0,0,0,0.12)] flex items-center justify-center hover:bg-surface-tint active:scale-90 transition-all z-40">
+<span class="material-symbols-outlined" data-icon="add">add</span>
+</button>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 left-0 w-full flex justify-around items-center py-2 px-4 md:hidden z-50 rounded-t-xl bg-surface dark:bg-surface-container-highest shadow-lg bg-surface dark:bg-surface-container-highest shadow-[0px_-2px_10px_rgba(0,0,0,0.05)]">
+<button class="flex flex-col items-center justify-center bg-primary-container dark:bg-primary text-on-primary-container dark:text-on-primary rounded-full px-4 py-1 active:scale-90 transition-transform duration-150">
+<span class="material-symbols-outlined" data-icon="home" data-weight="fill">home</span>
+<span class="font-label-sm text-label-sm mt-1">Home</span>
+</button>
+<button class="flex flex-col items-center justify-center text-on-surface-variant dark:text-outline-variant hover:bg-surface-variant dark:hover:bg-on-surface-variant/10 rounded-full px-4 py-1 active:scale-90 transition-transform duration-150">
+<span class="material-symbols-outlined" data-icon="description">description</span>
+<span class="font-label-sm text-label-sm mt-1">Drafts</span>
+</button>
+<button class="flex flex-col items-center justify-center text-on-surface-variant dark:text-outline-variant hover:bg-surface-variant dark:hover:bg-on-surface-variant/10 rounded-full px-4 py-1 active:scale-90 transition-transform duration-150">
+<span class="material-symbols-outlined" data-icon="auto_fix_high">auto_fix_high</span>
+<span class="font-label-sm text-label-sm mt-1">AI Import</span>
+</button>
+<button class="flex flex-col items-center justify-center text-on-surface-variant dark:text-outline-variant hover:bg-surface-variant dark:hover:bg-on-surface-variant/10 rounded-full px-4 py-1 active:scale-90 transition-transform duration-150">
+<span class="material-symbols-outlined" data-icon="person">person</span>
+<span class="font-label-sm text-label-sm mt-1">Profile</span>
+</button>
+</nav>
+<!-- Footer -->
+<footer class="w-full py-xl bg-surface-container-low dark:bg-surface-dim hidden md:block mt-auto">
+<div class="flex flex-col md:flex-row justify-between items-center px-gutter max-w-7xl mx-auto space-y-md md:space-y-0">
+<div class="font-body-sm text-body-sm text-on-surface-variant dark:text-outline-variant">
+                © 2024 Sparkfolio AI. Empowering creators worldwide.
+            </div>
+<nav class="flex gap-md font-label-md text-label-md text-on-surface-variant dark:text-outline-variant cursor-pointer">
+<a class="hover:text-primary dark:hover:text-primary-fixed underline decoration-2 transition-all" href="#">Privacy Policy</a>
+<a class="hover:text-primary dark:hover:text-primary-fixed underline decoration-2 transition-all" href="#">Terms of Service</a>
+<a class="hover:text-primary dark:hover:text-primary-fixed underline decoration-2 transition-all" href="#">Help Center</a>
+<a class="hover:text-primary dark:hover:text-primary-fixed underline decoration-2 transition-all" href="#">Feedback</a>
+</nav>
+</div>
+</footer>
+</body></html>

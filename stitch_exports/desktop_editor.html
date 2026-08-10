@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Sparkfolio Editor</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@700;800&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-secondary-fixed": "#270058",
+                        "on-secondary": "#ffffff",
+                        "primary-fixed-dim": "#3cdae2",
+                        "on-secondary-container": "#faf1ff",
+                        "surface-container-low": "#f6f3f2",
+                        "secondary-container": "#8b3dff",
+                        "primary": "#00696e",
+                        "on-error": "#ffffff",
+                        "error": "#ba1a1a",
+                        "primary-container": "#00c4cc",
+                        "surface-tint": "#00696e",
+                        "outline": "#6c7a7a",
+                        "surface-container-high": "#eae7e7",
+                        "inverse-surface": "#303030",
+                        "tertiary-fixed-dim": "#ffaed8",
+                        "on-background": "#1b1b1c",
+                        "surface-container-highest": "#e5e2e1",
+                        "surface-variant": "#e5e2e1",
+                        "on-primary": "#ffffff",
+                        "surface-dim": "#dcd9d9",
+                        "surface": "#fcf9f8",
+                        "on-tertiary": "#ffffff",
+                        "on-error-container": "#93000a",
+                        "inverse-on-surface": "#f3f0ef",
+                        "on-primary-container": "#004c4f",
+                        "surface-bright": "#fcf9f8",
+                        "primary-fixed": "#63f7ff",
+                        "secondary-fixed": "#ebdcff",
+                        "on-secondary-fixed-variant": "#5d00c2",
+                        "tertiary": "#ad1d7f",
+                        "tertiary-container": "#ff8acc",
+                        "on-tertiary-fixed-variant": "#890063",
+                        "on-tertiary-container": "#84005f",
+                        "background": "#fcf9f8",
+                        "on-tertiary-fixed": "#3c0029",
+                        "on-surface-variant": "#3c494a",
+                        "surface-container-lowest": "#ffffff",
+                        "on-surface": "#1b1b1c",
+                        "outline-variant": "#bbc9ca",
+                        "on-primary-fixed-variant": "#004f53",
+                        "on-primary-fixed": "#002021",
+                        "secondary": "#710fe5",
+                        "secondary-fixed-dim": "#d4bbff",
+                        "error-container": "#ffdad6",
+                        "tertiary-fixed": "#ffd8e9",
+                        "surface-container": "#f0eded",
+                        "inverse-primary": "#3cdae2"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "sm": "8px",
+                        "xl": "48px",
+                        "base": "4px",
+                        "xs": "4px",
+                        "gutter": "16px",
+                        "md": "16px",
+                        "container-margin": "24px",
+                        "lg": "24px"
+                    },
+                    "fontFamily": {
+                        "headline-md": ["Plus Jakarta Sans"],
+                        "label-md": ["Inter"],
+                        "label-sm": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "headline-lg": ["Plus Jakarta Sans"],
+                        "body-sm": ["Inter"],
+                        "headline-lg-mobile": ["Plus Jakarta Sans"],
+                        "headline-xl": ["Plus Jakarta Sans"],
+                        "body-md": ["Inter"]
+                    },
+                    "fontSize": {
+                        "headline-md": ["24px", { "lineHeight": "1.3", "fontWeight": "700" }],
+                        "label-md": ["14px", { "lineHeight": "1", "letterSpacing": "0.01em", "fontWeight": "600" }],
+                        "label-sm": ["12px", { "lineHeight": "1", "fontWeight": "500" }],
+                        "body-lg": ["18px", { "lineHeight": "1.6", "fontWeight": "400" }],
+                        "headline-lg": ["32px", { "lineHeight": "1.2", "letterSpacing": "-0.01em", "fontWeight": "700" }],
+                        "body-sm": ["14px", { "lineHeight": "1.5", "fontWeight": "400" }],
+                        "headline-lg-mobile": ["28px", { "lineHeight": "1.2", "fontWeight": "700" }],
+                        "headline-xl": ["48px", { "lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "800" }],
+                        "body-md": ["16px", { "lineHeight": "1.5", "fontWeight": "400" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .editor-layout {
+            display: grid;
+            grid-template-rows: auto 1fr;
+            height: 100vh;
+            overflow: hidden;
+        }
+        .workspace-split {
+            display: grid;
+            grid-template-columns: 360px 1fr;
+            height: 100%;
+            overflow: hidden;
+        }
+        /* Custom scrollbar for webkit */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #dcd9d9;
+            border-radius: 9999px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #bbc9ca;
+        }
+    </style>
+</head>
+<body class="bg-surface text-on-surface font-body-md h-screen w-screen overflow-hidden editor-layout">
+<!-- Top Toolbar (Derived from TopAppBar logic, adjusted for Editor Context) -->
+<header class="bg-surface-container-lowest border-b border-outline-variant/30 px-gutter h-16 flex items-center justify-between shrink-0 shadow-sm z-20 relative">
+<div class="flex items-center gap-sm">
+<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">auto_awesome</span>
+<span class="font-headline-md text-headline-md font-bold text-primary">Sparkfolio</span>
+<span class="ml-sm px-2 py-1 bg-surface-container-highest rounded-md font-label-sm text-label-sm text-on-surface-variant flex items-center gap-xs">
+                Draft - Last saved 2m ago
+            </span>
+</div>
+<div class="flex items-center gap-md">
+<!-- Viewport Switcher -->
+<div class="flex bg-surface-container-low rounded-lg p-xs">
+<button class="p-2 rounded-md bg-surface shadow-[0px_2px_4px_rgba(0,0,0,0.05)] text-primary hover:text-primary transition-colors flex items-center justify-center">
+<span class="material-symbols-outlined text-[20px]">desktop_mac</span>
+</button>
+<button class="p-2 rounded-md text-on-surface-variant hover:text-primary transition-colors flex items-center justify-center">
+<span class="material-symbols-outlined text-[20px]">smartphone</span>
+</button>
+</div>
+<!-- Publish Button -->
+<button class="h-10 px-md bg-primary text-on-primary rounded-lg font-label-md text-label-md hover:bg-primary/90 hover:-translate-y-[1px] transition-all shadow-[0px_2px_4px_rgba(0,0,0,0.05)] flex items-center gap-sm">
+<span class="material-symbols-outlined text-[18px]">rocket_launch</span>
+                Publish
+            </button>
+</div>
+</header>
+<!-- Workspace Area -->
+<main class="workspace-split bg-surface-container-low">
+<!-- Left Sidebar: Content Editor -->
+<aside class="bg-surface-container-lowest border-r border-outline-variant/30 h-full overflow-y-auto flex flex-col z-10 shadow-[4px_0px_24px_rgba(0,0,0,0.02)]">
+<!-- Editor Tabs -->
+<div class="flex border-b border-outline-variant/30 sticky top-0 bg-surface-container-lowest z-10">
+<button class="flex-1 py-3 text-center border-b-2 border-primary text-primary font-label-md text-label-md font-bold transition-colors">Content</button>
+<button class="flex-1 py-3 text-center border-b-2 border-transparent text-on-surface-variant hover:text-primary font-label-md text-label-md transition-colors">Theme</button>
+<button class="flex-1 py-3 text-center border-b-2 border-transparent text-on-surface-variant hover:text-primary font-label-md text-label-md transition-colors">Settings</button>
+</div>
+<div class="p-md flex flex-col gap-lg pb-xl">
+<!-- Section: Personal Info -->
+<div class="flex flex-col gap-md">
+<div class="flex items-center justify-between cursor-pointer group">
+<h3 class="font-label-md text-label-md text-on-surface font-bold uppercase tracking-wider">Hero Section</h3>
+<span class="material-symbols-outlined text-on-surface-variant group-hover:text-primary transition-colors">expand_less</span>
+</div>
+<div class="flex flex-col gap-sm">
+<div class="flex flex-col gap-xs">
+<label class="font-label-sm text-label-sm text-on-surface-variant">Name</label>
+<input class="h-10 rounded-lg bg-[#F4F7F7] border border-transparent focus:bg-surface-container-lowest focus:border-primary focus:ring-0 transition-colors px-sm font-body-sm text-body-sm text-on-surface outline-none shadow-[inset_0px_2px_4px_rgba(0,0,0,0.02)]" type="text" value="Jane Doe"/>
+</div>
+<div class="flex flex-col gap-xs">
+<label class="font-label-sm text-label-sm text-on-surface-variant">Headline</label>
+<input class="h-10 rounded-lg bg-[#F4F7F7] border border-transparent focus:bg-surface-container-lowest focus:border-primary focus:ring-0 transition-colors px-sm font-body-sm text-body-sm text-on-surface outline-none shadow-[inset_0px_2px_4px_rgba(0,0,0,0.02)]" type="text" value="Product Designer &amp; AI Enthusiast"/>
+</div>
+<div class="flex flex-col gap-xs">
+<label class="font-label-sm text-label-sm text-on-surface-variant">Bio</label>
+<textarea class="rounded-lg bg-[#F4F7F7] border border-transparent focus:bg-surface-container-lowest focus:border-primary focus:ring-0 transition-colors p-sm font-body-sm text-body-sm text-on-surface outline-none resize-none shadow-[inset_0px_2px_4px_rgba(0,0,0,0.02)]" rows="4">Crafting intuitive digital experiences with a focus on human-centered design. Currently exploring the intersection of AI and user interfaces.</textarea>
+</div>
+</div>
+</div>
+<!-- Divider -->
+<div class="h-px w-full bg-outline-variant/30"></div>
+<!-- Section: Projects -->
+<div class="flex flex-col gap-md">
+<div class="flex items-center justify-between cursor-pointer group">
+<h3 class="font-label-md text-label-md text-on-surface font-bold uppercase tracking-wider">Featured Projects</h3>
+<span class="material-symbols-outlined text-on-surface-variant group-hover:text-primary transition-colors">expand_more</span>
+</div>
+<!-- Draggable Project Items -->
+<div class="flex flex-col gap-sm">
+<div class="bg-surface border border-outline-variant/30 rounded-lg p-sm flex items-center gap-sm cursor-move hover:shadow-[0px_2px_4px_rgba(0,0,0,0.05)] transition-shadow group">
+<span class="material-symbols-outlined text-outline text-[18px]">drag_indicator</span>
+<div class="w-10 h-10 rounded-md bg-secondary-container/20 flex-shrink-0 flex items-center justify-center">
+<span class="material-symbols-outlined text-secondary text-[20px]">palette</span>
+</div>
+<div class="flex-1 overflow-hidden">
+<p class="font-label-sm text-label-sm text-on-surface truncate">Fintech Dashboard Redesign</p>
+<p class="font-body-sm text-body-sm text-on-surface-variant text-[11px] truncate">UI/UX • 2023</p>
+</div>
+<button class="text-outline hover:text-error transition-colors p-1 opacity-0 group-hover:opacity-100"><span class="material-symbols-outlined text-[18px]">delete</span></button>
+</div>
+<div class="bg-surface border border-outline-variant/30 rounded-lg p-sm flex items-center gap-sm cursor-move hover:shadow-[0px_2px_4px_rgba(0,0,0,0.05)] transition-shadow group">
+<span class="material-symbols-outlined text-outline text-[18px]">drag_indicator</span>
+<div class="w-10 h-10 rounded-md bg-tertiary-container/20 flex-shrink-0 flex items-center justify-center">
+<span class="material-symbols-outlined text-tertiary text-[20px]">smart_toy</span>
+</div>
+<div class="flex-1 overflow-hidden">
+<p class="font-label-sm text-label-sm text-on-surface truncate">AI Chat Assistant</p>
+<p class="font-body-sm text-body-sm text-on-surface-variant text-[11px] truncate">Interaction Design • 2024</p>
+</div>
+<button class="text-outline hover:text-error transition-colors p-1 opacity-0 group-hover:opacity-100"><span class="material-symbols-outlined text-[18px]">delete</span></button>
+</div>
+<button class="w-full py-2 mt-2 border border-dashed border-primary/50 text-primary rounded-lg font-label-sm text-label-sm flex items-center justify-center gap-xs hover:bg-primary/5 transition-colors">
+<span class="material-symbols-outlined text-[18px]">add</span> Add Project
+                        </button>
+</div>
+</div>
+</div>
+</aside>
+<!-- Right Preview Canvas -->
+<section class="h-full w-full overflow-hidden flex flex-col bg-surface-container p-md relative">
+<!-- Canvas Controls Overlay -->
+<div class="absolute top-md left-1/2 -translate-x-1/2 z-20 bg-surface-container-lowest/80 backdrop-blur-md px-4 py-2 rounded-full shadow-[0px_8px_16px_rgba(0,0,0,0.08)] flex items-center gap-md border border-outline-variant/20">
+<span class="font-label-sm text-label-sm text-on-surface-variant">Live Preview</span>
+<div class="w-px h-4 bg-outline-variant"></div>
+<button class="text-primary hover:text-primary-container transition-colors" title="Refresh Preview">
+<span class="material-symbols-outlined text-[18px]">refresh</span>
+</button>
+<button class="text-on-surface-variant hover:text-primary transition-colors" title="Open in new tab">
+<span class="material-symbols-outlined text-[18px]">open_in_new</span>
+</button>
+</div>
+<!-- Browser Chrome Wrapper (simulated) -->
+<div class="w-full max-w-[1024px] mx-auto h-full flex flex-col bg-surface-container-lowest rounded-xl shadow-[0px_12px_32px_rgba(0,0,0,0.12)] overflow-hidden border border-outline-variant/20 mt-8 relative">
+<!-- Mock Browser Bar -->
+<div class="h-10 bg-surface-container border-b border-outline-variant/30 flex items-center px-4 gap-2 shrink-0">
+<div class="flex gap-1.5">
+<div class="w-3 h-3 rounded-full bg-error/80"></div>
+<div class="w-3 h-3 rounded-full bg-[#fbbc04]"></div>
+<div class="w-3 h-3 rounded-full bg-[#34a853]"></div>
+</div>
+<div class="mx-auto bg-surface-container-lowest border border-outline-variant/30 rounded-md h-6 w-1/2 flex items-center justify-center px-2">
+<span class="font-label-sm text-label-sm text-on-surface-variant/50 text-[10px]">janedoe.sparkfolio.com</span>
+</div>
+</div>
+<!-- Iframe / Rendered Content Container -->
+<div class="flex-1 overflow-y-auto bg-background relative w-full h-full p-8 scroll-smooth">
+<!-- Dummy Portfolio Content Rendering -->
+<div class="max-w-4xl mx-auto space-y-xl mt-12 pb-xl">
+<!-- Rendered Hero -->
+<div class="text-center space-y-md">
+<div class="w-24 h-24 mx-auto rounded-full bg-primary/10 flex items-center justify-center mb-4">
+<span class="material-symbols-outlined text-primary text-[48px]">face</span>
+</div>
+<h1 class="font-headline-xl text-headline-xl text-on-surface">Jane Doe</h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant max-w-2xl mx-auto">Crafting intuitive digital experiences with a focus on human-centered design. Currently exploring the intersection of AI and user interfaces.</p>
+<div class="flex items-center justify-center gap-sm pt-4">
+<button class="px-6 py-3 bg-primary text-on-primary rounded-full font-label-md text-label-md hover:bg-primary/90 transition-colors">Get in touch</button>
+<button class="px-6 py-3 border border-outline rounded-full font-label-md text-label-md text-on-surface hover:bg-surface-variant transition-colors">View Resume</button>
+</div>
+</div>
+<!-- Rendered Projects Bento Grid -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-md mt-xl">
+<div class="bg-surface border border-outline-variant/20 rounded-xl p-md aspect-square flex flex-col justify-between group hover:shadow-[0px_8px_16px_rgba(0,0,0,0.08)] transition-all cursor-pointer relative overflow-hidden">
+<div class="absolute inset-0 bg-secondary/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+<div class="w-12 h-12 rounded-lg bg-secondary-container/20 flex items-center justify-center">
+<span class="material-symbols-outlined text-secondary">palette</span>
+</div>
+<div>
+<h3 class="font-headline-md text-headline-md text-on-surface mb-1">Fintech Dashboard</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Streamlining complex financial data into actionable insights for retail investors.</p>
+</div>
+</div>
+<div class="bg-surface border border-outline-variant/20 rounded-xl p-md aspect-square flex flex-col justify-between group hover:shadow-[0px_8px_16px_rgba(0,0,0,0.08)] transition-all cursor-pointer relative overflow-hidden">
+<div class="absolute inset-0 bg-tertiary/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+<div class="w-12 h-12 rounded-lg bg-tertiary-container/20 flex items-center justify-center">
+<span class="material-symbols-outlined text-tertiary">smart_toy</span>
+</div>
+<div>
+<h3 class="font-headline-md text-headline-md text-on-surface mb-1">AI Chat Assistant</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Conversational interface design focusing on empathy and clarity in automated support.</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+</main>
+</body></html>
