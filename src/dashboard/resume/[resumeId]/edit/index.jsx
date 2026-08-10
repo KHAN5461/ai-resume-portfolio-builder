@@ -72,7 +72,6 @@ function EditResume() {
                 Launch
               </button>
             </div>
-          </div>
         </header>
 
         <ExportModal 

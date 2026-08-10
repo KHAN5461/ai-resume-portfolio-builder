@@ -1,7 +1,8 @@
 import { configureStore } from '@reduxjs/toolkit';
 import resumeReducer from './resumeSlice';
 import portfolioReducer from './portfolioSlice';
-import { supabase } from '../lib/supabaseClient';
+import { auth, db } from '../lib/firebaseConfig';
+import { doc, setDoc } from 'firebase/firestore';
 
 // Safe load from LocalStorage (Fallback)
 const loadState = () => {
@@ -16,20 +17,19 @@ const loadState = () => {
   }
 };
 
-// Safe save to LocalStorage and Supabase
+// Safe save to LocalStorage and Firebase
 const saveState = async (state) => {
   try {
     const serializedState = JSON.stringify(state);
     localStorage.setItem('sparkfolio_state', serializedState);
 
-    // Try to save to Supabase if authenticated
-    const { data: { session } } = await supabase.auth.getSession();
-    if (session?.user) {
-      await supabase.from('user_data').upsert({
-        id: session.user.id,
+    // Try to save to Firebase if authenticated
+    const user = auth.currentUser;
+    if (user) {
+      await setDoc(doc(db, 'user_data', user.uid), {
         state_data: state,
         updated_at: new Date().toISOString()
-      }, { onConflict: 'id' });
+      }, { merge: true });
     }
   } catch {
     // ignore write errors
@@ -54,5 +54,5 @@ store.subscribe(() => {
       resume: store.getState().resume,
       portfolio: store.getState().portfolio
     });
-  }, 1000); // 1s debounce to avoid spamming Supabase
+  }, 1000); // 1s debounce to avoid spamming Firebase
 });

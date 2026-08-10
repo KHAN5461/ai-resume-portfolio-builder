@@ -1,152 +1,160 @@
-import { supabase } from '../lib/supabaseClient';
+import { db } from '../lib/firebaseConfig';
+import { collection, doc, setDoc, getDoc, getDocs, query, where, updateDoc, deleteDoc } from 'firebase/firestore';
 
 const GetUserResumes = async (userEmail) => {
-    // Assuming 'resumes' table has columns: documentId, userEmail, title, data (jsonb)
-    const { data, error } = await supabase
-        .from('resumes')
-        .select('*')
-        .eq('userEmail', userEmail);
-    
-    if (error) {
-        console.error("Supabase Error:", error);
-        // Fallback to local storage if table doesn't exist yet (for smooth frontend transition)
+    try {
+        const q = query(collection(db, "resumes"), where("userEmail", "==", userEmail));
+        const querySnapshot = await getDocs(q);
+        const data = querySnapshot.docs.map(doc => doc.data());
+        return { data: { data } };
+    } catch (error) {
+        console.error("Firestore Error:", error);
         const local = JSON.parse(localStorage.getItem('local_resumes') || '[]');
         return { data: { data: local.filter(r => r.userEmail === userEmail) } };
     }
-    return { data: { data } };
 };
 
 const GetUserPortfolios = async (userEmail) => {
-    const { data, error } = await supabase
-        .from('portfolios')
-        .select('*')
-        .eq('userEmail', userEmail);
-    
-    if (error) {
+    try {
+        const q = query(collection(db, "portfolios"), where("userEmail", "==", userEmail));
+        const querySnapshot = await getDocs(q);
+        const data = querySnapshot.docs.map(doc => doc.data());
+        return { data: { data } };
+    } catch (error) {
+        console.error("Firestore Error:", error);
         const local = JSON.parse(localStorage.getItem('local_portfolios') || '[]');
         return { data: { data: local.filter(p => p.userEmail === userEmail) } };
     }
-    return { data: { data } };
 };
 
 const CreateNewResume = async (payload) => {
     const documentId = payload.data.resumeId || crypto.randomUUID();
     const newResume = { ...payload.data, documentId };
     
-    const { data, error } = await supabase
-        .from('resumes')
-        .insert([newResume])
-        .select();
-
-    if (error) {
-        // Fallback
+    try {
+        await setDoc(doc(db, "resumes", documentId), newResume);
+        return { data: { data: newResume } };
+    } catch (error) {
+        console.error("Firestore Error:", error);
         const local = JSON.parse(localStorage.getItem('local_resumes') || '[]');
         local.push(newResume);
         localStorage.setItem('local_resumes', JSON.stringify(local));
         return { data: { data: newResume } };
     }
-    return { data: { data: data[0] } };
 };
 
 const CreateNewPortfolio = async (payload) => {
     const documentId = payload.data.portfolioId || crypto.randomUUID();
     const newPortfolio = { ...payload.data, documentId };
 
-    const { data, error } = await supabase
-        .from('portfolios')
-        .insert([newPortfolio])
-        .select();
-
-    if (error) {
+    try {
+        await setDoc(doc(db, "portfolios", documentId), newPortfolio);
+        return { data: { data: newPortfolio } };
+    } catch (error) {
+        console.error("Firestore Error:", error);
         const local = JSON.parse(localStorage.getItem('local_portfolios') || '[]');
         local.push(newPortfolio);
         localStorage.setItem('local_portfolios', JSON.stringify(local));
         return { data: { data: newPortfolio } };
     }
-    return { data: { data: data[0] } };
 };
 
 const GetResumeById = async (id) => {
-    const { data, error } = await supabase
-        .from('resumes')
-        .select('*')
-        .eq('documentId', id)
-        .single();
-
-    if (error) {
+    try {
+        const docRef = doc(db, "resumes", id);
+        const docSnap = await getDoc(docRef);
+        
+        if (docSnap.exists()) {
+            return { data: { data: docSnap.data() } };
+        } else {
+            throw new Error("No such document!");
+        }
+    } catch (error) {
+        console.error("Firestore Error:", error);
         const local = JSON.parse(localStorage.getItem('local_resumes') || '[]');
         const found = local.find(r => r.documentId === id);
         return { data: { data: found } };
     }
-    return { data: { data } };
 };
 
 const GetPortfolioById = async (id) => {
-    const { data, error } = await supabase
-        .from('portfolios')
-        .select('*')
-        .eq('documentId', id)
-        .single();
-
-    if (error) {
+    try {
+        const docRef = doc(db, "portfolios", id);
+        const docSnap = await getDoc(docRef);
+        
+        if (docSnap.exists()) {
+            return { data: { data: docSnap.data() } };
+        } else {
+            throw new Error("No such document!");
+        }
+    } catch (error) {
+        console.error("Firestore Error:", error);
         const local = JSON.parse(localStorage.getItem('local_portfolios') || '[]');
         const found = local.find(p => p.documentId === id);
         return { data: { data: found } };
     }
-    return { data: { data } };
 };
 
 const UpdateResumeDetail = async (id, payload) => {
-    const { data, error } = await supabase
-        .from('resumes')
-        .update(payload)
-        .eq('documentId', id)
-        .select();
-
-    if (error) {
+    try {
+        const docRef = doc(db, "resumes", id);
+        await updateDoc(docRef, payload.data);
+        const docSnap = await getDoc(docRef);
+        return { data: { data: docSnap.data() } };
+    } catch (error) {
+        console.error("Firestore Error:", error);
         const local = JSON.parse(localStorage.getItem('local_resumes') || '[]');
-        const index = local.findIndex(r => r.documentId === id);
-        if (index > -1) {
-            local[index] = { ...local[index], ...payload };
+        const idx = local.findIndex(r => r.documentId === id);
+        if(idx !== -1) {
+            local[idx] = { ...local[idx], ...payload.data };
             localStorage.setItem('local_resumes', JSON.stringify(local));
-            return { data: { data: local[index] } };
+            return { data: { data: local[idx] } };
         }
+        return { data: { data: payload.data } };
     }
-    return { data: { data: data?.[0] } };
 };
 
 const UpdatePortfolioDetail = async (id, payload) => {
-    const { data, error } = await supabase
-        .from('portfolios')
-        .update(payload.data)
-        .eq('documentId', id)
-        .select();
-
-    if (error) {
+    try {
+        const docRef = doc(db, "portfolios", id);
+        await updateDoc(docRef, payload.data);
+        const docSnap = await getDoc(docRef);
+        return { data: { data: docSnap.data() } };
+    } catch (error) {
+        console.error("Firestore Error:", error);
         const local = JSON.parse(localStorage.getItem('local_portfolios') || '[]');
-        const index = local.findIndex(p => p.documentId === id);
-        if (index > -1) {
-            local[index] = { ...local[index], ...payload.data };
+        const idx = local.findIndex(p => p.documentId === id);
+        if(idx !== -1) {
+            local[idx] = { ...local[idx], ...payload.data };
             localStorage.setItem('local_portfolios', JSON.stringify(local));
-            return { data: { data: local[index] } };
+            return { data: { data: local[idx] } };
         }
+        return { data: { data: payload.data } };
     }
-    return { data: { data: data?.[0] } };
 };
 
 const DeleteResumeById = async (id) => {
-    const { data, error } = await supabase
-        .from('resumes')
-        .delete()
-        .eq('documentId', id);
-
-    if (error) {
-        let local = JSON.parse(localStorage.getItem('local_resumes') || '[]');
-        local = local.filter(r => r.documentId !== id);
-        localStorage.setItem('local_resumes', JSON.stringify(local));
-        return { data: { data: true } };
+    try {
+        await deleteDoc(doc(db, "resumes", id));
+        return { data: { success: true } };
+    } catch (error) {
+        console.error("Firestore Error:", error);
+        const local = JSON.parse(localStorage.getItem('local_resumes') || '[]');
+        localStorage.setItem('local_resumes', JSON.stringify(local.filter(r => r.documentId !== id)));
+        return { data: { success: true } };
     }
-    return { data: { data: true } };
+};
+
+const DeletePortfolioById = async (id) => {
+    try {
+        await deleteDoc(doc(db, "portfolios", id));
+        return { data: { success: true } };
+    } catch (error) {
+        console.error("Firestore Error:", error);
+        const local = JSON.parse(localStorage.getItem('local_portfolios') || '[]');
+        localStorage.setItem('local_portfolios', JSON.stringify(local.filter(p => p.documentId !== id)));
+        return { data: { success: true } };
+    }
 };
 
 export default {
@@ -158,5 +166,6 @@ export default {
     GetPortfolioById,
     UpdateResumeDetail,
     UpdatePortfolioDetail,
-    DeleteResumeById
+    DeleteResumeById,
+    DeletePortfolioById
 };

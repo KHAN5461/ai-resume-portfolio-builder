@@ -17,6 +17,7 @@ const EditResume = lazy(() => import('./dashboard/resume/[resumeId]/edit/index.j
 const ViewResume = lazy(() => import('./my-resume/[resumeId]/view/index.jsx'))
 const EditPortfolio = lazy(() => import('./dashboard/portfolio/[portfolioId]/edit/index.jsx'))
 const Portfolio = lazy(() => import('./portfolio/index.jsx'))
+const ProfilePage = lazy(() => import('./profile/index.jsx'))
 const NotFound = lazy(() => import('./pages/NotFound.jsx'))
 
 const LoadingFallback = () => (
@@ -51,6 +52,10 @@ const router=createBrowserRouter([
       {
         path:'/templates',
         element:<TemplateGallery/>
+      },
+      {
+        path:'/profile',
+        element: <Suspense fallback={<LoadingFallback />}><ProfilePage/></Suspense>
       }
     ]
   },

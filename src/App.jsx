@@ -5,10 +5,10 @@ import './App.css'
 import { Button } from './components/ui/button'
 import { Navigate, Outlet } from 'react-router-dom'
 import { useUser } from './auth.jsx'
-import Header from './components/custom/Header'
 import { Toaster } from './components/ui/sonner'
 import OfflineBanner from './components/OfflineBanner'
-import { supabase } from './lib/supabaseClient'
+import { db } from './lib/firebaseConfig'
+import { doc, getDoc } from 'firebase/firestore'
 import { useDispatch } from 'react-redux'
 import { setResumeData, setPortfolioData } from './store/resumeSlice'
 
@@ -20,19 +20,23 @@ function App() {
   useEffect(() => {
     const fetchUserData = async () => {
       if (isSignedIn && user?.id) {
-        const { data, error } = await supabase
-          .from('user_data')
-          .select('state_data')
-          .eq('id', user.id)
-          .single();
-        
-        if (data?.state_data) {
-          if (data.state_data.resume) {
-            dispatch({ type: 'resume/setResumeData', payload: data.state_data.resume.resumeData });
+        try {
+          const docRef = doc(db, 'user_data', user.id);
+          const docSnap = await getDoc(docRef);
+          
+          if (docSnap.exists()) {
+            const data = docSnap.data();
+            if (data?.state_data) {
+              if (data.state_data.resume) {
+                dispatch({ type: 'resume/setResumeData', payload: data.state_data.resume.resumeData });
+              }
+              if (data.state_data.portfolio) {
+                dispatch({ type: 'portfolio/setPortfolioData', payload: data.state_data.portfolio.portfolioData });
+              }
+            }
           }
-          if (data.state_data.portfolio) {
-            dispatch({ type: 'portfolio/setPortfolioData', payload: data.state_data.portfolio.portfolioData });
-          }
+        } catch (error) {
+          console.error("Error fetching user state from Firebase:", error);
         }
       }
     };
@@ -47,7 +51,6 @@ function App() {
   return (
     <>
       <OfflineBanner />
-      <Header/>
       <Outlet/>
       <Toaster />
     </>
@@ -55,4 +58,3 @@ function App() {
 }
 
 export default App
-
