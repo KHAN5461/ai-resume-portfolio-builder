@@ -10,6 +10,8 @@ import { toast } from 'sonner';
 import { motion } from 'framer-motion';
 import { AtsScoreRing } from '../../components/AtsScoreRing';
 import { ExportModal } from '../../components/ExportModal';
+import { AtsRoastPanel } from '../../components/AtsRoastPanel';
+import RawJsonEditor from '../../components/RawJsonEditor';
 
 function EditResume() {
     const {resumeId}=useParams();
@@ -18,6 +20,8 @@ function EditResume() {
     const [activeTab, setActiveTab] = useState('Content');
     const [view, setView] = useState('builder'); // 'builder' or 'preview'
     const [isExportOpen, setIsExportOpen] = useState(false);
+    const [isAtsPanelOpen, setIsAtsPanelOpen] = useState(false);
+    const [saveStatus, setSaveStatus] = useState('saved'); // 'saved', 'saving', 'error', 'unsaved'
 
     useEffect(()=>{
         GetResumeInfo();
@@ -30,6 +34,28 @@ function EditResume() {
           toast.error("Failed to load resume data");
         })
     }
+
+    // Auto-Save Effect
+    useEffect(() => {
+      // Skip initial load
+      if (!resumeInfo || Object.keys(resumeInfo).length === 0) return;
+      
+      setSaveStatus('unsaved');
+      
+      const timer = setTimeout(() => {
+        setSaveStatus('saving');
+        GlobalApi.UpdateResumeDetail(resumeId, { data: resumeInfo })
+          .then(() => {
+            setSaveStatus('saved');
+          })
+          .catch(() => {
+            setSaveStatus('error');
+            toast.error('Auto-save failed. Please check your connection.');
+          });
+      }, 2000); // 2 second debounce
+
+      return () => clearTimeout(timer);
+    }, [resumeInfo, resumeId]);
 
   return (
       <motion.div 
@@ -51,6 +77,35 @@ function EditResume() {
             </span>
           </div>
           <div className="flex items-center gap-md">
+            
+            {/* Save Status Indicator */}
+            <div className="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-full bg-surface-variant/30 border border-outline-variant/20 mr-2">
+              {saveStatus === 'saved' && (
+                <>
+                  <span className="material-symbols-outlined text-[16px] text-green-500">cloud_done</span>
+                  <span className="font-label-sm text-[12px] text-on-surface-variant">Saved to Cloud</span>
+                </>
+              )}
+              {saveStatus === 'saving' && (
+                <>
+                  <span className="material-symbols-outlined text-[16px] text-stitch-primary animate-pulse">cloud_sync</span>
+                  <span className="font-label-sm text-[12px] text-on-surface-variant">Saving...</span>
+                </>
+              )}
+              {saveStatus === 'unsaved' && (
+                <>
+                  <span className="material-symbols-outlined text-[16px] text-yellow-500">edit_note</span>
+                  <span className="font-label-sm text-[12px] text-on-surface-variant">Unsaved changes</span>
+                </>
+              )}
+              {saveStatus === 'error' && (
+                <>
+                  <span className="material-symbols-outlined text-[16px] text-red-500">cloud_off</span>
+                  <span className="font-label-sm text-[12px] text-on-surface-variant">Save Failed</span>
+                </>
+              )}
+            </div>
+
             {/* Viewport Switcher */}
             <div className="hidden md:flex bg-surface-container-low rounded-lg p-xs">
               <button className="p-2 rounded-md bg-surface shadow-sm text-stitch-primary flex items-center justify-center">
@@ -63,7 +118,13 @@ function EditResume() {
             </div>
             
             <div className="flex items-center gap-4">
-              <AtsScoreRing />
+              <button 
+                onClick={() => setIsAtsPanelOpen(true)}
+                className="hover:scale-105 transition-transform cursor-pointer"
+                title="Open ATS Copilot"
+              >
+                <AtsScoreRing />
+              </button>
               <button 
                 onClick={() => setIsExportOpen(true)}
                 className="h-10 px-6 bg-indigo-600 text-white rounded-xl font-label-md text-[14px] hover:bg-indigo-500 transition-all shadow-[0_4px_14px_rgba(79,70,229,0.3)] flex items-center gap-2 cursor-pointer active:scale-95"
@@ -78,6 +139,11 @@ function EditResume() {
           isOpen={isExportOpen} 
           onOpenChange={setIsExportOpen} 
           resumeInfo={resumeInfo} 
+        />
+
+        <AtsRoastPanel 
+          isOpen={isAtsPanelOpen}
+          onClose={() => setIsAtsPanelOpen(false)}
         />
 
         {/* Pill Tab Switcher (Mobile Only) */}
@@ -112,7 +178,7 @@ function EditResume() {
             <div className="p-4 flex flex-col flex-1 pb-24 overflow-y-auto custom-scrollbar">
                {activeTab === 'Content' && <FormSection />}
                {activeTab === 'Theme' && <ThemeBuilder />}
-               {activeTab === 'Settings' && <div className="p-10 text-center text-on-surface-variant bg-surface rounded-xl border border-dashed border-outline-variant mt-4">Advanced Settings coming soon</div>}
+               {activeTab === 'Settings' && <div className="flex-1 mt-4"><RawJsonEditor /></div>}
             </div>
           </aside>
 
@@ -133,7 +199,7 @@ function EditResume() {
             {/* Clean A4 Canvas */}
             <div className="w-full h-full flex flex-col bg-surface-container overflow-hidden pt-16 pb-10">
               <div className="flex-1 overflow-y-auto w-full h-full custom-scrollbar flex justify-center pb-8">
-                 <div className="bg-white w-[210mm] min-h-[297mm] shadow-[0_4px_24px_rgba(0,0,0,0.06)] ring-1 ring-outline-variant/30 flex-shrink-0 mt-4">
+                 <div className="bg-white w-[210mm] min-h-[297mm] shadow-[0_4px_24px_rgba(0,0,0,0.06)] ring-1 ring-outline-variant/30 flex-shrink-0 mt-4 break-words">
                     <ResumePreview />
                  </div>
               </div>

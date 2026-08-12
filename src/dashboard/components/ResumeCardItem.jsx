@@ -50,7 +50,7 @@ function ResumeCardItem({resume,refreshData, optimisticDelete, rollbackDelete}) 
 
   return (
     <>
-      <div className="group flex flex-col bg-surface-container-lowest rounded-xl border border-outline-variant/40 overflow-hidden hover:shadow-[0px_8px_16px_rgba(0,0,0,0.08)] transition-all duration-300 cursor-pointer hardware-accelerated">
+      <div className="group flex flex-col bg-surface-container-lowest rounded-xl border border-outline-variant/40 overflow-hidden hover:shadow-[0px_8px_16px_rgba(0,0,0,0.08)] transition-all duration-300 cursor-pointer hardware-accelerated h-[280px]">
         <Link to={'/dashboard/resume/'+resume.documentId+"/edit"} className="relative h-40 bg-surface-container overflow-hidden flex items-center justify-center bg-surface-variant/30 group-hover:bg-surface-variant/50 transition-colors">
           <span className="material-symbols-outlined text-outline text-4xl group-hover:scale-110 transition-transform">description</span>
           <div className="absolute top-2 right-2 bg-surface/90 backdrop-blur-sm px-2 py-1 rounded-full flex items-center gap-1 shadow-sm">

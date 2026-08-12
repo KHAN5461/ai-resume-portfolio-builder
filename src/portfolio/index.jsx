@@ -8,12 +8,17 @@ import SkillsSection from './components/SkillsSection';
 import ContactSection from './components/ContactSection';
 import GlobalApi from './../../service/GlobalApi';
 
+import ModernTemplate from './templates/ModernTemplate';
+import MinimalistTemplate from './templates/MinimalistTemplate';
+import CreativeTemplate from './templates/CreativeTemplate';
+
 export default function Portfolio() {
   const { portfolioId } = useParams();
   const dispatch = useDispatch();
   const reduxPortfolioData = useSelector((state) => state.portfolio.portfolios[portfolioId]);
   const [localData, setLocalData] = useState(reduxPortfolioData);
   const [loading, setLoading] = useState(!reduxPortfolioData);
+  const [isThemePanelOpen, setIsThemePanelOpen] = useState(false);
 
   useEffect(() => {
     if (!reduxPortfolioData && portfolioId) {
@@ -37,8 +42,6 @@ export default function Portfolio() {
      return <div className="min-h-screen flex items-center justify-center bg-background text-on-background">Loading...</div>;
   }
 
-  // If there's no data, we should probably redirect back or show a message.
-  // Assuming the user needs to generate it first.
   if (!portfolioData || Object.keys(portfolioData).length === 0) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background text-on-background">
@@ -55,18 +58,52 @@ export default function Portfolio() {
     '--accent': portfolioData.siteConfig?.accentColor || '#6366f1',
   };
 
+  const themePreset = portfolioData.siteConfig?.themePreset || 'modern';
+
+  const updateThemePreset = (preset) => {
+    // Optimistic UI update
+    setLocalData({
+      ...localData,
+      siteConfig: {
+        ...localData.siteConfig,
+        themePreset: preset
+      }
+    });
+    // In a real app, we would also call GlobalApi.UpdatePortfolio to persist this to the DB.
+  };
+
   return (
-    <div 
-      className="min-h-screen bg-background text-on-background font-body-md selection:bg-primary-container/30"
-      style={style}
-    >
-      <div className="max-w-5xl mx-auto px-6 py-12 md:py-20 space-y-32">
-        <HeroSection data={portfolioData.heroSection} />
-        <AboutSection data={portfolioData.aboutSection} />
-        <ProjectsSection data={portfolioData.projectsSection} />
-        <SkillsSection data={portfolioData.skillsSection} />
-        <ContactSection data={portfolioData.contactSection} />
+    <div className="min-h-screen relative" style={style}>
+      
+      {/* Dynamic Template Engine */}
+      {themePreset === 'minimalist' && <MinimalistTemplate portfolioData={portfolioData} />}
+      {themePreset === 'creative' && <CreativeTemplate portfolioData={portfolioData} />}
+      {(themePreset === 'modern' || themePreset === 'default') && <ModernTemplate portfolioData={portfolioData} />}
+
+      {/* Floating Theme Switcher UI */}
+      <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 flex items-center gap-2 p-2 bg-slate-900/80 backdrop-blur-md rounded-full shadow-2xl border border-slate-700/50">
+        <span className="material-symbols-outlined text-slate-300 ml-2 text-[20px]">palette</span>
+        <div className="h-4 w-px bg-slate-700 mx-1"></div>
+        <button 
+          onClick={() => updateThemePreset('modern')}
+          className={`px-4 py-1.5 rounded-full text-sm font-medium transition-colors ${themePreset === 'modern' || themePreset === 'default' ? 'bg-white text-slate-900' : 'text-slate-300 hover:text-white hover:bg-slate-800'}`}
+        >
+          Modern
+        </button>
+        <button 
+          onClick={() => updateThemePreset('minimalist')}
+          className={`px-4 py-1.5 rounded-full text-sm font-medium transition-colors ${themePreset === 'minimalist' ? 'bg-white text-slate-900' : 'text-slate-300 hover:text-white hover:bg-slate-800'}`}
+        >
+          Minimalist
+        </button>
+        <button 
+          onClick={() => updateThemePreset('creative')}
+          className={`px-4 py-1.5 rounded-full text-sm font-medium transition-colors ${themePreset === 'creative' ? 'bg-white text-slate-900' : 'text-slate-300 hover:text-white hover:bg-slate-800'}`}
+        >
+          Creative
+        </button>
       </div>
+
     </div>
   );
 }

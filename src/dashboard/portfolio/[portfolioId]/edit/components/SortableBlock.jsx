@@ -1,0 +1,94 @@
+import React from 'react';
+import { useSortable } from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
+import { GripVertical, Trash2 } from 'lucide-react';
+import { useDispatch } from 'react-redux';
+import { removeBlock } from '@/store/portfolioSlice';
+import { useParams } from 'react-router-dom';
+import HeroBlock from '@/components/blocks/HeroBlock';
+import ProjectsBlock from '@/components/blocks/ProjectsBlock';
+import AboutBlock from '@/components/blocks/AboutBlock';
+import ExperienceBlock from '@/components/blocks/ExperienceBlock';
+import SkillsBlock from '@/components/blocks/SkillsBlock';
+import ContactBlock from '@/components/blocks/ContactBlock';
+
+export default function SortableBlock({ block, isActive, onClick }) {
+  const { portfolioId } = useParams();
+  const dispatch = useDispatch();
+  
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id: block.id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    zIndex: isDragging ? 50 : 1,
+    opacity: isDragging ? 0.8 : 1,
+  };
+
+  const handleDelete = (e) => {
+    e.stopPropagation();
+    dispatch(removeBlock({ portfolioId, blockId: block.id }));
+  };
+
+  return (
+    <div 
+      ref={setNodeRef} 
+      style={style} 
+      onClick={onClick}
+      className={`relative group w-full cursor-pointer border-2 transition-colors ${isActive ? 'border-[#6366f1]' : 'border-transparent hover:border-[#c0c1ff]/50'}`}
+    >
+      {/* Block Controls (Hover/Active) */}
+      {(isActive || isDragging) && (
+        <div className="absolute top-2 right-2 bg-surface-container rounded-lg shadow-lg border border-outline-variant flex items-center p-1 z-10 gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+          <button 
+            {...attributes} 
+            {...listeners}
+            className="p-1.5 text-outline hover:text-stitch-primary hover:bg-surface-variant rounded cursor-grab active:cursor-grabbing"
+            title="Drag to reorder"
+          >
+            <GripVertical size={16} />
+          </button>
+          <div className="w-[1px] h-4 bg-surface-variant"></div>
+          <button 
+            onClick={handleDelete}
+            className="p-1.5 text-red-400 hover:text-red-300 hover:bg-red-400/10 rounded"
+            title="Remove block"
+          >
+            <Trash2 size={16} />
+          </button>
+        </div>
+      )}
+
+      {/* Render the actual block content */}
+      <div className="w-full min-h-[120px] pointer-events-none select-none overflow-hidden relative">
+        {block.type === 'HeroSection' ? (
+          <HeroBlock data={block.data} />
+        ) : block.type === 'ProjectsGrid' ? (
+          <ProjectsBlock data={block.data} />
+        ) : block.type === 'AboutSection' ? (
+          <AboutBlock data={block.data} />
+        ) : block.type === 'WorkExperience' ? (
+          <ExperienceBlock data={block.data} />
+        ) : block.type === 'SkillsGrid' ? (
+          <SkillsBlock data={block.data} />
+        ) : block.type === 'ContactForm' ? (
+          <ContactBlock data={block.data} />
+        ) : (
+          <div className="w-full bg-slate-50 min-h-[120px] p-8 flex items-center justify-center border-b border-slate-200">
+             <div className="text-center">
+               <div className="text-sm font-bold text-slate-400 uppercase tracking-wider mb-2">{block.type}</div>
+               <p className="text-slate-500">Placeholder for {block.type}</p>
+             </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}

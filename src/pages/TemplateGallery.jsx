@@ -4,12 +4,10 @@ import { useUser } from '@/auth';
 import { motion } from 'framer-motion';
 
 const TEMPLATES = [
-  { id: 1, name: 'Minimalist Professional', category: 'Professional', image: 'https://images.unsplash.com/photo-1586281380349-632531db7ed4?w=500&q=80', description: 'Clean lines and lots of whitespace. Perfect for corporate roles.' },
-  { id: 2, name: 'Creative Portfolio', category: 'Creative', image: 'https://images.unsplash.com/photo-1542831371-29b0f74f9713?w=500&q=80', description: 'Showcase your work with big visuals and a modern layout.' },
-  { id: 3, name: 'Tech Developer', category: 'Tech', image: 'https://images.unsplash.com/photo-1555099962-4199c345e5dd?w=500&q=80', description: 'Optimized for ATS with sections for skills and GitHub links.' },
-  { id: 4, name: 'Executive Summary', category: 'Professional', image: 'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=500&q=80', description: 'A classic, dense layout for experienced leaders.' },
-  { id: 5, name: 'Modern Startup', category: 'Creative', image: 'https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=500&q=80', description: 'Stand out with bold colors and unique typography.' },
-  { id: 6, name: 'Academic CV', category: 'Academic', image: 'https://images.unsplash.com/photo-1532012197267-da84d127e765?w=500&q=80', description: 'Comprehensive multi-page layout for publications and research.' },
+  { id: 'classic', name: 'Classic Template', category: 'Professional', image: 'https://images.unsplash.com/photo-1586281380349-632531db7ed4?w=500&q=80', description: 'A timeless layout with a strong focus on experience and structure.' },
+  { id: 'modern', name: 'Modern Template', category: 'Creative', image: 'https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=500&q=80', description: 'Stand out with bold colors and unique typography.' },
+  { id: 'minimal', name: 'Minimal Template', category: 'Professional', image: 'https://images.unsplash.com/photo-1555099962-4199c345e5dd?w=500&q=80', description: 'Clean lines and lots of whitespace. Perfect for corporate roles.' },
+  { id: 'minimal-image', name: 'Minimal Image Template', category: 'Creative', image: 'https://images.unsplash.com/photo-1542831371-29b0f74f9713?w=500&q=80', description: 'Showcase your work with big visuals and a modern layout.' },
 ];
 
 const CATEGORIES = ['All', 'Professional', 'Creative', 'Tech', 'Academic'];
@@ -26,7 +24,7 @@ export default function TemplateGallery() {
   });
 
   return (
-    <div className="min-h-screen bg-background text-on-background flex flex-col md:flex-row antialiased overflow-x-hidden font-body-md text-body-md">
+    <div className="h-[100dvh] w-full bg-background text-on-background flex flex-col md:flex-row antialiased overflow-hidden font-body-md text-body-md">
       {/* Top Navigation (Mobile Only) */}
       <header className="flex justify-between items-center h-16 px-gutter max-w-7xl mx-auto w-full fixed top-0 z-50 bg-surface/80 backdrop-blur-md shadow-sm md:hidden">
         <div className="flex items-center gap-sm">
@@ -78,7 +76,7 @@ export default function TemplateGallery() {
       </aside>
 
       {/* Main Content Area */}
-      <main className="flex-1 w-full md:pl-64 pt-16 md:pt-0 min-h-screen">
+      <main className="flex-1 w-full h-full overflow-y-scroll overflow-x-hidden md:pl-64 pt-16 md:pt-0 pb-24 md:pb-8">
         <div className="max-w-7xl mx-auto px-gutter md:px-lg py-lg md:py-xl flex flex-col gap-xl">
           
           <section className="flex flex-col md:flex-row justify-between items-start md:items-end gap-md">

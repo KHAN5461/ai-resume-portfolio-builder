@@ -4,6 +4,7 @@ import { useUser } from '../auth.jsx'
 import GlobalApi from './../../service/GlobalApi';
 import ResumeCardItem from './components/ResumeCardItem';
 import AddPortfolio from './components/AddPortfolio';
+import MagicImportModal from './components/MagicImportModal';
 import { useSelector } from 'react-redux';
 import { useNavigate, Link } from 'react-router-dom';
 import { toast } from 'sonner';
@@ -182,7 +183,7 @@ function Dashboard() {
           </section>
 
           {/* Quick Actions (Bento Grid Style) */}
-          <section className="grid grid-cols-1 md:grid-cols-2 gap-md">
+          <section className="grid grid-cols-1 md:grid-cols-3 gap-md">
             {/* Action Card 1 */}
             <AddResume renderTrigger={(onClick) => (
               <button onClick={onClick} className="group relative overflow-hidden rounded-xl bg-surface-container-lowest border border-outline-variant/50 p-6 flex flex-col justify-between items-start h-48 hover:shadow-[0px_8px_16px_rgba(0,0,0,0.08)] hover:border-primary-container transition-all duration-300 text-left w-full">
@@ -207,6 +208,20 @@ function Dashboard() {
                 <div className="relative z-10">
                   <h3 className="font-headline-md text-[24px] font-bold text-on-surface mb-1 group-hover:text-stitch-secondary transition-colors">New Portfolio</h3>
                   <p className="font-body-sm text-[14px] text-on-surface-variant">Build a stunning showcase</p>
+                </div>
+              </button>
+            )} />
+
+            {/* Action Card 3: Magic Import */}
+            <MagicImportModal renderTrigger={(onClick) => (
+              <button onClick={onClick} className="group relative overflow-hidden rounded-xl bg-surface-container-lowest border border-outline-variant/50 p-6 flex flex-col justify-between items-start h-48 hover:shadow-[0px_8px_16px_rgba(0,0,0,0.08)] hover:border-stitch-primary transition-all duration-300 text-left w-full">
+                <div className="absolute -right-8 -top-8 w-32 h-32 bg-stitch-primary/5 rounded-full group-hover:scale-150 transition-transform duration-500 ease-out"></div>
+                <div className="w-12 h-12 rounded-lg bg-stitch-primary/10 text-stitch-primary flex items-center justify-center mb-4 relative z-10 group-hover:bg-stitch-primary group-hover:text-on-primary transition-colors duration-300">
+                  <span className="material-symbols-outlined" style={{fontVariationSettings: "'FILL' 1"}}>auto_fix_high</span>
+                </div>
+                <div className="relative z-10">
+                  <h3 className="font-headline-md text-[24px] font-bold text-on-surface mb-1 group-hover:text-stitch-primary transition-colors">Magic Import</h3>
+                  <p className="font-body-sm text-[14px] text-on-surface-variant">Import from PDF or LinkedIn</p>
                 </div>
               </button>
             )} />
@@ -256,7 +271,7 @@ function Dashboard() {
                 <motion.div variants={itemVariants} key={`res-skel-${index}`} className="h-[280px] rounded-xl bg-surface-variant/30 animate-pulse border border-outline-variant/20"></motion.div>
               ))}
               {!isLoadingResumes && showResumes && processedResumes.map((resume, index) => (
-                <motion.div variants={itemVariants} key={resume.documentId || index} layout>
+                <motion.div variants={itemVariants} key={resume.documentId || index}>
                   <ResumeCardItem 
                     resume={resume} 
                     refreshData={GetResumesList} 
@@ -328,10 +343,12 @@ function Dashboard() {
           <span className="material-symbols-outlined font-label-sm text-[14px]" style={{fontVariationSettings: "'FILL' 1"}}>description</span>
           <span className="font-label-sm text-[12px] mt-1">Drafts</span>
         </Link>
-        <a className="flex flex-col items-center justify-center text-on-surface-variant hover:bg-surface-variant/50 rounded-full px-4 py-1 active:scale-90 transition-transform duration-150" href="#">
-          <span className="material-symbols-outlined font-label-sm text-[14px]">auto_fix_high</span>
-          <span className="font-label-sm text-[12px] mt-1">AI Import</span>
-        </a>
+        <MagicImportModal renderTrigger={(onClick) => (
+          <button onClick={onClick} className="flex flex-col items-center justify-center text-on-surface-variant hover:bg-surface-variant/50 rounded-full px-4 py-1 active:scale-90 transition-transform duration-150">
+            <span className="material-symbols-outlined font-label-sm text-[14px]">auto_fix_high</span>
+            <span className="font-label-sm text-[12px] mt-1">AI Import</span>
+          </button>
+        )} />
         <a className="flex flex-col items-center justify-center text-on-surface-variant hover:bg-surface-variant/50 rounded-full px-4 py-1 active:scale-90 transition-transform duration-150" href="#">
           <span className="material-symbols-outlined font-label-sm text-[14px]">person</span>
           <span className="font-label-sm text-[12px] mt-1">Profile</span>

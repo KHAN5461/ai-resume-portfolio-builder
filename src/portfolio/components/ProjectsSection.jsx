@@ -5,64 +5,39 @@ export default function ProjectsSection({ data }) {
   if (!data || data.length === 0) return null;
 
   return (
-    <section className="relative">
-      <h2 className="text-3xl font-bold mb-12 flex items-center gap-4">
-        <span className="text-stitch-primary font-headline-md text-xl">02.</span>
-        <span className="text-on-surface">Selected Works</span>
-        <div className="flex-grow h-px bg-outline-variant/30 ml-4" />
+    <section id="projects" className="py-[clamp(2rem,8vw,6rem)] px-8 max-w-[1200px] mx-auto">
+      <h2 className="text-center text-[clamp(2rem,4vw,3.5rem)] mb-12 text-[#2c3e50] font-['Space_Grotesk',sans-serif] font-bold">
+        My Work
       </h2>
       
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+      <div className="grid grid-cols-[repeat(auto-fill,minmax(320px,1fr))] gap-10">
         {data.map((project, idx) => (
-          <div key={idx} className="group flex flex-col bg-surface-container-lowest rounded-xl border border-outline-variant/30 overflow-hidden hover:shadow-sm transition-shadow">
+          <div key={idx} className="bg-white rounded-xl shadow-[0_10px_30px_rgba(0,0,0,0.1)] overflow-hidden transition-all duration-300 hover:-translate-y-2 hover:shadow-[0_15px_35px_rgba(0,0,0,0.15)] flex flex-col">
             
-            {/* Project Image Placeholder */}
-            <div className="h-48 w-full bg-surface-container relative overflow-hidden border-b border-outline-variant/30">
-              
+            <a href={project.liveUrl || project.githubUrl || "#"} target="_blank" rel="noreferrer" className="block text-inherit no-underline flex-grow flex flex-col">
               {project.thumbnailUrl ? (
-                <img src={project.thumbnailUrl} alt={project.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                <img src={project.thumbnailUrl} alt={project.title} className="w-full h-[240px] object-cover" />
               ) : (
-                <div className="w-full h-full flex items-center justify-center text-on-surface-variant font-headline-xl opacity-30">
+                <div className="w-full h-[240px] bg-gray-200 flex items-center justify-center text-gray-400 font-bold text-4xl">
                   {project.title?.substring(0, 2).toUpperCase()}
                 </div>
               )}
               
-              {/* Overlay Links */}
-              <div className="absolute bottom-4 right-4 z-20 flex gap-3 opacity-0 group-hover:opacity-100 transition-opacity">
-                {project.githubUrl && (
-                  <a href={project.githubUrl} className="p-2 bg-surface border border-outline-variant/30 text-on-surface rounded-full hover:text-stitch-primary shadow-sm hover:shadow-md transition-all">
-                    <Github className="w-5 h-5" />
-                  </a>
-                )}
-                {project.liveUrl && (
-                  <a href={project.liveUrl} className="p-2 bg-surface border border-outline-variant/30 text-on-surface rounded-full hover:text-stitch-primary shadow-sm hover:shadow-md transition-all">
-                    <ExternalLink className="w-5 h-5" />
-                  </a>
-                )}
-              </div>
-            </div>
-
-            {/* Project Details */}
-            <div className="p-6 flex flex-col flex-grow">
-              <div className="flex justify-between items-start mb-2">
-                <h3 className="font-headline-md text-on-surface group-hover:text-stitch-primary transition-colors">{project.title}</h3>
-                {project.featured && (
-                  <span className="px-2 py-1 font-label-sm text-stitch-primary bg-primary-container/20 rounded">Featured</span>
+              <div className="p-6 flex flex-col flex-grow">
+                <h3 className="m-0 mb-2 text-2xl text-[#2c3e50] font-['Space_Grotesk',sans-serif] font-bold">{project.title}</h3>
+                <p className="m-0 text-[#555] flex-grow">{project.description || project.tagline}</p>
+                
+                {project.tags && project.tags.length > 0 && (
+                  <div className="flex flex-wrap gap-2 mt-4">
+                    {project.tags.map((tag, tIdx) => (
+                      <span key={tIdx} className="text-xs font-semibold text-[#3366BB] bg-[#E8F0FE] px-2 py-1 rounded">
+                        {tag}
+                      </span>
+                    ))}
+                  </div>
                 )}
               </div>
-              <p className="text-stitch-primary font-body-sm mb-4">{project.tagline}</p>
-              <p className="text-on-surface-variant font-body-sm mb-6 flex-grow">
-                {project.description}
-              </p>
-              
-              <div className="flex flex-wrap gap-2 mt-auto">
-                {project.tags?.map((tag, tIdx) => (
-                  <span key={tIdx} className="font-label-sm text-on-surface-variant bg-surface-container px-2 py-1 rounded">
-                    {tag}
-                  </span>
-                ))}
-              </div>
-            </div>
+            </a>
             
           </div>
         ))}

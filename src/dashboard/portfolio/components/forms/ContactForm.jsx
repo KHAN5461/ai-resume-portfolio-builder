@@ -25,15 +25,15 @@ export default function ContactForm() {
       <div className='grid grid-cols-1 gap-4 mt-5'>
         <div>
           <label className='text-sm font-semibold'>Heading</label>
-          <Input name="heading" value={contact.heading} onChange={handleChange} placeholder="e.g. Get in touch" />
+          <Input name="heading" value={contact.heading || ""} onChange={handleChange} placeholder="e.g. Get in touch" />
         </div>
         <div>
           <label className='text-sm font-semibold'>Subheading</label>
-          <Input name="subheading" value={contact.subheading} onChange={handleChange} placeholder="e.g. My inbox is always open." />
+          <Input name="subheading" value={contact.subheading || ""} onChange={handleChange} placeholder="e.g. My inbox is always open." />
         </div>
         <div>
           <label className='text-sm font-semibold'>Email Address</label>
-          <Input name="email" value={contact.email} onChange={handleChange} placeholder="e.g. hello@example.com" />
+          <Input name="email" value={contact.email || ""} onChange={handleChange} placeholder="e.g. hello@example.com" />
         </div>
       </div>
     </div>

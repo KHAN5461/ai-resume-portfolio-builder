@@ -29,13 +29,18 @@ export const ClerkProvider = ({ children }) => {
 
 export const useUser = () => {
   const { user, isLoaded } = useContext(AuthContext);
-  return {
-    user: user ? {
+  
+  const mappedUser = React.useMemo(() => {
+    return user ? {
       primaryEmailAddress: { emailAddress: user.email },
       fullName: user.displayName || 'Anonymous User',
       id: user.uid,
       imageUrl: user.photoURL || null
-    } : null,
+    } : null;
+  }, [user]);
+
+  return {
+    user: mappedUser,
     isSignedIn: !!user,
     isLoaded
   };

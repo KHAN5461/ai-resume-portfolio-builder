@@ -20,8 +20,9 @@ class PreviewErrorBoundary extends React.Component {
         <div className="w-full h-full flex flex-col items-center justify-center bg-surface text-on-surface p-4 rounded-xl border border-error/30 bg-error-container/10">
           <span className="material-symbols-outlined text-error text-[48px] mb-2">error</span>
           <h3 className="font-headline-sm font-bold text-error mb-1">Preview Render Error</h3>
-          <p className="font-body-sm text-on-surface-variant text-center mb-4 max-w-xs">
-            We encountered an issue rendering this preview. The data might be malformed.
+          <p className="font-body-sm text-on-surface-variant text-center mb-4 max-w-xs break-words">
+            We encountered an issue rendering this preview. The data might be malformed.<br/><br/>
+            <span className="text-error font-mono text-xs">{this.state.error?.toString()}</span>
           </p>
           <button 
             onClick={() => this.setState({ hasError: false })}

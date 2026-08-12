@@ -4,18 +4,18 @@ export default function SkillsSection({ data }) {
   if (!data || !data.categories || data.categories.length === 0) return null;
 
   return (
-    <section className="relative">
+    <section className="py-[clamp(2rem,6vw,4rem)] px-8 max-w-[1200px] mx-auto">
       <h2 className="text-3xl font-bold mb-12 flex items-center gap-4">
-        <span className="text-stitch-primary font-headline-md text-xl">03.</span>
-        <span className="text-on-surface">Technical Arsenal</span>
-        <div className="flex-grow h-px bg-outline-variant/30 ml-4" />
+        <span className="text-[#3366BB] font-['Space_Grotesk',sans-serif] text-xl">03.</span>
+        <span className="text-[#2c3e50] font-['Space_Grotesk',sans-serif]">Technical Arsenal</span>
+        <div className="flex-grow h-px bg-gray-300 ml-4" />
       </h2>
       
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
         {data.categories.map((category, idx) => (
-          <div key={idx} className="bg-surface-container-lowest p-6 rounded-xl border border-outline-variant/30 shadow-sm">
-            <h3 className="font-label-md text-on-surface mb-6 flex items-center gap-3">
-              <div className="w-2 h-2 rounded-full bg-stitch-primary" />
+          <div key={idx} className="bg-white p-6 rounded-xl border border-gray-200 shadow-[0_4px_15px_rgba(0,0,0,0.05)]">
+            <h3 className="font-semibold text-[#2c3e50] mb-6 flex items-center gap-3 font-['Space_Grotesk',sans-serif]">
+              <div className="w-2 h-2 rounded-full bg-[#3366BB]" />
               {category.categoryName}
             </h3>
             
@@ -23,7 +23,7 @@ export default function SkillsSection({ data }) {
               {category.skills?.map((skill, sIdx) => (
                 <span 
                   key={sIdx} 
-                  className="px-3 py-1.5 bg-surface text-on-surface-variant rounded-lg font-label-sm border border-outline-variant/30 hover:border-stitch-primary/50 hover:text-stitch-primary transition-colors cursor-default"
+                  className="px-3 py-1.5 bg-gray-50 text-gray-700 rounded-lg text-sm border border-gray-200 hover:border-[#3366BB] hover:text-[#3366BB] transition-colors cursor-default"
                 >
                   {skill}
                 </span>

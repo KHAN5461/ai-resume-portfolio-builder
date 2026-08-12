@@ -14,25 +14,25 @@ import { handleFormKeyDown } from '@/lib/keyboard'
 
 function Skills() {
 
-    const [skillsList,setSkillsList]=useState([{
-        name:'',
-        rating:0
-    }])
     const {resumeId}=useParams();
-
     const [loading,setLoading]=useState(false);
     const dispatch = useDispatch();
     const resumeInfo = useSelector(state => state.resume.resumeData);
-   
-    useEffect(()=>{
-        resumeInfo?.skills?.length>0&&setSkillsList(resumeInfo?.skills)
-      },[])
+
+    const [skillsList,setSkillsList]=useState(() => {
+        const sk = resumeInfo?.skills || resumeInfo?.Skills;
+        return sk?.length > 0 ? sk : [{
+            name:'',
+            rating:0
+        }];
+    });
    
     const handleChange=(index,name,value)=>{
-        const newEntries=skillsList.slice();
-      
-        newEntries[index][name]=value;
-        setSkillsList(newEntries);
+        setSkillsList(prev => {
+            const newEntries = [...prev];
+            newEntries[index] = { ...newEntries[index], [name]: value };
+            return newEntries;
+        });
     }
 
     const AddNewSkills=()=>{

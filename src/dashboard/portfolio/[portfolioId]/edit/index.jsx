@@ -6,7 +6,8 @@ import PortfolioFormSection from '../../components/PortfolioFormSection';
 import PortfolioPreview from '../../components/PortfolioPreview';
 import GlobalApi from './../../../../../service/GlobalApi';
 import { toast } from 'sonner';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
+import ErrorBoundary from '@/components/ErrorBoundary';
 
 export default function EditPortfolio() {
   const { portfolioId } = useParams();
@@ -49,6 +50,7 @@ export default function EditPortfolio() {
   }, [portfolioData, portfolioId]);
 
   return (
+    <ErrorBoundary>
     <motion.div 
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
@@ -60,20 +62,32 @@ export default function EditPortfolio() {
         <header className="bg-surface-container-lowest border-b border-outline-variant/30 px-gutter h-16 flex items-center justify-between shrink-0 shadow-sm z-20 relative">
           <div className="flex items-center gap-sm">
             <Link to="/dashboard" className="flex items-center gap-sm hover:opacity-80 transition-opacity">
-              <span className="material-symbols-outlined text-stitch-primary font-headline-md text-[24px]" style={{fontVariationSettings: "'FILL' 1"}}>auto_awesome</span>
+              <span className="material-symbols-outlined text-stitch-primary font-headline-md text-[24px]" style={{fontVariationSettings: "'FILL' 1"}} translate="no">auto_awesome</span>
               <span className="font-headline-md text-[24px] font-bold text-stitch-primary">Sparkfolio</span>
             </Link>
-            <span className="ml-sm px-2 py-1 bg-surface-container-highest rounded-md font-label-sm text-[12px] text-on-surface-variant hidden md:flex items-center gap-xs">
+            <AnimatePresence mode="wait">
               {isSaving ? (
-                <>
-                  <span className="material-symbols-outlined text-[14px] animate-spin">sync</span> Saving...
-                </>
+                <motion.div 
+                  key="saving"
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: 10 }}
+                  className="ml-sm px-3 py-1.5 bg-primary-container text-on-primary-container rounded-full font-label-sm flex items-center gap-2 shadow-sm"
+                >
+                  <span className="material-symbols-outlined text-[14px] animate-spin" translate="no">sync</span> Saving...
+                </motion.div>
               ) : (
-                <>
-                  <span className="material-symbols-outlined text-[14px] text-[#34A853]">check_circle</span> Saved
-                </>
+                <motion.div 
+                  key="saved"
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: 10 }}
+                  className="ml-sm px-3 py-1.5 bg-surface-container-highest text-on-surface-variant rounded-full font-label-sm flex items-center gap-2 shadow-sm"
+                >
+                  <span className="material-symbols-outlined text-[14px] text-[#34A853]" translate="no">check_circle</span> Saved
+                </motion.div>
               )}
-            </span>
+            </AnimatePresence>
           </div>
           <div className="flex items-center gap-md">
             {/* Viewport Switcher */}
@@ -149,5 +163,6 @@ export default function EditPortfolio() {
           </section>
         </main>
     </motion.div>
+    </ErrorBoundary>
   );
 }

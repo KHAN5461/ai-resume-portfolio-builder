@@ -76,9 +76,17 @@ export const portfolioSlice = createSlice({
     // We can add more specific reducers later, or a generic one:
     updatePortfolioData: (state, action) => {
       const { id, data } = action.payload;
-      if (state.portfolios[id]) {
-        state.portfolios[id] = { ...state.portfolios[id], ...data };
-      }
+      const current = state.portfolios[id] || { ...defaultPortfolioData };
+      state.portfolios[id] = {
+        ...current,
+        ...data,
+        heroSection: { ...defaultPortfolioData.heroSection, ...(current.heroSection || {}), ...(data.heroSection || {}) },
+        aboutSection: { ...defaultPortfolioData.aboutSection, ...(current.aboutSection || {}), ...(data.aboutSection || {}) },
+        siteConfig: { ...defaultPortfolioData.siteConfig, ...(current.siteConfig || {}), ...(data.siteConfig || {}) },
+        contactSection: { ...defaultPortfolioData.contactSection, ...(current.contactSection || {}), ...(data.contactSection || {}) },
+        projectsSection: data.projectsSection || current.projectsSection || defaultPortfolioData.projectsSection,
+        skillsSection: data.skillsSection || current.skillsSection || defaultPortfolioData.skillsSection,
+      };
     }
   },
 });

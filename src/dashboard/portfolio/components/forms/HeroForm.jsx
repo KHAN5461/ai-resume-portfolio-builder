@@ -11,7 +11,7 @@ export default function HeroForm() {
   const portfolioData = useSelector((state) => state.portfolio.portfolios[portfolioId]);
   
   if (!portfolioData) return null;
-  const heroData = portfolioData.heroSection;
+  const heroData = portfolioData.heroSection || {};
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -35,15 +35,15 @@ export default function HeroForm() {
       <div className='grid grid-cols-1 gap-4 mt-5'>
         <div>
           <label className='text-sm font-semibold'>Greeting</label>
-          <Input name="greeting" value={heroData.greeting} onChange={handleChange} placeholder="e.g. Hello World" />
+          <Input name="greeting" value={heroData.greeting || ""} onChange={handleChange} placeholder="e.g. Hello World" />
         </div>
         <div>
           <label className='text-sm font-semibold'>Headline</label>
-          <Input name="headline" value={heroData.headline} onChange={handleChange} placeholder="e.g. I build things for the web" />
+          <Input name="headline" value={heroData.headline || ""} onChange={handleChange} placeholder="e.g. I build things for the web" />
         </div>
         <div>
           <label className='text-sm font-semibold'>Subheadline</label>
-          <Textarea name="subheadline" value={heroData.subheadline} onChange={handleChange} placeholder="Brief introduction..." />
+          <Textarea name="subheadline" value={heroData.subheadline || ""} onChange={handleChange} placeholder="Brief introduction..." />
         </div>
         
         <div className='grid grid-cols-2 gap-4 border-t pt-4 mt-2'>
@@ -70,7 +70,7 @@ export default function HeroForm() {
         
         <div className='border-t pt-4 mt-2'>
           <label className='text-sm font-semibold'>Terminal Code Snippet</label>
-          <Textarea name="terminalCodeSnippet" value={heroData.terminalCodeSnippet} onChange={handleChange} placeholder="npm install awesome-developer" className="font-mono bg-zinc-900 text-green-400 mt-2" />
+          <Textarea name="terminalCodeSnippet" value={heroData.terminalCodeSnippet || ""} onChange={handleChange} placeholder="npm install awesome-developer" className="font-mono bg-zinc-900 text-green-400 mt-2" />
         </div>
       </div>
     </div>

@@ -79,7 +79,7 @@ function Summery({enabledNext}) {
             </div>
             <Textarea className="mt-5" required
             value={summery}
-                defaultValue={summery?summery:resumeInfo?.summery}
+                defaultValue={summery?summery:(resumeInfo?.summery || resumeInfo?.summary)}
             onChange={(e)=>setSummery(e.target.value)}
             />
             <div className='mt-2 flex justify-end'>

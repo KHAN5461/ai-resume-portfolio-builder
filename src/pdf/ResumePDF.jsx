@@ -1,5 +1,6 @@
 import React from 'react';
 import { Page, Text, View, Document, StyleSheet, Link } from '@react-pdf/renderer';
+import { mapResumeInfoToTemplateData } from '@/dashboard/resume/components/ResumePreview';
 
 // Define clean, ATS-compliant typographic styles
 const styles = StyleSheet.create({
@@ -27,7 +28,7 @@ const styles = StyleSheet.create({
   targetTitle: {
     fontSize: 12,
     fontFamily: 'Helvetica-Bold',
-    color: '#4f46e5', // Indigo accent
+    color: '#4f46e5',
     marginTop: 4,
     marginBottom: 6,
   },
@@ -80,7 +81,6 @@ const styles = StyleSheet.create({
   },
   bulletList: {
     marginTop: 3,
-    paddingLeft: 10,
   },
   bulletItem: {
     flexDirection: 'row',
@@ -111,8 +111,20 @@ const styles = StyleSheet.create({
   },
 });
 
+const stripHtml = (html) => {
+  if (!html) return '';
+  return html
+    .replace(/<li>/gi, '• ')
+    .replace(/<\/li>/gi, '\n')
+    .replace(/<\/p>/gi, '\n')
+    .replace(/<br\s*\/?>/gi, '\n')
+    .replace(/<[^>]+>/g, '')
+    .trim();
+};
+
 export const ResumePDF = ({ resumeData }) => {
-  const { personalInfo, professionalSummary, workExperience, projects, education, skills } = resumeData || {};
+  const data = mapResumeInfoToTemplateData(resumeData);
+  const { personal_info, professional_summary, experience, project, education, skills } = data;
 
   return (
     <Document>
@@ -120,44 +132,37 @@ export const ResumePDF = ({ resumeData }) => {
         
         {/* Header / Personal Info */}
         <View style={styles.header}>
-          <Text style={styles.name}>{personalInfo?.fullName || 'Your Name'}</Text>
-          <Text style={styles.targetTitle}>{personalInfo?.targetTitle || 'Software Engineer'}</Text>
+          <Text style={styles.name}>{personal_info?.full_name || 'Your Name'}</Text>
+          <Text style={styles.targetTitle}>{personal_info?.profession || 'Professional Title'}</Text>
           <View style={styles.contactRow}>
-            {personalInfo?.email && <Text>{personalInfo.email} | </Text>}
-            {personalInfo?.phone && <Text>{personalInfo.phone} | </Text>}
-            {personalInfo?.location && <Text>{personalInfo.location} | </Text>}
-            {personalInfo?.githubUrl && <Link src={personalInfo.githubUrl}>GitHub</Link>}
-            {personalInfo?.linkedinUrl && <Text> | </Text>}
-            {personalInfo?.linkedinUrl && <Link src={personalInfo.linkedinUrl}>LinkedIn</Link>}
+            {personal_info?.email && <Text>{personal_info.email}</Text>}
+            {personal_info?.phone && <Text> | {personal_info.phone}</Text>}
+            {personal_info?.location && <Text> | {personal_info.location}</Text>}
+            {personal_info?.linkedin && <Text> | {personal_info.linkedin}</Text>}
           </View>
         </View>
 
         {/* Professional Summary */}
-        {professionalSummary && (
+        {professional_summary && (
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Professional Summary</Text>
-            <Text style={styles.summaryText}>{professionalSummary}</Text>
+            <Text style={styles.summaryText}>{stripHtml(professional_summary)}</Text>
           </View>
         )}
 
         {/* Work Experience */}
-        {workExperience && workExperience.length > 0 && (
+        {experience && experience.length > 0 && (
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Professional Experience</Text>
-            {workExperience.map((exp, index) => (
+            {experience.map((exp, index) => (
               <View key={index} style={{ marginBottom: 8 }}>
                 <View style={styles.itemHeader}>
-                  <Text style={styles.itemTitle}>{exp.role} — <Text style={styles.itemSubtitle}>{exp.company}</Text></Text>
-                  <Text style={styles.dateLocation}>{exp.startDate} – {exp.current ? 'Present' : exp.endDate}</Text>
+                  <Text style={styles.itemTitle}>{exp.position} — <Text style={styles.itemSubtitle}>{exp.company}</Text></Text>
+                  <Text style={styles.dateLocation}>{exp.start_date} – {exp.is_current ? 'Present' : exp.end_date}</Text>
                 </View>
-                {exp.bullets && (
+                {exp.description && (
                   <View style={styles.bulletList}>
-                    {exp.bullets.map((bullet, bIdx) => (
-                      <View key={bIdx} style={styles.bulletItem}>
-                        <Text style={styles.bulletPoint}>•</Text>
-                        <Text style={styles.bulletText}>{bullet}</Text>
-                      </View>
-                    ))}
+                    <Text style={styles.summaryText}>{stripHtml(exp.description)}</Text>
                   </View>
                 )}
               </View>
@@ -166,23 +171,17 @@ export const ResumePDF = ({ resumeData }) => {
         )}
 
         {/* Projects */}
-        {projects && projects.length > 0 && (
+        {project && project.length > 0 && (
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Key Projects</Text>
-            {projects.map((proj, index) => (
+            {project.map((proj, index) => (
               <View key={index} style={{ marginBottom: 8 }}>
                 <View style={styles.itemHeader}>
-                  <Text style={styles.itemTitle}>{proj.name} {proj.technologies ? `(${proj.technologies.join(', ')})` : ''}</Text>
-                  <Text style={styles.dateLocation}>{proj.startDate} – {proj.endDate}</Text>
+                  <Text style={styles.itemTitle}>{proj.name}</Text>
                 </View>
-                {proj.highlights && (
+                {proj.description && (
                   <View style={styles.bulletList}>
-                    {proj.highlights.map((highlight, hIdx) => (
-                      <View key={hIdx} style={styles.bulletItem}>
-                        <Text style={styles.bulletPoint}>•</Text>
-                        <Text style={styles.bulletText}>{highlight}</Text>
-                      </View>
-                    ))}
+                    <Text style={styles.summaryText}>{stripHtml(proj.description)}</Text>
                   </View>
                 )}
               </View>
@@ -197,37 +196,22 @@ export const ResumePDF = ({ resumeData }) => {
             {education.map((edu, index) => (
               <View key={index} style={{ marginBottom: 6 }}>
                 <View style={styles.itemHeader}>
-                  <Text style={styles.itemTitle}>{edu.degree}</Text>
-                  <Text style={styles.dateLocation}>{edu.startDate} – {edu.endDate}</Text>
+                  <Text style={styles.itemTitle}>{edu.degree} {edu.field && `in ${edu.field}`}</Text>
+                  <Text style={styles.dateLocation}>{edu.graduation_date}</Text>
                 </View>
-                <Text style={styles.itemSubtitle}>{edu.institution}{edu.gpaOrHonors ? ` | ${edu.gpaOrHonors}` : ''}</Text>
+                <Text style={styles.itemSubtitle}>{edu.institution}</Text>
               </View>
             ))}
           </View>
         )}
 
         {/* Skills */}
-        {skills && (
+        {skills && skills.length > 0 && (
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Technical Skills</Text>
-            {skills.languages && skills.languages.length > 0 && (
-              <View style={styles.skillsCategory}>
-                <Text style={styles.skillsLabel}>Languages:</Text>
-                <Text style={styles.skillsValues}>{skills.languages.join(', ')}</Text>
-              </View>
-            )}
-            {skills.frameworksAndLibraries && skills.frameworksAndLibraries.length > 0 && (
-              <View style={styles.skillsCategory}>
-                <Text style={styles.skillsLabel}>Frameworks/Libraries:</Text>
-                <Text style={styles.skillsValues}>{skills.frameworksAndLibraries.join(', ')}</Text>
-              </View>
-            )}
-            {skills.databasesAndTools && skills.databasesAndTools.length > 0 && (
-              <View style={styles.skillsCategory}>
-                <Text style={styles.skillsLabel}>Tools & Databases:</Text>
-                <Text style={styles.skillsValues}>{skills.databasesAndTools.join(', ')}</Text>
-              </View>
-            )}
+            <View style={styles.skillsCategory}>
+               <Text style={styles.skillsValues}>{skills.join(' • ')}</Text>
+            </View>
           </View>
         )}
 

@@ -4,51 +4,35 @@ export default function HeroSection({ data }) {
   if (!data) return null;
 
   return (
-    <section className="relative pt-20 pb-10">
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-primary-container/20 rounded-full blur-[120px] pointer-events-none" />
-      
-      <div className="relative z-10 flex flex-col items-start gap-6 max-w-3xl">
-        <span className="text-stitch-primary font-label-md tracking-wider uppercase">
-          {data.greeting || "Hello World"}
-        </span>
-        
-        <h1 className="font-headline-xl text-[56px] leading-[1.1] text-on-surface">
-          {data.headline || "I build things for the web."}
+    <section className="min-h-[80vh] flex items-center justify-center text-center p-8 bg-gradient-to-br from-[#5A8DEE] to-[#3366BB] text-white">
+      <div className="max-w-[600px] mx-auto">
+        {/* We can use the Space Grotesk font by adding the font-['Space_Grotesk'] utility if loaded, or just sans-serif */}
+        <h1 className="text-[clamp(2.5rem,5vw,4.5rem)] font-bold mb-4 leading-[1.1] font-['Space_Grotesk',sans-serif]">
+          {data.headline || "Building Digital Experiences"}
         </h1>
         
-        <p className="font-body-lg text-on-surface-variant leading-relaxed max-w-2xl">
-          {data.subheadline}
+        <p className="text-[clamp(1rem,2vw,1.25rem)] mb-8 opacity-90 mx-auto max-w-[600px]">
+          {data.subheadline || "A passionate developer creating modern and responsive web applications. Welcome to my creative space."}
         </p>
         
-        <div className="flex gap-4 mt-4">
+        <div className="flex flex-wrap justify-center gap-4">
           {data.primaryCta && (
             <a 
-              href={data.primaryCta.link || "#"} 
-              className="px-6 py-3 bg-stitch-primary text-on-primary font-label-md rounded-full hover:bg-stitch-primary/90 transition-colors"
+              href={data.primaryCta.link || "#projects"} 
+              className="inline-block bg-white text-[#3366BB] px-[30px] py-[12px] rounded-full no-underline font-bold transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_4px_15px_rgba(0,0,0,0.2)]"
             >
-              {data.primaryCta.text}
+              {data.primaryCta.text || "View My Work"}
             </a>
           )}
           {data.secondaryCta && (
             <a 
               href={data.secondaryCta.link || "#"} 
-              className="px-6 py-3 bg-surface text-on-surface font-label-md rounded-full hover:bg-surface-variant transition-colors border border-outline-variant/30"
+              className="inline-block bg-transparent border-2 border-white text-white px-[30px] py-[12px] rounded-full no-underline font-bold transition-all duration-300 hover:-translate-y-1 hover:bg-white/10"
             >
               {data.secondaryCta.text}
             </a>
           )}
         </div>
-
-        {data.terminalCodeSnippet && (
-          <div className="mt-10 p-4 rounded-xl bg-surface-container-lowest border border-outline-variant/30 font-label-sm text-on-surface w-full shadow-sm">
-            <div className="flex gap-2 mb-3">
-              <div className="w-3 h-3 rounded-full bg-red-500/20 border border-red-500/50" />
-              <div className="w-3 h-3 rounded-full bg-yellow-500/20 border border-yellow-500/50" />
-              <div className="w-3 h-3 rounded-full bg-green-500/20 border border-green-500/50" />
-            </div>
-            <code>{data.terminalCodeSnippet}</code>
-          </div>
-        )}
       </div>
     </section>
   );
