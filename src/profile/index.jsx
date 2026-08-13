@@ -1,13 +1,17 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useUser } from '../auth.jsx';
 import { auth } from '../lib/firebaseConfig';
 import { signOut } from 'firebase/auth';
 import { useNavigate, Link } from 'react-router-dom';
 import { toast } from 'sonner';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Settings, User, CreditCard, Link as LinkIcon, Palette, Bell, Shield, LogOut, X, Github, Linkedin } from 'lucide-react';
 
-function ProfilePage() {
+export default function ProfilePage() {
   const { user } = useUser();
   const navigate = useNavigate();
+  const [activeTab, setActiveTab] = useState('account');
+  const [theme, setTheme] = useState('system'); // light, dark, system
 
   const handleLogout = async () => {
     try {
@@ -19,81 +23,161 @@ function ProfilePage() {
     }
   };
 
+  const tabs = [
+    { id: 'account', label: 'Account', icon: <User className="w-4 h-4" /> },
+    { id: 'appearance', label: 'Appearance', icon: <Palette className="w-4 h-4" /> },
+    { id: 'integrations', label: 'Integrations', icon: <LinkIcon className="w-4 h-4" /> },
+    { id: 'billing', label: 'Billing', icon: <CreditCard className="w-4 h-4" /> },
+    { id: 'notifications', label: 'Notifications', icon: <Bell className="w-4 h-4" /> },
+    { id: 'security', label: 'Security', icon: <Shield className="w-4 h-4" /> },
+  ];
+
   return (
-    <div className="bg-[#0c1324] min-h-screen flex items-center justify-center p-4">
-      <style dangerouslySetInnerHTML={{__html: `
-        .glass-panel {
-            background: rgba(12, 19, 36, 0.6);
-            backdrop-filter: blur(24px);
-            -webkit-backdrop-filter: blur(24px);
-            border: 1px solid rgba(144, 143, 160, 0.2);
-            box-shadow: 0 20px 50px -12px rgba(0, 0, 0, 0.5);
-        }
-        .btn-gradient {
-            background: linear-gradient(135deg, #c0c1ff 0%, #8083ff 100%);
-            transition: all 200ms cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        .btn-gradient:hover {
-            box-shadow: 0 0 20px rgba(128, 131, 255, 0.4);
-            transform: translateY(-2px);
-        }
-      `}} />
+    <div className="fixed inset-0 z-[100] bg-black/40 backdrop-blur-md flex items-center justify-center p-4 sm:p-8">
+        <motion.div 
+            initial={{ opacity: 0, scale: 0.95, y: 20 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+            className="w-full max-w-5xl h-[85vh] bg-surface-container-lowest rounded-3xl shadow-2xl overflow-hidden flex flex-col md:flex-row border border-outline-variant/30 relative"
+        >
+            {/* Close Button */}
+            <Link to="/dashboard" className="absolute top-4 right-4 w-8 h-8 rounded-full bg-surface-variant flex items-center justify-center hover:bg-outline-variant/30 transition-colors z-20">
+                <X className="w-4 h-4 text-on-surface-variant" />
+            </Link>
 
-      {/* Ambient Background Glow */}
-      <div className="fixed inset-0 pointer-events-none overflow-hidden flex items-center justify-center">
-        <div className="w-[800px] h-[800px] bg-[#c0c1ff]/5 rounded-full blur-[120px]"></div>
-      </div>
+            {/* Sidebar (Tabs) */}
+            <div className="w-full md:w-64 bg-surface-container-low border-r border-outline-variant/30 flex flex-col pt-12 pb-6 px-4">
+                <div className="flex items-center gap-3 px-2 mb-8">
+                    <div className="w-10 h-10 rounded-full overflow-hidden bg-surface-variant shadow-sm shrink-0">
+                        <img src={user?.imageUrl || "https://lh3.googleusercontent.com/aida-public/AB6AXuAdpNE5-WKm5MFn2b-yk7gA_p_Kn0HAZVhocCeU2LroTUEh6spLnuqz718WVyECY57YXlU_ZIFCUP0yGIJO_9U68aiTdsfRod1cixn6cKWCHGCU1TBw7YOsxAxmvaQRU7bQawiaphVcD7NXJGkEw4T17S5ZE5dsiLGnhuWWHpHu7DRWKB488oEZxy_BNFlnaOEAOYVeWHiKKyPLGYaj65KODG0706Jkyi97-2XpynlrGdiFF6kaYbQH"} alt="Avatar" className="w-full h-full object-cover" />
+                    </div>
+                    <div className="truncate">
+                        <p className="font-bold text-[14px] text-on-surface truncate">{user?.fullName || 'User'}</p>
+                        <p className="font-label-sm text-[11px] text-on-surface-variant truncate">{user?.primaryEmailAddress?.emailAddress}</p>
+                    </div>
+                </div>
 
-      <main className="w-full max-w-2xl relative z-10 flex flex-col items-center">
-        <Link to="/dashboard" className="text-[#908fa0] hover:text-[#dce1fb] transition-colors self-start mb-8 flex items-center gap-2">
-          <span className="material-symbols-outlined text-[20px]">arrow_back</span>
-          Back to Dashboard
-        </Link>
-
-        <div className="flex justify-center mb-10">
-          <div className="flex flex-col items-center gap-2">
-            <span className="material-symbols-outlined text-[#c0c1ff] text-5xl" style={{fontVariationSettings: "'FILL' 1"}}>person</span>
-            <span className="text-3xl font-bold text-[#c0c1ff] tracking-tighter">Profile Settings</span>
-          </div>
-        </div>
-
-        <div className="glass-panel rounded-3xl p-8 md:p-12 w-full">
-          <div className="flex flex-col md:flex-row items-center gap-8 mb-10 border-b border-[#464554]/30 pb-10">
-            <div className="w-32 h-32 rounded-full overflow-hidden border-4 border-[#191f31] shadow-xl">
-              <img 
-                alt="User profile photo" 
-                className="w-full h-full object-cover" 
-                src={user?.imageUrl || "https://lh3.googleusercontent.com/aida-public/AB6AXuAdpNE5-WKm5MFn2b-yk7gA_p_Kn0HAZVhocCeU2LroTUEh6spLnuqz718WVyECY57YXlU_ZIFCUP0yGIJO_9U68aiTdsfRod1cixn6cKWCHGCU1TBw7YOsxAxmvaQRU7bQawiaphVcD7NXJGkEw4T17S5ZE5dsiLGnhuWWHpHu7DRWKB488oEZxy_BNFlnaOEAOYVeWHiKKyPLGYaj65KODG0706Jkyi97-2XpynlrGdiFF6kaYbQH"}
-              />
+                <div className="flex flex-row md:flex-col gap-1 overflow-x-auto md:overflow-visible custom-scrollbar pb-2 md:pb-0">
+                    {tabs.map(tab => (
+                        <button
+                            key={tab.id}
+                            onClick={() => setActiveTab(tab.id)}
+                            className={`flex items-center gap-3 px-3 py-2.5 rounded-lg font-label-md text-[14px] transition-colors whitespace-nowrap md:whitespace-normal ${activeTab === tab.id ? 'bg-stitch-primary/10 text-stitch-primary font-bold' : 'text-on-surface hover:bg-surface-variant/50'}`}
+                        >
+                            {tab.icon}
+                            {tab.label}
+                        </button>
+                    ))}
+                </div>
             </div>
-            
-            <div className="flex flex-col text-center md:text-left">
-              <h2 className="text-2xl font-bold text-[#dce1fb]">{user?.fullName || 'Anonymous User'}</h2>
-              <p className="text-lg text-[#908fa0] mt-1">{user?.primaryEmailAddress?.emailAddress}</p>
-              <div className="mt-4 inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#151b2d] border border-[#2e3447] text-sm text-[#c0c1ff]">
-                <span className="material-symbols-outlined text-[16px] text-[#4285F4]">verified_user</span>
-                Premium Account
-              </div>
-            </div>
-          </div>
 
-          <div className="space-y-6">
-            <h3 className="text-xl font-semibold text-[#c7c4d7]">Account Actions</h3>
-            
-            <div className="flex flex-col sm:flex-row gap-4">
-              <button 
-                onClick={handleLogout}
-                className="flex-1 bg-[#2e3447] hover:bg-[#33394c] text-[#ffb4ab] border border-[#ffb4ab]/20 font-medium py-3.5 rounded-lg flex items-center justify-center gap-2 transition-colors duration-200"
-              >
-                <span className="material-symbols-outlined text-[20px]">logout</span>
-                Sign Out
-              </button>
+            {/* Main Content Area */}
+            <div className="flex-1 bg-surface-container-lowest p-8 md:p-12 overflow-y-auto custom-scrollbar relative">
+                <AnimatePresence mode="wait">
+                    {activeTab === 'account' && (
+                        <motion.div key="account" initial={{opacity:0, x:20}} animate={{opacity:1, x:0}} exit={{opacity:0, x:-20}} className="max-w-2xl">
+                            <h2 className="font-headline-md text-2xl font-bold mb-6">Account Settings</h2>
+                            <div className="space-y-6">
+                                <div className="p-6 rounded-2xl border border-outline-variant/30 bg-surface flex flex-col sm:flex-row items-center gap-6">
+                                    <img src={user?.imageUrl} className="w-24 h-24 rounded-full shadow-sm" alt="Profile" />
+                                    <div className="flex-1">
+                                        <h3 className="font-bold mb-1">Profile Picture</h3>
+                                        <p className="text-sm text-on-surface-variant mb-3">Upload a new avatar. Larger image will be resized automatically.</p>
+                                        <div className="flex gap-2">
+                                            <button className="px-4 py-1.5 bg-stitch-primary text-white rounded-md text-sm font-medium hover:bg-stitch-primary/90">Change</button>
+                                            <button className="px-4 py-1.5 bg-surface-variant text-on-surface rounded-md text-sm font-medium hover:bg-outline-variant/30">Remove</button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div className="flex flex-col gap-1.5">
+                                        <label className="text-sm font-medium">First Name</label>
+                                        <input type="text" className="px-4 py-2 rounded-lg border border-outline-variant/30 bg-surface-container-low" defaultValue={user?.firstName} />
+                                    </div>
+                                    <div className="flex flex-col gap-1.5">
+                                        <label className="text-sm font-medium">Last Name</label>
+                                        <input type="text" className="px-4 py-2 rounded-lg border border-outline-variant/30 bg-surface-container-low" defaultValue={user?.lastName} />
+                                    </div>
+                                </div>
+                                <div className="pt-6 border-t border-outline-variant/20 mt-8">
+                                    <h3 className="font-bold text-red-500 mb-2">Danger Zone</h3>
+                                    <p className="text-sm text-on-surface-variant mb-4">Permanently delete your account and all of your content.</p>
+                                    <button onClick={handleLogout} className="px-4 py-2 bg-red-50 text-red-600 rounded-lg text-sm font-medium border border-red-200 hover:bg-red-100 flex items-center gap-2">
+                                        <LogOut className="w-4 h-4" /> Sign Out
+                                    </button>
+                                </div>
+                            </div>
+                        </motion.div>
+                    )}
+
+                    {activeTab === 'appearance' && (
+                        <motion.div key="appearance" initial={{opacity:0, x:20}} animate={{opacity:1, x:0}} exit={{opacity:0, x:-20}} className="max-w-2xl">
+                            <h2 className="font-headline-md text-2xl font-bold mb-6">Appearance</h2>
+                            <p className="text-on-surface-variant mb-6 text-sm">Customize how Sparkfolio looks on your device.</p>
+                            
+                            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                                <button onClick={() => setTheme('light')} className={`flex flex-col gap-3 p-4 rounded-xl border-2 transition-colors text-left ${theme === 'light' ? 'border-stitch-primary bg-stitch-primary/5' : 'border-outline-variant/30 hover:border-outline-variant'}`}>
+                                    <div className="w-full h-24 rounded-lg bg-[#F7F7F8] border border-gray-200 p-2 flex flex-col gap-2">
+                                        <div className="w-full h-3 rounded-full bg-gray-200"></div>
+                                        <div className="w-2/3 h-3 rounded-full bg-gray-200"></div>
+                                        <div className="w-full h-8 rounded-md bg-white border border-gray-200 mt-auto"></div>
+                                    </div>
+                                    <span className="font-medium text-sm">Light Mode</span>
+                                </button>
+                                <button onClick={() => setTheme('dark')} className={`flex flex-col gap-3 p-4 rounded-xl border-2 transition-colors text-left ${theme === 'dark' ? 'border-stitch-primary bg-stitch-primary/5' : 'border-outline-variant/30 hover:border-outline-variant'}`}>
+                                    <div className="w-full h-24 rounded-lg bg-[#0F1115] border border-gray-800 p-2 flex flex-col gap-2">
+                                        <div className="w-full h-3 rounded-full bg-gray-800"></div>
+                                        <div className="w-2/3 h-3 rounded-full bg-gray-800"></div>
+                                        <div className="w-full h-8 rounded-md bg-[#1C1F26] border border-gray-800 mt-auto"></div>
+                                    </div>
+                                    <span className="font-medium text-sm">Dark Mode</span>
+                                </button>
+                                <button onClick={() => setTheme('system')} className={`flex flex-col gap-3 p-4 rounded-xl border-2 transition-colors text-left ${theme === 'system' ? 'border-stitch-primary bg-stitch-primary/5' : 'border-outline-variant/30 hover:border-outline-variant'}`}>
+                                    <div className="w-full h-24 rounded-lg bg-gradient-to-br from-[#F7F7F8] to-[#0F1115] border border-outline-variant/30 p-2 flex flex-col gap-2 overflow-hidden relative">
+                                        <div className="absolute inset-0 bg-gradient-to-r from-transparent to-black/50"></div>
+                                    </div>
+                                    <span className="font-medium text-sm">System Default</span>
+                                </button>
+                            </div>
+                        </motion.div>
+                    )}
+
+                    {activeTab === 'integrations' && (
+                        <motion.div key="integrations" initial={{opacity:0, x:20}} animate={{opacity:1, x:0}} exit={{opacity:0, x:-20}} className="max-w-2xl">
+                            <h2 className="font-headline-md text-2xl font-bold mb-6">OAuth Integrations</h2>
+                            <p className="text-on-surface-variant mb-6 text-sm">Connect your external accounts to automatically import data and sync your portfolio widgets.</p>
+                            
+                            <div className="space-y-4">
+                                <div className="p-5 rounded-2xl border border-outline-variant/30 bg-surface flex items-center justify-between">
+                                    <div className="flex items-center gap-4">
+                                        <div className="w-10 h-10 rounded-full bg-[#0077b5]/10 text-[#0077b5] flex items-center justify-center shrink-0">
+                                            <Linkedin className="w-5 h-5" />
+                                        </div>
+                                        <div>
+                                            <h4 className="font-bold text-sm">LinkedIn</h4>
+                                            <p className="text-xs text-on-surface-variant">Import your work experience instantly</p>
+                                        </div>
+                                    </div>
+                                    <button className="px-4 py-1.5 bg-surface-variant text-on-surface rounded-full text-sm font-medium hover:bg-outline-variant/30">Connect</button>
+                                </div>
+                                <div className="p-5 rounded-2xl border border-outline-variant/30 bg-surface flex items-center justify-between">
+                                    <div className="flex items-center gap-4">
+                                        <div className="w-10 h-10 rounded-full bg-[#333]/10 text-[#333] flex items-center justify-center shrink-0">
+                                            <Github className="w-5 h-5" />
+                                        </div>
+                                        <div>
+                                            <h4 className="font-bold text-sm">GitHub</h4>
+                                            <p className="text-xs text-on-surface-variant">Sync repositories to your portfolio</p>
+                                        </div>
+                                    </div>
+                                    <button className="px-4 py-1.5 bg-surface-variant text-on-surface rounded-full text-sm font-medium hover:bg-outline-variant/30">Connect</button>
+                                </div>
+                            </div>
+                        </motion.div>
+                    )}
+                </AnimatePresence>
             </div>
-          </div>
-        </div>
-      </main>
+        </motion.div>
     </div>
   );
 }
-
-export default ProfilePage;

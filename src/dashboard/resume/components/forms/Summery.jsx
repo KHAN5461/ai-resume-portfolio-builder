@@ -58,9 +58,9 @@ function Summery({enabledNext}) {
     }
     return (
     <div>
-         <div className='p-5 shadow-lg rounded-lg border-t-primary border-t-4 mt-10'>
-        <h2 className='font-bold text-lg'>Summery</h2>
-        <p>Add Summery for your job title</p>
+         <div className='bg-surface-container-lowest p-6 rounded-2xl border border-outline-variant/30 shadow-sm mt-4'>
+        <h2 className='font-headline-md font-bold text-on-surface'>Summary</h2>
+        <p className='font-body-sm text-on-surface-variant mb-6'>Add Summary for your job title</p>
 
         <form className='mt-7' onSubmit={onSave}>
             <div className='flex justify-between items-end'>
@@ -82,10 +82,10 @@ function Summery({enabledNext}) {
                 defaultValue={summery?summery:(resumeInfo?.summery || resumeInfo?.summary)}
             onChange={(e)=>setSummery(e.target.value)}
             />
-            <div className='mt-2 flex justify-end'>
+            <div className='mt-6 flex justify-end'>
             <Button type="submit"
-                disabled={loading}>
-                    {loading?<LoaderCircle className='animate-spin' />:'Save'}
+                disabled={loading} className="bg-stitch-primary hover:bg-stitch-primary/90 text-white rounded-xl h-12 px-8 shadow-sm">
+                    {loading?<LoaderCircle className='animate-spin' />:'Force Save'}
                     </Button>
             </div>
         </form>

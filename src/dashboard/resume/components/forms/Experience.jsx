@@ -7,7 +7,7 @@ import { setResumeData } from '@/store/resumeSlice';
 import { useParams } from 'react-router-dom'
 import GlobalApi from './../../../../../service/GlobalApi'
 import { toast } from 'sonner'
-import { LoaderCircle, GripVertical } from 'lucide-react'
+import { LoaderCircle, GripVertical, Trash2, Wand2 } from 'lucide-react'
 import { handleFormKeyDown } from '@/lib/keyboard'
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd'
 
@@ -54,8 +54,8 @@ function Experience() {
         }])
     }
 
-    const RemoveExperience=()=>{
-        setExperinceList(experinceList=>experinceList.slice(0,-1))
+    const RemoveExperience=(indexToRemove)=>{
+        setExperinceList(experinceList.filter((_, index) => index !== indexToRemove));
     }
 
     const handleRichTextEditor=(e,name,index)=>{
@@ -73,6 +73,27 @@ function Experience() {
         }));
      
     },[experinceList]);
+
+    const handleAIGenerate = async (index) => {
+        const item = experinceList[index];
+        if (!item.title || !item.companyName) {
+            toast.error("Please enter a Position Title and Company Name first.");
+            return;
+        }
+
+        toast.info("Generating bullet points...");
+        // Mock API call
+        setTimeout(() => {
+            const aiText = `<ul>
+                <li>Spearheaded new initiatives at ${item.companyName} as a ${item.title}, increasing overall efficiency by 25%.</li>
+                <li>Collaborated with cross-functional teams to deliver key projects ahead of schedule.</li>
+                <li>Implemented industry best practices to optimize workflows and reduce operational costs.</li>
+            </ul>`;
+            
+            handleRichTextEditor({ target: { value: aiText } }, 'workSummery', index);
+            toast.success("AI generated bullet points!");
+        }, 1500);
+    }
 
     const onDragEnd = (result) => {
         if (!result.destination) return;
@@ -104,9 +125,9 @@ function Experience() {
     }
   return (
     <div onKeyDown={handleFormKeyDown} className="form-container">
-        <div className='p-5 shadow-lg rounded-lg border-t-primary border-t-4 mt-10'>
-        <h2 className='font-bold text-lg'>Professional Experience</h2>
-        <p>Add Your previous Job experience</p>
+        <div className='bg-surface-container-lowest p-6 rounded-2xl border border-outline-variant/30 shadow-sm mt-4'>
+        <h2 className='font-headline-md font-bold text-on-surface'>Professional Experience</h2>
+        <p className='font-body-sm text-on-surface-variant mb-6'>Add Your previous Job experience. Drag to reorder.</p>
         <div>
             <DragDropContext onDragEnd={onDragEnd}>
                 <Droppable droppableId="experience-list">
@@ -126,49 +147,66 @@ function Experience() {
                                             >
                                                 <GripVertical size={16} />
                                             </div>
-                                            <div className='grid grid-cols-2 gap-3 border p-3 rounded-lg bg-surface hover:border-stitch-primary/30 transition-colors'>
+                                            <div className='grid grid-cols-2 gap-3 border border-outline-variant/20 p-5 rounded-xl bg-surface hover:border-stitch-primary/30 transition-colors relative'>
+                                                <Button 
+                                                    variant="ghost" 
+                                                    size="icon" 
+                                                    className="absolute top-2 right-2 text-on-surface-variant hover:text-red-500 hover:bg-red-500/10 h-8 w-8 rounded-full"
+                                                    onClick={() => RemoveExperience(index)}
+                                                >
+                                                    <Trash2 size={16} />
+                                                </Button>
                                                 <div>
-                                                    <label className='text-xs'>Position Title</label>
+                                                    <label className='font-label-md'>Position Title</label>
                                                     <Input name="title" 
                                                     onChange={(event)=>handleChange(index,event)}
                                                     defaultValue={item?.title}
                                                     />
                                                 </div>
                                                 <div>
-                                                    <label className='text-xs'>Company Name</label>
+                                                    <label className='font-label-md'>Company Name</label>
                                                     <Input name="companyName" 
                                                     onChange={(event)=>handleChange(index,event)}
                                                     defaultValue={item?.companyName} />
                                                 </div>
                                                 <div>
-                                                    <label className='text-xs'>City</label>
+                                                    <label className='font-label-md'>City</label>
                                                     <Input name="city" 
                                                     onChange={(event)=>handleChange(index,event)} 
                                                     defaultValue={item?.city}/>
                                                 </div>
                                                 <div>
-                                                    <label className='text-xs'>State</label>
+                                                    <label className='font-label-md'>State</label>
                                                     <Input name="state" 
                                                     onChange={(event)=>handleChange(index,event)}
                                                     defaultValue={item?.state}
                                                      />
                                                 </div>
                                                 <div>
-                                                    <label className='text-xs'>Start Date</label>
+                                                    <label className='font-label-md'>Start Date</label>
                                                     <Input type="date"  
                                                     name="startDate" 
                                                     onChange={(event)=>handleChange(index,event)} 
                                                     defaultValue={item?.startDate}/>
                                                 </div>
                                                 <div>
-                                                    <label className='text-xs'>End Date</label>
+                                                    <label className='font-label-md'>End Date</label>
                                                     <Input type="date" name="endDate" 
                                                     onChange={(event)=>handleChange(index,event)} 
                                                     defaultValue={item?.endDate}
                                                     />
                                                 </div>
-                                                <div className='col-span-2'>
-                                                   {/* Work Summery  */}
+                                                <div className='col-span-2 relative mt-4'>
+                                                   <div className="flex justify-between items-center mb-2">
+                                                       <label className='font-label-md'>Work Summary</label>
+                                                       <button 
+                                                           onClick={(e) => { e.preventDefault(); handleAIGenerate(index); }}
+                                                           className="flex items-center gap-1.5 text-xs font-bold text-stitch-primary hover:bg-stitch-primary/10 px-3 py-1.5 rounded-full transition-colors"
+                                                       >
+                                                           <Wand2 className="w-3.5 h-3.5" />
+                                                           AI Generate
+                                                       </button>
+                                                   </div>
                                                    <RichTextEditor
                                                    index={index}
                                                    defaultValue={item?.workSummery}
@@ -185,14 +223,12 @@ function Experience() {
                 </Droppable>
             </DragDropContext>
         </div>
-        <div className='flex justify-between'>
-            <div className='flex gap-2'>
-            <Button variant="outline" onClick={AddNewExperience} className="text-primary"> + Add More Experience</Button>
-            <Button variant="outline" onClick={RemoveExperience} className="text-primary"> - Remove</Button>
-
+        <div className='flex flex-col md:flex-row justify-between mt-6 gap-4'>
+            <div className='flex-1'>
+            <Button variant="outline" onClick={AddNewExperience} className="w-full border-dashed border-2 border-stitch-primary/30 text-stitch-primary hover:bg-stitch-primary/5 hover:border-stitch-primary transition-colors rounded-xl h-12"> + Add More Experience</Button>
             </div>
-            <Button disabled={loading} onClick={()=>onSave()}>
-            {loading?<LoaderCircle className='animate-spin' />:'Save'}    
+            <Button disabled={loading} onClick={()=>onSave()} className="bg-stitch-primary hover:bg-stitch-primary/90 text-white rounded-xl h-12 px-8 shadow-sm">
+            {loading?<LoaderCircle className='animate-spin' />:'Force Save'}    
             </Button>
         </div>
         </div>

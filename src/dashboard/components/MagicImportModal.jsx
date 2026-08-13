@@ -139,36 +139,59 @@ function MagicImportModal({ renderTrigger }) {
       ) : null}
 
       <Dialog open={openDialog} onOpenChange={setOpenDialog}>
-        <DialogContent className="bg-surface border-outline-variant/30 rounded-2xl max-w-2xl">
-          <DialogHeader>
-            <DialogTitle className="text-2xl font-bold flex items-center gap-2">
-              <Wand2 className="text-stitch-primary" />
+        <DialogContent className="bg-surface-container-lowest border-outline-variant/30 rounded-2xl max-w-2xl p-0 overflow-hidden">
+          <DialogHeader className="p-6 border-b border-outline-variant/20 bg-surface">
+            <DialogTitle className="text-2xl font-bold flex items-center gap-2 text-on-surface">
+              <div className="w-10 h-10 rounded-full bg-stitch-primary/10 flex items-center justify-center text-stitch-primary">
+                <Wand2 size={24} />
+              </div>
               Magic Import
             </DialogTitle>
             <DialogDescription className="text-on-surface-variant mt-2">
-              Paste your messy LinkedIn dump, old resume, or a bio below. Our AI will instantly structure it into a perfect, ATS-ready JSON payload.
+              Our AI will instantly structure messy data into a perfect, ATS-ready format.
             </DialogDescription>
-            
+          </DialogHeader>
+          
+          <div className="p-6">
+            {/* Tabs */}
+            <div className="flex gap-2 mb-6 border-b border-outline-variant/20 pb-2">
+              <button className="px-4 py-2 font-label-md text-stitch-primary border-b-2 border-stitch-primary transition-colors flex items-center gap-2">
+                <span className="material-symbols-outlined text-[18px]">content_paste</span>
+                Paste Text
+              </button>
+              <button className="px-4 py-2 font-label-md text-on-surface-variant hover:text-on-surface transition-colors flex items-center gap-2 opacity-50 cursor-not-allowed" title="Coming soon">
+                <span className="material-symbols-outlined text-[18px]">link</span>
+                LinkedIn URL
+              </button>
+              <button className="px-4 py-2 font-label-md text-on-surface-variant hover:text-on-surface transition-colors flex items-center gap-2 opacity-50 cursor-not-allowed" title="Coming soon">
+                <span className="material-symbols-outlined text-[18px]">upload_file</span>
+                Upload PDF
+              </button>
+            </div>
+
             <div className="my-4">
               <textarea
                 value={rawText}
                 onChange={(e) => setRawText(e.target.value)}
-                className="w-full h-[250px] p-4 bg-surface-container-lowest border border-outline-variant/30 rounded-xl focus:ring-2 focus:ring-stitch-primary outline-none resize-none custom-scrollbar"
-                placeholder="Paste your raw text here..."
+                className="w-full h-[250px] p-4 bg-surface text-on-surface border border-outline-variant/30 rounded-xl focus:ring-2 focus:ring-stitch-primary/50 focus:border-stitch-primary outline-none resize-none custom-scrollbar font-body-sm shadow-inner transition-all placeholder:text-outline"
+                placeholder="Paste your raw LinkedIn dump, old resume text, or bio here..."
               />
             </div>
 
-            <div className="flex justify-end gap-3 mt-4">
-              <Button onClick={() => setOpenDialog(false)} variant="ghost" className="rounded-full">Cancel</Button>
-              <Button 
-                disabled={!rawText || loading}
-                onClick={handleImport}
-                className="bg-stitch-primary hover:bg-stitch-primary/90 text-white rounded-full flex items-center gap-2 px-6"
-              >
-                {loading ? <Loader2 className='animate-spin' /> : <><Wand2 size={16} /> Extract & Generate</>}
-              </Button>
+            <div className="flex justify-end gap-3 mt-6">
+              <Button onClick={() => setOpenDialog(false)} variant="ghost" className="rounded-full text-on-surface-variant hover:bg-surface-variant">Cancel</Button>
+              <div className="relative group">
+                <div className={`absolute -inset-1 rounded-full bg-gradient-to-r from-stitch-primary to-purple-600 blur opacity-75 group-hover:opacity-100 transition duration-1000 group-hover:duration-200 animate-pulse ${loading || !rawText ? 'hidden' : ''}`}></div>
+                <Button 
+                  disabled={!rawText || loading}
+                  onClick={handleImport}
+                  className="relative bg-stitch-primary hover:bg-stitch-primary/90 text-white rounded-full flex items-center gap-2 px-8 h-10 shadow-md transition-all active:scale-95"
+                >
+                  {loading ? <Loader2 className='animate-spin' /> : <><Wand2 size={16} /> Extract & Generate</>}
+                </Button>
+              </div>
             </div>
-          </DialogHeader>
+          </div>
         </DialogContent>
       </Dialog>
     </div>

@@ -7,25 +7,23 @@ import { ClerkProvider } from './auth.jsx'
 import { Provider } from 'react-redux'
 import { store } from './store/store.js'
 import ErrorBoundary from './components/ErrorBoundary.jsx'
-import TemplateGallery from './pages/TemplateGallery.jsx'
 
 // Code splitting / Lazy Loading for optimization
 const Home = lazy(() => import('./home/index.jsx'))
 const Dashboard = lazy(() => import('./dashboard/index.jsx'))
 const SignInPage = lazy(() => import('./auth/sign-in/index.jsx'))
 const EditResume = lazy(() => import('./dashboard/resume/[resumeId]/edit/index.jsx'))
-const ViewResume = lazy(() => import('./my-resume/[resumeId]/view/index.jsx'))
+const ResumeViewPage = lazy(() => import('./my-resume/[resumeId]/view/index.jsx'))
 const EditPortfolio = lazy(() => import('./dashboard/portfolio/[portfolioId]/edit/index.jsx'))
 const Portfolio = lazy(() => import('./portfolio/index.jsx'))
 const ProfilePage = lazy(() => import('./profile/index.jsx'))
+const TemplatesPage = lazy(() => import('./pages/TemplateGallery.jsx'))
 const NotFound = lazy(() => import('./pages/NotFound.jsx'))
+const CoverLetters = lazy(() => import('./dashboard/cover-letters/index.jsx'))
 
 const LoadingFallback = () => (
-  <div className="flex items-center justify-center min-h-screen bg-slate-950">
-    <div className="flex flex-col items-center gap-4">
-      <div className="w-12 h-12 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin"></div>
-      <p className="text-slate-400 font-medium">Loading Application...</p>
-    </div>
+  <div className="h-screen w-screen flex items-center justify-center bg-surface-container-lowest">
+    <div className="w-12 h-12 border-4 border-stitch-primary border-t-transparent rounded-full animate-spin"></div>
   </div>
 )
 
@@ -51,11 +49,15 @@ const router=createBrowserRouter([
       },
       {
         path:'/templates',
-        element:<TemplateGallery/>
+        element: <Suspense fallback={<LoadingFallback />}><TemplatesPage/></Suspense>
       },
       {
         path:'/profile',
         element: <Suspense fallback={<LoadingFallback />}><ProfilePage/></Suspense>
+      },
+      {
+        path:'/dashboard/cover-letters',
+        element: <Suspense fallback={<LoadingFallback />}><CoverLetters/></Suspense>
       }
     ]
   },
@@ -65,7 +67,7 @@ const router=createBrowserRouter([
   },
   {
     path:'/my-resume/:resumeId/view',
-    element: <Suspense fallback={<LoadingFallback />}><ViewResume/></Suspense>
+    element: <Suspense fallback={<LoadingFallback />}><ResumeViewPage/></Suspense>
   },
   {
     path:'/my-portfolio/:portfolioId/view',

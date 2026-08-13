@@ -47,42 +47,14 @@ function AddResume({ renderTrigger }) {
   return (
     <div>
         {renderTrigger ? (
-            renderTrigger(() => setOpenDialog(true))
+            renderTrigger(() => navigation('/templates'))
         ) : (
-            <div className='p-14 py-24 items-center flex justify-center bg-[var(--color-paper)] rounded-[16px] h-[280px] hover:border-[var(--color-signal-blue)] cursor-pointer border border-[var(--color-chalk)] group transition-colors'
-            onClick={()=>setOpenDialog(true)}
+            <div className='p-14 py-24 items-center flex justify-center bg-surface-container-lowest rounded-[16px] h-[280px] hover:border-primary-container cursor-pointer border border-outline-variant/30 group transition-colors'
+            onClick={()=>navigation('/templates')}
             >
-                <PlusSquare className="text-[var(--color-fog)] group-hover:text-[var(--color-signal-blue)] transition-colors w-10 h-10 stroke-[1.5px]" />
+                <PlusSquare className="text-on-surface-variant group-hover:text-stitch-primary transition-colors w-10 h-10 stroke-[1.5px]" />
             </div>
         )}
-
-        <Dialog open={openDialog} onOpenChange={setOpenDialog}>
-            <DialogContent className="bg-[var(--color-paper)] border-[var(--color-chalk)] rounded-[16px]">
-                <DialogHeader>
-                    <DialogTitle className="text-[24px] font-semibold text-[var(--color-carbon)]">Create New Resume</DialogTitle>
-                    <DialogDescription>
-                        <p className="text-[var(--color-pencil)] mt-1">Add a title for your new resume</p>
-                        <Input className="my-4 border-[var(--color-chalk)] text-[var(--color-ink)]" 
-                        placeholder="Ex.Full Stack resume"
-                        onChange={(e)=>setResumeTitle(e.target.value)}
-                        />
-                    </DialogDescription>
-                    <div className='flex justify-end gap-3'>
-                        <Button onClick={()=>setOpenDialog(false)} variant="ghost" className="text-[var(--color-pencil)] hover:bg-[var(--color-mist)] rounded-[36px]">Cancel</Button>
-                        <Button 
-                            disabled={!resumeTitle||loading}
-                            onClick={()=>onCreate()}
-                            className="bg-[var(--color-signal-blue)] hover:bg-[var(--color-deep-signal)] text-white rounded-[36px]"
-                        >
-                            {loading?
-                            <Loader2 className='animate-spin' /> :'Create'   
-                        }
-                        </Button>
-                    </div>
-                </DialogHeader>
-            </DialogContent>
-        </Dialog>
-
     </div>
   )
 }

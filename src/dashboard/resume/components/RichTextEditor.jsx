@@ -79,26 +79,32 @@ function RichTextEditor({onRichTextEditorChange,index,defaultValue}) {
           {loading ? 'Generating...' : (value && value.length > 20 && value !== '<ul><li></li></ul>' ? 'Rewrite with AI' : 'Generate from scratch')}
         </Button>
       </div>
+    <div className="bg-surface-container-lowest border border-outline-variant/30 rounded-xl overflow-hidden focus-within:ring-2 focus-within:ring-stitch-primary/50 focus-within:border-stitch-primary transition-all">
     <EditorProvider>
       <Editor value={value} onChange={(e)=>{
         setValue(e.target.value);
         onRichTextEditorChange(e)
-      }}>
-         <Toolbar>
-          <BtnBold />
-          <BtnItalic />
-          <BtnUnderline />
-          <BtnStrikeThrough />
-          <Separator />
-          <BtnNumberedList />
-          <BtnBulletList />
-          <Separator />
-          <BtnLink />
-         
-         
+      }} className="min-h-[150px] p-4 text-on-surface bg-transparent focus:outline-none">
+         <Toolbar className="bg-surface-variant/30 border-b border-outline-variant/30 px-2 py-1 flex gap-1 flex-wrap items-center">
+          <div className="flex gap-1 bg-surface rounded-lg p-1 shadow-sm border border-outline-variant/20">
+            <BtnBold className="hover:bg-primary-container hover:text-on-primary-container rounded-md p-1" />
+            <BtnItalic className="hover:bg-primary-container hover:text-on-primary-container rounded-md p-1" />
+            <BtnUnderline className="hover:bg-primary-container hover:text-on-primary-container rounded-md p-1" />
+            <BtnStrikeThrough className="hover:bg-primary-container hover:text-on-primary-container rounded-md p-1" />
+          </div>
+          <Separator className="mx-1 h-6 bg-outline-variant/30 w-px" />
+          <div className="flex gap-1 bg-surface rounded-lg p-1 shadow-sm border border-outline-variant/20">
+            <BtnNumberedList className="hover:bg-primary-container hover:text-on-primary-container rounded-md p-1" />
+            <BtnBulletList className="hover:bg-primary-container hover:text-on-primary-container rounded-md p-1" />
+          </div>
+          <Separator className="mx-1 h-6 bg-outline-variant/30 w-px" />
+          <div className="flex gap-1 bg-surface rounded-lg p-1 shadow-sm border border-outline-variant/20">
+            <BtnLink className="hover:bg-primary-container hover:text-on-primary-container rounded-md p-1" />
+          </div>
         </Toolbar>
       </Editor>
       </EditorProvider>
+    </div>
     </div>
   )
 }

@@ -1,7 +1,19 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useUser } from '@/auth';
 import { motion } from 'framer-motion';
+import { v4 as uuidv4 } from 'uuid';
+import GlobalApi from './../service/GlobalApi';
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogHeader,
+    DialogTitle,
+} from "@/components/ui/dialog";
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Loader2 } from 'lucide-react';
 
 const TEMPLATES = [
   { id: 'classic', name: 'Classic Template', category: 'Professional', image: 'https://images.unsplash.com/photo-1586281380349-632531db7ed4?w=500&q=80', description: 'A timeless layout with a strong focus on experience and structure.' },
@@ -14,8 +26,42 @@ const CATEGORIES = ['All', 'Professional', 'Creative', 'Tech', 'Academic'];
 
 export default function TemplateGallery() {
   const { user } = useUser();
+  const navigation = useNavigate();
   const [searchTerm, setSearchTerm] = useState('');
   const [activeCategory, setActiveCategory] = useState('All');
+  
+  const [openDialog, setOpenDialog] = useState(false);
+  const [resumeTitle, setResumeTitle] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [selectedTemplateId, setSelectedTemplateId] = useState(null);
+
+  const onCreate = async () => {
+      setLoading(true);
+      const uuid = uuidv4();
+      const data = {
+          data: {
+              title: resumeTitle,
+              resumeId: uuid,
+              userEmail: user?.primaryEmailAddress?.emailAddress,
+              userName: user?.fullName,
+              themeColor: selectedTemplateId === 'modern' ? '#ff6666' : '#9F5BFF' // Example logic to apply theme based on template
+          }
+      };
+
+      GlobalApi.CreateNewResume(data).then(resp => {
+          if(resp){
+              setLoading(false);
+              navigation('/dashboard/resume/' + resp.data.data.documentId + "/edit");
+          }
+      }).catch((error) => {
+          setLoading(false);
+      });
+  };
+
+  const handleUseTemplate = (templateId) => {
+      setSelectedTemplateId(templateId);
+      setOpenDialog(true);
+  };
 
   const filteredTemplates = TEMPLATES.filter(t => {
     const matchesSearch = t.name.toLowerCase().includes(searchTerm.toLowerCase());
@@ -124,9 +170,9 @@ export default function TemplateGallery() {
                 <div className="relative h-48 overflow-hidden bg-surface-container border-b border-outline-variant/30">
                   <img src={template.image} alt={template.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out" />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center p-4">
-                     <Link to="/dashboard" className="px-6 py-2 bg-stitch-primary text-white font-label-md rounded-full shadow-lg hover:bg-stitch-primary/90 transition-colors transform translate-y-4 group-hover:translate-y-0 duration-300">
+                     <button onClick={() => handleUseTemplate(template.id)} className="px-6 py-2 bg-stitch-primary text-white font-label-md rounded-full shadow-lg hover:bg-stitch-primary/90 transition-colors transform translate-y-4 group-hover:translate-y-0 duration-300">
                         Use Template
-                     </Link>
+                     </button>
                   </div>
                   <div className="absolute top-3 right-3 bg-surface/90 backdrop-blur-sm px-2 py-1 rounded-md">
                      <span className="text-[10px] font-bold text-stitch-primary uppercase tracking-wider">{template.category}</span>
@@ -149,6 +195,32 @@ export default function TemplateGallery() {
           </div>
 
         </div>
+
+        <Dialog open={openDialog} onOpenChange={setOpenDialog}>
+            <DialogContent className="bg-surface-container-lowest border-outline-variant/30 rounded-2xl">
+                <DialogHeader>
+                    <DialogTitle className="text-[24px] font-semibold text-on-surface">Create New Resume</DialogTitle>
+                    <DialogDescription>
+                        <p className="text-on-surface-variant mt-1">Add a title for your new resume based on the selected template</p>
+                        <Input className="my-4 border-outline-variant/50 text-on-surface bg-surface" 
+                        placeholder="Ex. Full Stack Developer"
+                        onChange={(e)=>setResumeTitle(e.target.value)}
+                        />
+                    </DialogDescription>
+                    <div className='flex justify-end gap-3'>
+                        <Button onClick={()=>setOpenDialog(false)} variant="ghost" className="text-on-surface-variant hover:bg-surface-variant rounded-full">Cancel</Button>
+                        <Button 
+                            disabled={!resumeTitle||loading}
+                            onClick={onCreate}
+                            className="bg-stitch-primary hover:bg-stitch-primary/90 text-white rounded-full"
+                        >
+                            {loading ? <Loader2 className='animate-spin' /> : 'Create'}
+                        </Button>
+                    </div>
+                </DialogHeader>
+            </DialogContent>
+        </Dialog>
+
       </main>
     </div>
   );

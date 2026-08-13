@@ -7,6 +7,8 @@ import { Navigate, Outlet } from 'react-router-dom'
 import { useUser } from './auth.jsx'
 import { Toaster } from './components/ui/sonner'
 import OfflineBanner from './components/OfflineBanner'
+import { CommandPalette } from './components/CommandPalette'
+import { ProductTour } from './components/ProductTour'
 import { db } from './lib/firebaseConfig'
 import { doc, getDoc } from 'firebase/firestore'
 import { useDispatch } from 'react-redux'
@@ -53,6 +55,8 @@ function App() {
       <OfflineBanner />
       <Outlet/>
       <Toaster />
+      <CommandPalette />
+      <ProductTour />
     </>
   )
 }

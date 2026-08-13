@@ -60,50 +60,50 @@ function PersonalDetail({enabledNext}) {
         
     }
   return (
-    <div className='p-5 shadow-lg rounded-lg border-t-primary border-t-4 mt-10'>
-        <h2 className='font-bold text-lg'>Personal Detail</h2>
-        <p>Get Started with the basic information</p>
+    <div className='bg-surface-container-lowest p-6 rounded-2xl border border-outline-variant/30 shadow-sm mt-4'>
+        <h2 className='font-headline-md font-bold text-on-surface'>Personal Detail</h2>
+        <p className='font-body-sm text-on-surface-variant mb-6'>Get Started with the basic information</p>
 
         <form onSubmit={onSave} onKeyDown={handleFormKeyDown}>
             <div className='grid grid-cols-2 mt-5 gap-3'>
                 <div>
-                    <label className='text-sm'>First Name</label>
+                    <label className='font-label-md mb-1.5 block'>First Name</label>
                     <Input name="firstName" value={formData?.firstName || ''} required onChange={handleInputChange}  />
                 </div>
                 <div>
-                    <label className='text-sm'>Last Name</label>
+                    <label className='font-label-md mb-1.5 block'>Last Name</label>
                     <Input name="lastName" required onChange={handleInputChange} 
                     value={formData?.lastName || ''} />
                 </div>
                 <div className='col-span-2'>
-                    <label className='text-sm'>Job Title</label>
+                    <label className='font-label-md mb-1.5 block'>Job Title</label>
                     <Input name="jobTitle" required 
                     value={formData?.jobTitle || ''}
                     onChange={handleInputChange}  />
                 </div>
                 <div className='col-span-2'>
-                    <label className='text-sm'>Address</label>
+                    <label className='font-label-md mb-1.5 block'>Address</label>
                     <Input name="address" required 
                     value={formData?.address || ''}
                     onChange={handleInputChange}  />
                 </div>
                 <div>
-                    <label className='text-sm'>Phone</label>
+                    <label className='font-label-md mb-1.5 block'>Phone</label>
                     <Input name="phone" required 
                     value={formData?.phone || ''}
                     onChange={handleInputChange}  />
                 </div>
                 <div>
-                    <label className='text-sm'>Email</label>
+                    <label className='font-label-md mb-1.5 block'>Email</label>
                     <Input name="email" required 
                     value={formData?.email || ''}
                     onChange={handleInputChange}  />
                 </div>
             </div>
-            <div className='mt-3 flex justify-end'>
+            <div className='mt-6 flex justify-end'>
                 <Button type="submit"
-                disabled={loading}>
-                    {loading?<LoaderCircle className='animate-spin' />:'Save'}
+                disabled={loading} className="bg-stitch-primary hover:bg-stitch-primary/90 text-white rounded-xl h-12 px-8 shadow-sm">
+                    {loading?<LoaderCircle className='animate-spin' />:'Force Save'}
                     </Button>
             </div>
         </form>

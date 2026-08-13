@@ -3,10 +3,59 @@ import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { PricingSection } from './components/PricingSection';
 import { CheckoutModal } from './components/CheckoutModal';
+import { HeroAnimation } from './components/HeroAnimation';
+import ResumePreview from '../dashboard/resume/components/ResumePreview';
+import { useDispatch } from 'react-redux';
+import { setResumeData } from '@/store/resumeSlice';
 
 function Home() {
   const [checkoutOpen, setCheckoutOpen] = useState(false);
   const [selectedPlan, setSelectedPlan] = useState('pro');
+  const dispatch = useDispatch();
+
+  // Inject dummy data for the demo
+  React.useEffect(() => {
+    dispatch(setResumeData({
+        firstName: 'Jane',
+        lastName: 'Doe',
+        jobTitle: 'Senior Product Designer',
+        address: 'San Francisco, CA',
+        phone: '(555) 123-4567',
+        email: 'jane.doe@example.com',
+        themeColor: '#6F42C1',
+        themeFont: 'Inter',
+        summery: 'Award-winning product designer with 8+ years of experience in crafting intuitive, user-centric digital experiences.',
+        experience: [
+            {
+                id: 1,
+                title: 'Lead Designer',
+                companyName: 'Tech Innovators Inc.',
+                city: 'San Francisco',
+                state: 'CA',
+                startDate: '2020-01-01',
+                endDate: '',
+                currentlyWorking: true,
+                workSummery: '<ul><li>Spearheaded the redesign of the core SaaS platform, increasing user retention by 25%.</li><li>Managed a team of 5 product designers.</li></ul>'
+            }
+        ],
+        education: [
+             {
+                id: 1,
+                universityName: 'Stanford University',
+                startDate: '2014-09-01',
+                endDate: '2018-06-01',
+                degree: 'BFA',
+                major: 'Interaction Design',
+                description: 'Graduated with Honors.'
+            }
+        ],
+        skills: [
+            { id: 1, name: 'Figma', rating: 5 },
+            { id: 2, name: 'React', rating: 4 },
+            { id: 3, name: 'UI/UX Design', rating: 5 },
+        ]
+    }));
+  }, [dispatch]);
 
   const handleUpgrade = (plan) => {
     setSelectedPlan(plan);
@@ -54,21 +103,47 @@ function Home() {
 <span className="material-symbols-outlined text-sm text-secondary" data-icon="sparkles">arrow_back_ios_new</span>
 <span className="font-label-sm text-label-sm text-on-surface font-medium">Empowered Creativity v2.0 is here</span>
 </div>
-<h1 className="font-headline-xl text-headline-xl md:text-[64px] font-extrabold leading-tight tracking-tight mb-6 max-w-4xl">
-                    Craft Your Future <br className="hidden md:block"/>with <span className="gradient-text">AI Magic</span>
-</h1>
-<p className="font-body-lg text-body-lg text-on-surface-variant max-w-2xl mb-10">
-                    Lower the barrier to professional-grade design. Sparkfolio combines intuitive tools with powerful AI to bring your creative vision to life instantly.
-                </p>
-<div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
-<Link to="/dashboard" className="bg-primary text-on-primary font-label-md text-label-md px-8 py-4 rounded-full shadow-[0_8px_16px_rgba(0,0,0,0.08)] hover:-translate-y-0.5 hover:shadow-[0_12px_32px_rgba(0,0,0,0.12)] transition-all duration-200 flex items-center justify-center gap-2 min-h-[48px]">
-                        Start Creating
-                        <span className="material-symbols-outlined" data-icon="arrow_forward">arrow_forward</span>
-</Link>
-<button className="bg-surface/50 backdrop-blur-sm text-primary border-2 border-primary/20 font-label-md text-label-md px-8 py-4 rounded-full hover:bg-surface-variant hover:border-primary/40 transition-all duration-200 flex items-center justify-center gap-2 min-h-[48px]">
-<span className="material-symbols-outlined" data-icon="play_circle">play_circle</span>
-                        Watch Demo
-                    </button>
+<div className="w-full max-w-6xl mb-12 flex flex-col lg:flex-row items-center gap-12">
+    <div className="flex-1 text-left">
+        <h1 className="font-headline-xl text-headline-xl md:text-[64px] font-extrabold leading-tight tracking-tight mb-6">
+            Craft Your Future <br className="hidden md:block"/>with <span className="gradient-text">AI Magic</span>
+        </h1>
+        <p className="font-body-lg text-body-lg text-on-surface-variant mb-10">
+            Lower the barrier to professional-grade design. Sparkfolio combines intuitive tools with powerful AI to bring your creative vision to life instantly.
+        </p>
+        <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto mt-4">
+            <Link to="/dashboard" className="bg-primary text-on-primary font-label-md text-label-md px-8 py-4 rounded-full shadow-[0_0_20px_rgba(159,91,255,0.4)] hover:-translate-y-1 hover:shadow-[0_0_30px_rgba(159,91,255,0.6)] hover:bg-primary/90 transition-all duration-300 flex items-center justify-center gap-2 min-h-[48px]">
+                Start Creating
+                <span className="material-symbols-outlined group-hover:translate-x-1 transition-transform" data-icon="arrow_forward">arrow_forward</span>
+            </Link>
+            <button className="bg-white/50 backdrop-blur-md text-primary border border-white/40 font-label-md text-label-md px-8 py-4 rounded-full hover:bg-white/80 hover:shadow-lg transition-all duration-300 flex items-center justify-center gap-2 min-h-[48px] hover:-translate-y-1">
+                <span className="material-symbols-outlined" data-icon="play_circle">play_circle</span>
+                Watch Demo
+            </button>
+        </div>
+    </div>
+    <div className="flex-1 relative w-full perspective-1000">
+        {/* Decorative elements behind the demo */}
+        <div className="absolute inset-0 bg-gradient-to-tr from-stitch-primary/20 to-secondary/20 rounded-[2rem] transform rotate-3 scale-105 -z-10"></div>
+        <div className="w-full bg-white rounded-[2rem] shadow-2xl border-4 border-surface-container overflow-hidden p-4 relative group">
+            <div className="absolute top-4 left-4 flex gap-2 z-20">
+                <div className="w-3 h-3 rounded-full bg-red-400"></div>
+                <div className="w-3 h-3 rounded-full bg-amber-400"></div>
+                <div className="w-3 h-3 rounded-full bg-green-400"></div>
+            </div>
+            {/* The actual live preview embedded! */}
+            <div className="w-full h-[500px] overflow-y-auto custom-scrollbar pt-8 rounded-xl scale-[0.8] origin-top bg-white pointer-events-none opacity-80 group-hover:opacity-100 transition-opacity">
+                <ResumePreview />
+            </div>
+            {/* Overlay to encourage clicking */}
+            <div className="absolute inset-0 bg-black/5 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none rounded-[2rem]">
+                <div className="bg-white text-stitch-primary font-bold px-6 py-3 rounded-full shadow-xl flex items-center gap-2 transform translate-y-4 group-hover:translate-y-0 transition-transform">
+                    <span className="material-symbols-outlined">edit</span>
+                    Live Editor Preview
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 </div>
 </section>
@@ -80,7 +155,7 @@ function Home() {
 </div>
 <div className="grid grid-cols-1 md:grid-cols-3 gap-md md:gap-lg auto-rows-[300px]">
 {/*  Bento Item 1: Large Span  */}
-<div className="md:col-span-2 bg-surface rounded-xl p-lg shadow-[0_2px_4px_rgba(0,0,0,0.05)] hover:shadow-[0_8px_16px_rgba(0,0,0,0.08)] transition-shadow duration-300 flex flex-col justify-between overflow-hidden relative group border border-outline-variant/30">
+<motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1, duration: 0.5 }} className="md:col-span-2 bg-surface/70 backdrop-blur-md rounded-2xl p-lg shadow-sm hover:shadow-2xl hover:shadow-primary/10 hover:-translate-y-2 transition-all duration-300 flex flex-col justify-between overflow-hidden relative group border border-white/60 dark:border-white/10">
 <div className="relative z-10">
 <div className="w-12 h-12 rounded-full bg-primary-container text-on-primary-container flex items-center justify-center mb-4">
 <span className="material-symbols-outlined" data-icon="auto_fix_high">auto_fix_high</span>
@@ -91,9 +166,9 @@ function Home() {
 <div className="absolute -bottom-10 -right-10 w-2/3 h-2/3 rounded-tl-2xl overflow-hidden shadow-lg group-hover:-translate-y-2 group-hover:-translate-x-2 transition-transform duration-500">
 <img className="w-full h-full object-cover" data-alt="A sleek digital workspace showing an abstract, modern UI dashboard interface on a screen, bathed in soft, diffused light mode illumination with white backgrounds and crisp teal and purple accents. The interface displays playful geometric shapes and smooth data visualizations, conveying a high-tech yet approachable creative tool environment." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCOvL-9SUuiII7JhJJZNGmwa54OQ1wDMv0_wY8YLdsAnXZ2kOtl4-gw4kqrLwkjzt2NtQCulaes6_tRJdlN3o72doF9w_6SrYKCJ_qlD6Yh50-7SjsWOO-yUT7oDFgcmZabEvhb5G6j_KsMTK4KEvcBgW8Y-IxyHqM-vD0l_QTMQpc_9cdLMUsPiCKMlwsOUXY5ANFmeFFDMP9o-ZCJG88ItbOBjW5KtMH6u3Brmu3iyapgR2EDLJl0"/>
 </div>
-</div>
+</motion.div>
 {/*  Bento Item 2: Small  */}
-<div className="bg-surface rounded-xl p-lg shadow-[0_2px_4px_rgba(0,0,0,0.05)] hover:shadow-[0_8px_16px_rgba(0,0,0,0.08)] transition-shadow duration-300 flex flex-col justify-between border border-outline-variant/30">
+<motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2, duration: 0.5 }} className="bg-surface/70 backdrop-blur-md rounded-2xl p-lg shadow-sm hover:shadow-2xl hover:shadow-secondary/10 hover:-translate-y-2 transition-all duration-300 flex flex-col justify-between border border-white/60 dark:border-white/10">
 <div>
 <div className="w-12 h-12 rounded-full bg-secondary-fixed text-on-secondary-fixed flex items-center justify-center mb-4">
 <span className="material-symbols-outlined" data-icon="palette">palette</span>
@@ -106,9 +181,9 @@ function Home() {
 <div className="h-8 flex-1 rounded-full bg-secondary"></div>
 <div className="h-8 flex-1 rounded-full bg-tertiary"></div>
 </div>
-</div>
+</motion.div>
 {/*  Bento Item 3: Small  */}
-<div className="bg-surface rounded-xl p-lg shadow-[0_2px_4px_rgba(0,0,0,0.05)] hover:shadow-[0_8px_16px_rgba(0,0,0,0.08)] transition-shadow duration-300 flex flex-col justify-between border border-outline-variant/30">
+<motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3, duration: 0.5 }} className="bg-surface/70 backdrop-blur-md rounded-2xl p-lg shadow-sm hover:shadow-2xl hover:shadow-tertiary/10 hover:-translate-y-2 transition-all duration-300 flex flex-col justify-between border border-white/60 dark:border-white/10">
 <div>
 <div className="w-12 h-12 rounded-full bg-tertiary-fixed text-on-tertiary-fixed flex items-center justify-center mb-4">
 <span className="material-symbols-outlined" data-icon="devices">devices</span>
@@ -116,9 +191,9 @@ function Home() {
 <h3 className="font-headline-md text-headline-md text-xl mb-2">Responsive by Default</h3>
 <p className="font-body-sm text-body-sm text-on-surface-variant">Your designs automatically adapt to look perfect on desktop, tablet, and mobile.</p>
 </div>
-</div>
+</motion.div>
 {/*  Bento Item 4: Medium Span  */}
-<div className="md:col-span-2 bg-gradient-to-br from-surface to-surface-variant rounded-xl p-lg shadow-[0_2px_4px_rgba(0,0,0,0.05)] hover:shadow-[0_8px_16px_rgba(0,0,0,0.08)] transition-shadow duration-300 flex items-center overflow-hidden border border-outline-variant/30 relative">
+<motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4, duration: 0.5 }} className="md:col-span-2 bg-gradient-to-br from-surface/80 to-surface-variant/80 backdrop-blur-md rounded-2xl p-lg shadow-sm hover:shadow-2xl hover:shadow-primary/10 hover:-translate-y-2 transition-all duration-300 flex items-center overflow-hidden border border-white/60 dark:border-white/10 relative group">
 <div className="w-1/2 pr-8 z-10">
 <h3 className="font-headline-md text-headline-md mb-2">Seamless Collaboration</h3>
 <p className="font-body-sm text-body-sm text-on-surface-variant mb-6">Work together in real-time. Leave comments, share drafts, and iterate faster than ever.</p>
@@ -129,7 +204,7 @@ function Home() {
 <div className="absolute right-0 top-0 bottom-0 w-1/2">
 <img className="w-full h-full object-cover object-left opacity-90" data-alt="A bright, minimalist collage showing diverse, smiling professional avatars interconnected by flowing lines and small UI 'comment' bubbles. The aesthetic uses soft white backgrounds, pastel teal and purple accents, and diffused lighting to convey a sense of modern, friendly digital teamwork in a light mode setting." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDoaGu-MWRfkGeCW3jDQJpVFs2T8z1Op-DAVXu2mjDQjGliw7TR0ou7Rg4Qk8fJPpgVn5Edle1wG3SXAbMMdczwzIQgxEwLFIsJBVhpVGbgkC9EOuJStSpyrJtB_uNOlint2wjLdRChlB43UD1jOhjuBcTZdIGYHHyOjfcZI1Hs2HevzeY3SRT6vKsRzXXJhG6a-dRUkIN8vlsXz1XHMUBtG0WONjtgj8uVnoSi5WNB0MzHbo2kWrBF"/>
 </div>
-</div>
+</motion.div>
 </div>
 </section>
 

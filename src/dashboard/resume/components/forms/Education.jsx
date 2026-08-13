@@ -3,7 +3,7 @@ import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { useDispatch, useSelector } from 'react-redux';
 import { setResumeData } from '@/store/resumeSlice';
-import { LoaderCircle, GripVertical } from 'lucide-react'
+import { LoaderCircle, GripVertical, Trash2 } from 'lucide-react'
 import React, { useContext, useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import GlobalApi from './../../../../../service/GlobalApi'
@@ -53,9 +53,8 @@ function Education() {
       }
     ])
   }
-  const RemoveEducation=()=>{
-    setEducationalList(educationalList=>educationalList.slice(0,-1))
-
+  const RemoveEducation=(indexToRemove)=>{
+    setEducationalList(educationalList.filter((_, index) => index !== indexToRemove));
   }
   const onSave=()=>{
     setLoading(true)
@@ -92,9 +91,9 @@ function Education() {
   };
   return (
     <div onKeyDown={handleFormKeyDown} className="form-container">
-      <div className='p-5 shadow-lg rounded-lg border-t-primary border-t-4 mt-10'>
-      <h2 className='font-bold text-lg'>Education</h2>
-    <p>Add Your educational details</p>
+      <div className='bg-surface-container-lowest p-6 rounded-2xl border border-outline-variant/30 shadow-sm mt-4'>
+      <h2 className='font-headline-md font-bold text-on-surface'>Education</h2>
+    <p className='font-body-sm text-on-surface-variant mb-6'>Add Your educational details</p>
 
     <div>
       <DragDropContext onDragEnd={onDragEnd}>
@@ -115,40 +114,48 @@ function Education() {
                       >
                           <GripVertical size={16} />
                       </div>
-                      <div className='grid grid-cols-2 gap-3 border p-3 rounded-lg bg-surface hover:border-stitch-primary/30 transition-colors'>
+                      <div className='grid grid-cols-2 gap-3 border border-outline-variant/20 p-5 rounded-xl bg-surface hover:border-stitch-primary/30 transition-colors relative'>
+                        <Button 
+                            variant="ghost" 
+                            size="icon" 
+                            className="absolute top-2 right-2 text-on-surface-variant hover:text-red-500 hover:bg-red-500/10 h-8 w-8 rounded-full"
+                            onClick={() => RemoveEducation(index)}
+                        >
+                            <Trash2 size={16} />
+                        </Button>
                         <div className='col-span-2'>
-                          <label>University Name</label>
+                          <label className='font-label-md'>University Name</label>
                           <Input name="universityName" 
                           onChange={(e)=>handleChange(e,index)}
                           defaultValue={item?.universityName}
                           />
                         </div>
                         <div>
-                          <label>Degree</label>
+                          <label className='font-label-md'>Degree</label>
                           <Input name="degree" 
                           onChange={(e)=>handleChange(e,index)}
                           defaultValue={item?.degree} />
                         </div>
                         <div>
-                          <label>Major</label>
+                          <label className='font-label-md'>Major</label>
                           <Input name="major" 
                           onChange={(e)=>handleChange(e,index)}
                           defaultValue={item?.major} />
                         </div>
                         <div>
-                          <label>Start Date</label>
+                          <label className='font-label-md'>Start Date</label>
                           <Input type="date" name="startDate" 
                           onChange={(e)=>handleChange(e,index)}
                           defaultValue={item?.startDate} />
                         </div>
                         <div>
-                          <label>End Date</label>
+                          <label className='font-label-md'>End Date</label>
                           <Input type="date" name="endDate" 
                           onChange={(e)=>handleChange(e,index)}
                           defaultValue={item?.endDate} />
                         </div>
                         <div className='col-span-2'>
-                          <label>Description</label>
+                          <label className='font-label-md'>Description</label>
                           <Textarea name="description" 
                           onChange={(e)=>handleChange(e,index)}
                           defaultValue={item?.description} />
@@ -164,14 +171,12 @@ function Education() {
         </Droppable>
       </DragDropContext>
     </div>
-    <div className='flex justify-between'>
-            <div className='flex gap-2'>
-            <Button variant="outline" onClick={AddNewEducation} className="text-primary"> + Add More Education</Button>
-            <Button variant="outline" onClick={RemoveEducation} className="text-primary"> - Remove</Button>
-
+    <div className='flex flex-col md:flex-row justify-between mt-6 gap-4'>
+            <div className='flex-1'>
+            <Button variant="outline" onClick={AddNewEducation} className="w-full border-dashed border-2 border-stitch-primary/30 text-stitch-primary hover:bg-stitch-primary/5 hover:border-stitch-primary transition-colors rounded-xl h-12"> + Add More Education</Button>
             </div>
-            <Button disabled={loading} onClick={()=>onSave()}>
-            {loading?<LoaderCircle className='animate-spin' />:'Save'}    
+            <Button disabled={loading} onClick={()=>onSave()} className="bg-stitch-primary hover:bg-stitch-primary/90 text-white rounded-xl h-12 px-8 shadow-sm">
+            {loading?<LoaderCircle className='animate-spin' />:'Force Save'}    
             </Button>
         </div>
     </div>

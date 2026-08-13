@@ -11,6 +11,7 @@ import GlobalApi from './../../service/GlobalApi';
 import ModernTemplate from './templates/ModernTemplate';
 import MinimalistTemplate from './templates/MinimalistTemplate';
 import CreativeTemplate from './templates/CreativeTemplate';
+import BentoTemplate from './templates/BentoTemplate';
 
 export default function Portfolio() {
   const { portfolioId } = useParams();
@@ -58,7 +59,7 @@ export default function Portfolio() {
     '--accent': portfolioData.siteConfig?.accentColor || '#6366f1',
   };
 
-  const themePreset = portfolioData.siteConfig?.themePreset || 'modern';
+  const themePreset = portfolioData.siteConfig?.themePreset || 'bento';
 
   const updateThemePreset = (preset) => {
     // Optimistic UI update
@@ -76,6 +77,7 @@ export default function Portfolio() {
     <div className="min-h-screen relative" style={style}>
       
       {/* Dynamic Template Engine */}
+      {themePreset === 'bento' && <BentoTemplate portfolioData={portfolioData} />}
       {themePreset === 'minimalist' && <MinimalistTemplate portfolioData={portfolioData} />}
       {themePreset === 'creative' && <CreativeTemplate portfolioData={portfolioData} />}
       {(themePreset === 'modern' || themePreset === 'default') && <ModernTemplate portfolioData={portfolioData} />}
@@ -84,6 +86,12 @@ export default function Portfolio() {
       <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 flex items-center gap-2 p-2 bg-slate-900/80 backdrop-blur-md rounded-full shadow-2xl border border-slate-700/50">
         <span className="material-symbols-outlined text-slate-300 ml-2 text-[20px]">palette</span>
         <div className="h-4 w-px bg-slate-700 mx-1"></div>
+        <button 
+          onClick={() => updateThemePreset('bento')}
+          className={`px-4 py-1.5 rounded-full text-sm font-medium transition-colors ${themePreset === 'bento' ? 'bg-white text-slate-900' : 'text-slate-300 hover:text-white hover:bg-slate-800'}`}
+        >
+          Bento
+        </button>
         <button 
           onClick={() => updateThemePreset('modern')}
           className={`px-4 py-1.5 rounded-full text-sm font-medium transition-colors ${themePreset === 'modern' || themePreset === 'default' ? 'bg-white text-slate-900' : 'text-slate-300 hover:text-white hover:bg-slate-800'}`}

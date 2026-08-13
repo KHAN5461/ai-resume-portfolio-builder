@@ -19,8 +19,9 @@ import {
 } from "@/components/ui/alert-dialog"
 import GlobalApi from './../../../service/GlobalApi'
 import { toast } from 'sonner'
+import { Eye, Clock } from 'lucide-react'
 
-function ResumeCardItem({resume,refreshData, optimisticDelete, rollbackDelete}) {
+function ResumeCardItem({resume,refreshData, optimisticDelete, rollbackDelete, views}) {
 
   const navigation=useNavigate();
   const [openAlert,setOpenAlert]=useState(false);
@@ -50,7 +51,7 @@ function ResumeCardItem({resume,refreshData, optimisticDelete, rollbackDelete}) 
 
   return (
     <>
-      <div className="group flex flex-col bg-surface-container-lowest rounded-xl border border-outline-variant/40 overflow-hidden hover:shadow-[0px_8px_16px_rgba(0,0,0,0.08)] transition-all duration-300 cursor-pointer hardware-accelerated h-[280px]">
+      <div className="group flex flex-col bg-surface-container-lowest/80 backdrop-blur-sm rounded-xl border border-outline-variant/40 overflow-hidden hover:shadow-[0px_12px_24px_rgba(0,0,0,0.12)] hover:-translate-y-2 transition-all duration-300 cursor-pointer hardware-accelerated h-[280px]">
         <Link to={'/dashboard/resume/'+resume.documentId+"/edit"} className="relative h-40 bg-surface-container overflow-hidden flex items-center justify-center bg-surface-variant/30 group-hover:bg-surface-variant/50 transition-colors">
           <span className="material-symbols-outlined text-outline text-4xl group-hover:scale-110 transition-transform">description</span>
           <div className="absolute top-2 right-2 bg-surface/90 backdrop-blur-sm px-2 py-1 rounded-full flex items-center gap-1 shadow-sm">
@@ -59,11 +60,20 @@ function ResumeCardItem({resume,refreshData, optimisticDelete, rollbackDelete}) 
           </div>
         </Link>
         <div className="p-4 flex flex-col flex-1">
-          <Link to={'/dashboard/resume/'+resume.documentId+"/edit"}>
-            <h4 className="font-headline-md text-[18px] font-bold text-on-surface mb-1 truncate group-hover:text-stitch-primary transition-colors">{resume.title}</h4>
-            <p className="font-body-sm text-[14px] text-on-surface-variant mb-4">ID: {resume.documentId?.substring(0,6)}...</p>
-          </Link>
-          <div className="mt-auto flex justify-between items-center">
+          <h4 className="font-headline-md text-[18px] font-bold text-on-surface mb-1 truncate group-hover:text-stitch-primary transition-colors">{resume.title}</h4>
+          
+          <div className="flex items-center justify-between mb-4 mt-2">
+              <p className="font-body-sm text-[12px] text-on-surface-variant flex items-center gap-1">
+                  <Clock className="w-3.5 h-3.5" /> Updated recently
+              </p>
+              {views !== undefined && (
+                  <p className="font-body-sm text-[12px] font-medium text-stitch-primary flex items-center gap-1 bg-stitch-primary/10 px-2 py-0.5 rounded-full">
+                      <Eye className="w-3.5 h-3.5" /> {views} views
+                  </p>
+              )}
+          </div>
+
+          <div className="mt-auto flex justify-between items-center pt-3 border-t border-outline-variant/30">
             <span className="inline-flex items-center rounded-full bg-stitch-primary/10 px-2.5 py-0.5 font-label-sm text-[12px] text-stitch-primary">Resume</span>
             
             <DropdownMenu>
