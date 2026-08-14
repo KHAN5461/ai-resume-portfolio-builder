@@ -5,7 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { updateHeroSection } from '@/store/portfolioSlice';
 
-export default function HeroForm() {
+const HeroForm = () => {
   const { portfolioId } = useParams();
   const dispatch = useDispatch();
   const portfolioData = useSelector((state) => state.portfolio.portfolios[portfolioId]);
@@ -76,3 +76,5 @@ export default function HeroForm() {
     </div>
   );
 }
+
+export default React.memo(HeroForm);

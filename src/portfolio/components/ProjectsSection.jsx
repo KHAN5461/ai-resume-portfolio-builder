@@ -5,7 +5,7 @@ export default function ProjectsSection({ data }) {
   if (!data || data.length === 0) return null;
 
   return (
-    <section id="projects" className="py-[clamp(2rem,8vw,6rem)] px-8 max-w-[1200px] mx-auto">
+    <section id="projects" className="py-24 px-8 max-w-6xl mx-auto">
       <h2 className="text-center text-[clamp(2rem,4vw,3.5rem)] mb-12 text-[#2c3e50] font-['Space_Grotesk',sans-serif] font-bold">
         My Work
       </h2>

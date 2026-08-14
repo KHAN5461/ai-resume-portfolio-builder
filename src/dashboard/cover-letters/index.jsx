@@ -1,22 +1,51 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Sparkles, FileText, Upload, ChevronRight, CheckCircle2, ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { useUser } from '../../auth.jsx';
+import GlobalApi from '../../service/GlobalApi';
+import { AIChatSession } from '../../service/AIModal';
 
 export default function CoverLetterGenerator() {
+  const { user } = useUser();
   const [step, setStep] = useState(1);
   const [jobDescription, setJobDescription] = useState('');
   const [isGenerating, setIsGenerating] = useState(false);
   const [coverLetter, setCoverLetter] = useState(null);
+  const [resumes, setResumes] = useState([]);
+  const [selectedResume, setSelectedResume] = useState(null);
 
-  const handleGenerate = () => {
+  useEffect(() => {
+    if (user?.primaryEmailAddress?.emailAddress) {
+        GlobalApi.GetUserResumes(user?.primaryEmailAddress?.emailAddress).then(resp => {
+            setResumes(resp.data.data);
+        });
+    }
+  }, [user]);
+
+  const handleGenerate = async () => {
     setIsGenerating(true);
-    // Simulate AI Generation
-    setTimeout(() => {
-      setIsGenerating(false);
-      setCoverLetter(`Dear Hiring Manager,\n\nI am thrilled to apply for this position. With over 8 years of experience in product design and a proven track record of increasing user retention by 25% at Tech Innovators Inc., I am confident in my ability to deliver outstanding results for your team.\n\nMy expertise in Figma and React aligns perfectly with your requirements. I would welcome the opportunity to discuss how my unique blend of technical and creative skills can contribute to your continued success.\n\nSincerely,\nJane Doe`);
+    try {
+      const prompt = `Write a professional cover letter for the following job description:\n${jobDescription}\n\nBased on my resume details:\n${JSON.stringify({
+        title: selectedResume.title,
+        summary: selectedResume.summary || selectedResume.summery,
+        experience: selectedResume.experience || selectedResume.Experience,
+        education: selectedResume.education,
+        skills: selectedResume.skills,
+        firstName: selectedResume.firstName,
+        lastName: selectedResume.lastName,
+        email: selectedResume.email,
+        phone: selectedResume.phone
+      })}\n\nDo not include placeholders like [Your Name] if the information is available, use the details provided. Just return the text of the cover letter, no markdown blocks.`;
+      
+      const result = await AIChatSession.sendMessage(prompt);
+      setCoverLetter(result.response.text());
       setStep(3);
-    }, 2500);
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setIsGenerating(false);
+    }
   };
 
   return (
@@ -69,32 +98,26 @@ export default function CoverLetterGenerator() {
                         className="bg-surface border border-outline-variant/30 rounded-3xl p-8 shadow-sm max-w-2xl"
                     >
                         <h2 className="text-xl font-bold mb-6">Which resume should we base this on?</h2>
-                        <div className="grid grid-cols-1 gap-4">
-                            <button onClick={() => setStep(2)} className="flex items-center justify-between p-5 rounded-2xl border-2 border-outline-variant/30 hover:border-stitch-primary hover:bg-stitch-primary/5 transition-all group text-left">
-                                <div className="flex items-center gap-4">
-                                    <div className="w-12 h-12 rounded-lg bg-blue-500/10 text-blue-600 flex items-center justify-center">
-                                        <FileText className="w-6 h-6" />
-                                    </div>
-                                    <div>
-                                        <h3 className="font-bold text-[16px]">Senior Designer Role</h3>
-                                        <p className="text-sm text-on-surface-variant">Last updated 2 days ago</p>
-                                    </div>
-                                </div>
-                                <ChevronRight className="w-5 h-5 text-on-surface-variant group-hover:text-stitch-primary transition-colors" />
-                            </button>
-                            <button onClick={() => setStep(2)} className="flex items-center justify-between p-5 rounded-2xl border-2 border-outline-variant/30 hover:border-stitch-primary hover:bg-stitch-primary/5 transition-all group text-left">
-                                <div className="flex items-center gap-4">
-                                    <div className="w-12 h-12 rounded-lg bg-emerald-500/10 text-emerald-600 flex items-center justify-center">
-                                        <FileText className="w-6 h-6" />
-                                    </div>
-                                    <div>
-                                        <h3 className="font-bold text-[16px]">Tech Lead Fallback</h3>
-                                        <p className="text-sm text-on-surface-variant">Last updated 1 week ago</p>
-                                    </div>
-                                </div>
-                                <ChevronRight className="w-5 h-5 text-on-surface-variant group-hover:text-stitch-primary transition-colors" />
-                            </button>
-                        </div>
+                        {resumes.length === 0 ? (
+                            <p className="text-on-surface-variant">No resumes found. Please create a resume first.</p>
+                        ) : (
+                            <div className="grid grid-cols-1 gap-4">
+                                {resumes.map((resume, index) => (
+                                    <button key={resume.documentId || index} onClick={() => { setSelectedResume(resume); setStep(2); }} className="flex items-center justify-between p-5 rounded-2xl border-2 border-outline-variant/30 hover:border-stitch-primary hover:bg-stitch-primary/5 transition-all group text-left">
+                                        <div className="flex items-center gap-4">
+                                            <div className="w-12 h-12 rounded-lg bg-blue-500/10 text-blue-600 flex items-center justify-center shrink-0">
+                                                <FileText className="w-6 h-6" />
+                                            </div>
+                                            <div>
+                                                <h3 className="font-bold text-[16px]">{resume.title || "Untitled Resume"}</h3>
+                                                <p className="text-sm text-on-surface-variant line-clamp-1">{resume.summary || resume.summery || "No summary provided."}</p>
+                                            </div>
+                                        </div>
+                                        <ChevronRight className="w-5 h-5 text-on-surface-variant group-hover:text-stitch-primary transition-colors shrink-0" />
+                                    </button>
+                                ))}
+                            </div>
+                        )}
                     </motion.div>
                 )}
 
@@ -107,7 +130,7 @@ export default function CoverLetterGenerator() {
                         className="bg-surface border border-outline-variant/30 rounded-3xl p-8 shadow-sm max-w-2xl"
                     >
                         <h2 className="text-xl font-bold mb-2">Paste the Job Description</h2>
-                        <p className="text-on-surface-variant mb-6">Our AI will analyze the requirements and align your cover letter perfectly.</p>
+                        <p className="text-on-surface-variant mb-6">Our AI will analyze the requirements and align your cover letter perfectly with your {selectedResume?.title} resume.</p>
                         
                         <textarea 
                             value={jobDescription}
@@ -158,20 +181,32 @@ export default function CoverLetterGenerator() {
                         <div className="w-full lg:w-80 bg-surface-container-low rounded-3xl p-6 border border-outline-variant/30 h-fit">
                             <h3 className="font-bold mb-4">Export Options</h3>
                             <div className="space-y-3">
-                                <button className="w-full py-3 bg-stitch-primary text-white rounded-xl font-bold hover:bg-stitch-primary/90 transition-colors shadow-sm">
-                                    Download as PDF
-                                </button>
-                                <button className="w-full py-3 bg-surface border border-outline-variant/30 text-on-surface rounded-xl font-bold hover:bg-surface-variant transition-colors">
+                                <button className="w-full py-3 bg-surface border border-outline-variant/30 text-on-surface rounded-xl font-bold hover:bg-surface-variant transition-colors"
+                                    onClick={() => {
+                                        navigator.clipboard.writeText(coverLetter);
+                                        alert("Copied to clipboard!");
+                                    }}
+                                >
                                     Copy to Clipboard
                                 </button>
                             </div>
 
                             <h3 className="font-bold mt-8 mb-4">AI Iteration</h3>
                             <div className="space-y-3">
-                                <button className="w-full py-2.5 bg-surface border border-outline-variant/30 text-on-surface rounded-lg font-medium hover:bg-surface-variant transition-colors text-sm flex items-center justify-center gap-2">
+                                <button onClick={async () => {
+                                    setIsGenerating(true);
+                                    const result = await AIChatSession.sendMessage(`Rewrite this cover letter to be more formal: ${coverLetter}`);
+                                    setCoverLetter(result.response.text());
+                                    setIsGenerating(false);
+                                }} className="w-full py-2.5 bg-surface border border-outline-variant/30 text-on-surface rounded-lg font-medium hover:bg-surface-variant transition-colors text-sm flex items-center justify-center gap-2">
                                     <Sparkles className="w-4 h-4 text-purple-500" /> Make it more formal
                                 </button>
-                                <button className="w-full py-2.5 bg-surface border border-outline-variant/30 text-on-surface rounded-lg font-medium hover:bg-surface-variant transition-colors text-sm flex items-center justify-center gap-2">
+                                <button onClick={async () => {
+                                    setIsGenerating(true);
+                                    const result = await AIChatSession.sendMessage(`Rewrite this cover letter to be significantly shorter and concise: ${coverLetter}`);
+                                    setCoverLetter(result.response.text());
+                                    setIsGenerating(false);
+                                }} className="w-full py-2.5 bg-surface border border-outline-variant/30 text-on-surface rounded-lg font-medium hover:bg-surface-variant transition-colors text-sm flex items-center justify-center gap-2">
                                     <Sparkles className="w-4 h-4 text-blue-500" /> Make it shorter
                                 </button>
                             </div>

@@ -82,7 +82,7 @@ function Home() {
 <nav className="hidden md:flex items-center gap-lg">
 <Link className="font-label-md text-label-md text-primary dark:text-primary-fixed font-bold border-b-2 border-primary dark:border-primary-fixed pb-1 transition-colors duration-200" to="/">Home</Link>
 <Link className="font-label-md text-label-md text-on-surface-variant dark:text-outline-variant font-medium hover:text-primary dark:hover:text-primary-fixed transition-colors duration-200" to="/dashboard">Drafts</Link>
-<a className="font-label-md text-label-md text-on-surface-variant dark:text-outline-variant font-medium hover:text-primary dark:hover:text-primary-fixed transition-colors duration-200" href="#">AI Import</a>
+<Link className="font-label-md text-label-md text-on-surface-variant dark:text-outline-variant font-medium hover:text-primary dark:hover:text-primary-fixed transition-colors duration-200" to="/dashboard">AI Import</Link>
 </nav>
 <div className="flex items-center">
 <div className="w-8 h-8 rounded-full bg-surface-variant overflow-hidden cursor-pointer active:scale-95 transition-transform duration-200 shadow-sm" title="User profile photo">
@@ -228,14 +228,14 @@ function Home() {
 <span className="material-symbols-outlined" data-icon="description">description</span>
 <span className="font-label-sm text-label-sm mt-1">Drafts</span>
 </Link>
-<a className="flex flex-col items-center justify-center text-on-surface-variant dark:text-outline-variant hover:bg-surface-variant dark:hover:bg-on-surface-variant/10 rounded-full px-4 py-1 active:scale-90 transition-transform duration-150" href="#">
+<Link className="flex flex-col items-center justify-center text-on-surface-variant dark:text-outline-variant hover:bg-surface-variant dark:hover:bg-on-surface-variant/10 rounded-full px-4 py-1 active:scale-90 transition-transform duration-150" to="/dashboard">
 <span className="material-symbols-outlined" data-icon="auto_fix_high">auto_fix_high</span>
 <span className="font-label-sm text-label-sm mt-1">AI Import</span>
-</a>
-<a className="flex flex-col items-center justify-center text-on-surface-variant dark:text-outline-variant hover:bg-surface-variant dark:hover:bg-on-surface-variant/10 rounded-full px-4 py-1 active:scale-90 transition-transform duration-150" href="#">
+</Link>
+<Link className="flex flex-col items-center justify-center text-on-surface-variant dark:text-outline-variant hover:bg-surface-variant dark:hover:bg-on-surface-variant/10 rounded-full px-4 py-1 active:scale-90 transition-transform duration-150" to="/profile">
 <span className="material-symbols-outlined" data-icon="person">person</span>
 <span className="font-label-sm text-label-sm mt-1">Profile</span>
-</a>
+</Link>
 </nav>
 {/*  Footer  */}
 <footer className="w-full py-xl bg-surface-container-low dark:bg-surface-dim mt-auto mb-16 md:mb-0">

@@ -14,6 +14,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { toast } from 'sonner';
 import { Input } from "@/components/ui/input"
 import { Grid, List as ListIcon } from 'lucide-react'
+import { Skeleton } from '@/components/ui/skeleton'
 
 function Dashboard() {
   const {user}=useUser();
@@ -112,6 +113,10 @@ function Dashboard() {
       transition: { staggerChildren: 0.1 }
     }
   };
+
+  const totalPortfolioViews = portfolioList.reduce((acc, curr) => acc + (curr.views || 0), 0);
+  const totalResumeViews = resumeList.reduce((acc, curr) => acc + (curr.views || 0), 0);
+  const totalViews = totalPortfolioViews + totalResumeViews;
 
   const itemVariants = {
     hidden: { opacity: 0, y: 20 },
@@ -277,7 +282,7 @@ function Dashboard() {
               {/* Dashboard Hero / Analytics Area */}
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-2">
                 <div className="lg:col-span-2">
-                    <AnalyticsDashboard />
+                    <AnalyticsDashboard totalViews={totalViews} />
                 </div>
                 <div className="bg-surface-container-low rounded-2xl p-6 border border-outline-variant/30 flex flex-col shadow-sm h-[250px] overflow-hidden">
                     <div className="flex justify-between items-center mb-4">
@@ -350,9 +355,21 @@ function Dashboard() {
             </div>
 
             {/* Documents Grid */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 w-full">
+            <motion.div 
+               variants={containerVariants}
+               initial="hidden"
+               animate="show"
+               className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 w-full"
+            >
               {isLoadingResumes && showResumes && [1, 2, 3, 4].map((item, index) => (
-                <motion.div variants={itemVariants} key={`skel-${index}`} className="h-[280px] rounded-xl bg-surface-variant/30 animate-pulse border border-outline-variant/20"></motion.div>
+                <motion.div variants={itemVariants} key={`skel-${index}`} className="h-[280px] rounded-xl border border-outline-variant/20 p-4 flex flex-col justify-between">
+                  <div>
+                    <Skeleton className="h-40 w-full mb-4 rounded-lg bg-surface-variant/30" />
+                    <Skeleton className="h-6 w-3/4 mb-2 bg-surface-variant/30" />
+                    <Skeleton className="h-4 w-1/2 bg-surface-variant/30" />
+                  </div>
+                  <Skeleton className="h-8 w-24 rounded-full mt-4 bg-surface-variant/30" />
+                </motion.div>
               ))}
               {!isLoadingResumes && showResumes && processedResumes.map((resume) => (
                 <motion.div variants={itemVariants} key={resume.documentId} className="w-full h-[280px]">
@@ -366,7 +383,14 @@ function Dashboard() {
               ))}
               
               {isLoadingPortfolios && showPortfolios && [1, 2, 3].map((item, index) => (
-                <motion.div variants={itemVariants} key={`port-skel-${index}`} className="h-[280px] rounded-xl bg-surface-variant/30 animate-pulse border border-outline-variant/20"></motion.div>
+                <motion.div variants={itemVariants} key={`port-skel-${index}`} className="h-[280px] rounded-xl border border-outline-variant/20 p-4 flex flex-col justify-between">
+                  <div>
+                    <Skeleton className="h-40 w-full mb-4 rounded-lg bg-surface-variant/30" />
+                    <Skeleton className="h-6 w-3/4 mb-2 bg-surface-variant/30" />
+                    <Skeleton className="h-4 w-1/2 bg-surface-variant/30" />
+                  </div>
+                  <Skeleton className="h-8 w-24 rounded-full mt-4 bg-surface-variant/30" />
+                </motion.div>
               ))}
               {!isLoadingPortfolios && showPortfolios && processedPortfolios.map((portfolio) => (
                 <motion.div variants={itemVariants} key={portfolio.documentId} onClick={() => navigate(`/dashboard/portfolio/${portfolio.documentId}/edit`)} className="group flex flex-col bg-surface-container-lowest/80 backdrop-blur-sm rounded-xl border border-outline-variant/40 overflow-hidden hover:shadow-[0px_12px_24px_rgba(0,0,0,0.12)] hover:-translate-y-2 transition-all duration-300 cursor-pointer h-[280px]">
@@ -443,7 +467,7 @@ function Dashboard() {
                   </div>
                 </motion.div>
               )}
-              </div>
+              </motion.div>
             </div>
           </section>
         </div>
@@ -465,10 +489,10 @@ function Dashboard() {
             <span className="font-label-sm text-[12px] mt-1">AI Import</span>
           </button>
         )} />
-        <a className="flex flex-col items-center justify-center text-on-surface-variant hover:bg-surface-variant/50 rounded-full px-4 py-1 active:scale-90 transition-transform duration-150" href="#">
+        <Link className="flex flex-col items-center justify-center text-on-surface-variant hover:bg-surface-variant/50 rounded-full px-4 py-1 active:scale-90 transition-transform duration-150" to="/profile">
           <span className="material-symbols-outlined font-label-sm text-[14px]">person</span>
           <span className="font-label-sm text-[12px] mt-1">Profile</span>
-        </a>
+        </Link>
       </nav>
 
       {/* FAB (Mobile Only) */}

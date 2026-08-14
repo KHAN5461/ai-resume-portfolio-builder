@@ -3,8 +3,10 @@ import reactLogo from './assets/react.svg'
 import viteLogo from '/vite.svg'
 import './App.css'
 import { Button } from './components/ui/button'
-import { Navigate, Outlet } from 'react-router-dom'
+import { Navigate, Outlet, useLocation, useOutlet } from 'react-router-dom'
 import { useUser } from './auth.jsx'
+import { AnimatePresence } from 'framer-motion'
+import React from 'react'
 import { Toaster } from './components/ui/sonner'
 import OfflineBanner from './components/OfflineBanner'
 import { CommandPalette } from './components/CommandPalette'
@@ -18,6 +20,8 @@ function App() {
   const [count, setCount] = useState(0)
   const {user,isLoaded,isSignedIn}=useUser();
   const dispatch = useDispatch();
+  const location = useLocation();
+  const element = useOutlet();
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -53,7 +57,9 @@ function App() {
   return (
     <>
       <OfflineBanner />
-      <Outlet/>
+      <AnimatePresence mode="wait">
+        {element && React.cloneElement(element, { key: location.pathname })}
+      </AnimatePresence>
       <Toaster />
       <CommandPalette />
       <ProductTour />

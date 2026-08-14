@@ -5,13 +5,13 @@ import { setResumeData } from '@/store/resumeSlice';
 import React, { useContext, useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom';
 import GlobalApi from './../../../../../service/GlobalApi';
-import { Brain, LoaderCircle, Sparkles, CheckCircle2 } from 'lucide-react';
+import { Brain, LoaderCircle, Sparkles, CheckCircle2, ArrowLeft, ArrowRight } from 'lucide-react';
 import { toast } from 'sonner';
 import { AIChatSession } from './../../../../../service/AIModal';
 import { motion, AnimatePresence } from 'framer-motion';
 
-const prompt="Job Title: {jobTitle} , Depends on job title give me list of  summery for 3 experience level, Mid Level and Freasher level in 3 -4 lines in array format, With summery and experience_level Field in JSON Format"
-function Summery({enabledNext}) {
+const prompt="Job Title: {jobTitle}. Based on this job title, give me a list of summaries for 3 experience levels (Fresher, Mid Level, Senior Level) in 3-4 lines in an array format. Return ONLY a valid JSON array of objects with 'summary' and 'experience_level' fields."
+function Summery({enabledNext, handleNext, handlePrev}) {
     const dispatch = useDispatch();
     const resumeInfo = useSelector(state => state.resume.resumeData);
     const [summery,setSummery]=useState();
@@ -51,14 +51,15 @@ function Summery({enabledNext}) {
             console.log(resp);
             enabledNext(true);
             setLoading(false);
-            toast("Details updated")
+            toast("Details updated");
+            if (handleNext) handleNext();
         },(error)=>{
             setLoading(false);
         })
     }
     return (
     <div>
-         <div className='bg-surface-container-lowest p-6 rounded-2xl border border-outline-variant/30 shadow-sm mt-4'>
+         <div className='p-2 md:p-4'>
         <h2 className='font-headline-md font-bold text-on-surface'>Summary</h2>
         <p className='font-body-sm text-on-surface-variant mb-6'>Add Summary for your job title</p>
 
@@ -77,16 +78,32 @@ function Summery({enabledNext}) {
                   {loading ? 'Generating...' : 'Magic Generate'}
                 </Button>
             </div>
-            <Textarea className="mt-5" required
+            <Textarea className="mt-5 min-h-[120px]" required
             value={summery}
                 defaultValue={summery?summery:(resumeInfo?.summery || resumeInfo?.summary)}
             onChange={(e)=>setSummery(e.target.value)}
+            maxLength={600}
             />
-            <div className='mt-6 flex justify-end'>
-            <Button type="submit"
+            <div className="flex justify-end mt-2">
+                <span className={`text-xs font-label-sm ${summery?.length > 550 ? 'text-red-500 font-bold' : 'text-on-surface-variant'}`}>
+                    {summery?.length || 0} / 600
+                </span>
+            </div>
+            <div className='mt-6 flex justify-between'>
+                <Button 
+                    type="button" 
+                    variant="outline" 
+                    onClick={handlePrev} 
+                    disabled={!handlePrev}
+                    className="h-12 px-6 rounded-xl text-on-surface-variant hover:text-stitch-primary hover:bg-surface-variant"
+                >
+                    <ArrowLeft className="w-4 h-4 mr-2" /> Prev
+                </Button>
+                <Button type="submit"
                 disabled={loading} className="bg-stitch-primary hover:bg-stitch-primary/90 text-white rounded-xl h-12 px-8 shadow-sm">
-                    {loading?<LoaderCircle className='animate-spin' />:'Force Save'}
-                    </Button>
+                    {loading?<LoaderCircle className='animate-spin mr-2' />:null}
+                    Next <ArrowRight className="w-4 h-4 ml-2" />
+                </Button>
             </div>
         </form>
         </div>

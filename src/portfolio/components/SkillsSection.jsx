@@ -4,7 +4,7 @@ export default function SkillsSection({ data }) {
   if (!data || !data.categories || data.categories.length === 0) return null;
 
   return (
-    <section className="py-[clamp(2rem,6vw,4rem)] px-8 max-w-[1200px] mx-auto">
+    <section className="py-24 px-8 max-w-6xl mx-auto">
       <h2 className="text-3xl font-bold mb-12 flex items-center gap-4">
         <span className="text-[#3366BB] font-['Space_Grotesk',sans-serif] text-xl">03.</span>
         <span className="text-[#2c3e50] font-['Space_Grotesk',sans-serif]">Technical Arsenal</span>

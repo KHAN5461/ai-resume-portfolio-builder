@@ -45,15 +45,21 @@ function RichTextEditor({onRichTextEditorChange,index,defaultValue}) {
             .replace('{companyName}', exp.companyName || 'a company');
         }
         
-        const result=await AIChatSession.sendMessage(prompt);
-        let resp=result.response.text();
+        const result = await AIChatSession.sendMessageStream(prompt);
+        let fullText = "";
         
-        // Cleanup markdown if AI accidentally includes it
-        resp = resp.replace(/```html/g, '').replace(/```/g, '').trim();
+        for await (const chunk of result.stream) {
+          const chunkText = chunk.text();
+          fullText += chunkText;
+          // Cleanup markdown progressively
+          let cleanText = fullText.replace(/```html/g, '').replace(/```/g, '');
+          setValue(cleanText);
+        }
         
-        setValue(resp);
+        let finalCleanText = fullText.replace(/```html/g, '').replace(/```/g, '').trim();
+        setValue(finalCleanText);
         // We need to trigger the parent's onChange manually since we bypassed the DOM event
-        onRichTextEditorChange({ target: { name: 'workSummery', value: resp } });
+        onRichTextEditorChange({ target: { name: 'workSummery', value: finalCleanText } });
         
         toast.success(hasExistingContent ? 'Rewrote experience successfully!' : 'Generated experience successfully!');
       } catch (e) {

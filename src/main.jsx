@@ -20,12 +20,17 @@ const ProfilePage = lazy(() => import('./profile/index.jsx'))
 const TemplatesPage = lazy(() => import('./pages/TemplateGallery.jsx'))
 const NotFound = lazy(() => import('./pages/NotFound.jsx'))
 const CoverLetters = lazy(() => import('./dashboard/cover-letters/index.jsx'))
+const InterviewCoach = lazy(() => import('./interview/index.jsx'))
 
 const LoadingFallback = () => (
   <div className="h-screen w-screen flex items-center justify-center bg-surface-container-lowest">
     <div className="w-12 h-12 border-4 border-stitch-primary border-t-transparent rounded-full animate-spin"></div>
   </div>
 )
+
+const PublicPortfolio = () => {
+  return <Suspense fallback={<LoadingFallback />}><Portfolio isPublic={true}/></Suspense>
+}
 
 const router=createBrowserRouter([
   {
@@ -58,6 +63,10 @@ const router=createBrowserRouter([
       {
         path:'/dashboard/cover-letters',
         element: <Suspense fallback={<LoadingFallback />}><CoverLetters/></Suspense>
+      },
+      {
+        path:'/interview/:resumeId',
+        element: <Suspense fallback={<LoadingFallback />}><InterviewCoach/></Suspense>
       }
     ]
   },
@@ -71,7 +80,11 @@ const router=createBrowserRouter([
   },
   {
     path:'/my-portfolio/:portfolioId/view',
-    element: <Suspense fallback={<LoadingFallback />}><Portfolio/></Suspense>
+    element: <Suspense fallback={<LoadingFallback />}><Portfolio isPublic={false}/></Suspense>
+  },
+  {
+    path:'/p/:portfolioId',
+    element: <PublicPortfolio />
   },
   {
     path: '*',

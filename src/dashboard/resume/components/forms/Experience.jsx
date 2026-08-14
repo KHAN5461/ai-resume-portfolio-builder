@@ -7,7 +7,7 @@ import { setResumeData } from '@/store/resumeSlice';
 import { useParams } from 'react-router-dom'
 import GlobalApi from './../../../../../service/GlobalApi'
 import { toast } from 'sonner'
-import { LoaderCircle, GripVertical, Trash2, Wand2 } from 'lucide-react'
+import { LoaderCircle, GripVertical, Trash2, Plus, ArrowLeft, ArrowRight } from 'lucide-react'
 import { handleFormKeyDown } from '@/lib/keyboard'
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd'
 
@@ -21,11 +21,12 @@ const formField={
     workSummery:'',
 }
 
-function Experience() {
+function Experience({handleNext, handlePrev}) {
     const dispatch = useDispatch();
     const resumeInfo = useSelector(state => state.resume.resumeData);
     const params=useParams();
     const [loading,setLoading]=useState(false);
+    const [expandedIndex, setExpandedIndex] = useState(0);
 
     const [experinceList,setExperinceList]=useState(() => {
         const exp = resumeInfo?.Experience || resumeInfo?.experience;
@@ -43,6 +44,7 @@ function Experience() {
 
     const AddNewExperience=()=>{
     
+        const newIndex = experinceList.length;
         setExperinceList([...experinceList,{
             title:'',
             companyName:'',
@@ -51,7 +53,8 @@ function Experience() {
             startDate:'',
             endDate:'',
             workSummery:'',
-        }])
+        }]);
+        setExpandedIndex(newIndex);
     }
 
     const RemoveExperience=(indexToRemove)=>{
@@ -74,26 +77,7 @@ function Experience() {
      
     },[experinceList]);
 
-    const handleAIGenerate = async (index) => {
-        const item = experinceList[index];
-        if (!item.title || !item.companyName) {
-            toast.error("Please enter a Position Title and Company Name first.");
-            return;
-        }
 
-        toast.info("Generating bullet points...");
-        // Mock API call
-        setTimeout(() => {
-            const aiText = `<ul>
-                <li>Spearheaded new initiatives at ${item.companyName} as a ${item.title}, increasing overall efficiency by 25%.</li>
-                <li>Collaborated with cross-functional teams to deliver key projects ahead of schedule.</li>
-                <li>Implemented industry best practices to optimize workflows and reduce operational costs.</li>
-            </ul>`;
-            
-            handleRichTextEditor({ target: { value: aiText } }, 'workSummery', index);
-            toast.success("AI generated bullet points!");
-        }, 1500);
-    }
 
     const onDragEnd = (result) => {
         if (!result.destination) return;
@@ -112,12 +96,10 @@ function Experience() {
             }
         }
 
-         console.log(experinceList)
-
         GlobalApi.UpdateResumeDetail(params?.resumeId,data).then(res=>{
-            console.log(res);
             setLoading(false);
             toast('Details updated !')
+            if (handleNext) handleNext();
         },(error)=>{
             setLoading(false);
         })
@@ -125,9 +107,9 @@ function Experience() {
     }
   return (
     <div onKeyDown={handleFormKeyDown} className="form-container">
-        <div className='bg-surface-container-lowest p-6 rounded-2xl border border-outline-variant/30 shadow-sm mt-4'>
-        <h2 className='font-headline-md font-bold text-on-surface'>Professional Experience</h2>
-        <p className='font-body-sm text-on-surface-variant mb-6'>Add Your previous Job experience. Drag to reorder.</p>
+        <div>
+            <h2 className='font-headline-md font-bold text-on-surface'>Professional Experience</h2>
+            <p className='font-body-sm text-on-surface-variant mb-6'>Add Your previous Job experience. Drag to reorder.</p>
         <div>
             <DragDropContext onDragEnd={onDragEnd}>
                 <Droppable droppableId="experience-list">
@@ -147,72 +129,102 @@ function Experience() {
                                             >
                                                 <GripVertical size={16} />
                                             </div>
-                                            <div className='grid grid-cols-2 gap-3 border border-outline-variant/20 p-5 rounded-xl bg-surface hover:border-stitch-primary/30 transition-colors relative'>
-                                                <Button 
-                                                    variant="ghost" 
-                                                    size="icon" 
-                                                    className="absolute top-2 right-2 text-on-surface-variant hover:text-red-500 hover:bg-red-500/10 h-8 w-8 rounded-full"
-                                                    onClick={() => RemoveExperience(index)}
+                                            {expandedIndex === index ? (
+                                                <div className='grid grid-cols-2 gap-3 border border-outline-variant/20 p-5 rounded-xl bg-surface hover:border-stitch-primary/30 transition-colors relative'>
+                                                    <Button 
+                                                        variant="ghost" 
+                                                        size="icon" 
+                                                        className="absolute top-2 right-2 text-on-surface-variant hover:text-red-500 hover:bg-red-500/10 h-8 w-8 rounded-full"
+                                                        onClick={(e) => { e.stopPropagation(); RemoveExperience(index); }}
+                                                    >
+                                                        <Trash2 size={16} />
+                                                    </Button>
+                                                    <Button 
+                                                        variant="ghost" 
+                                                        size="sm" 
+                                                        className="absolute top-2 right-12 text-on-surface-variant h-8 rounded-full"
+                                                        onClick={() => setExpandedIndex(-1)}
+                                                    >
+                                                        Collapse
+                                                    </Button>
+                                                    <div>
+                                                        <label className='font-label-md'>Position Title</label>
+                                                        <Input name="title" 
+                                                        onChange={(event)=>handleChange(index,event)}
+                                                        defaultValue={item?.title}
+                                                        className="focus:ring-2 focus:ring-stitch-primary shadow-sm"
+                                                        />
+                                                    </div>
+                                                    <div>
+                                                        <label className='font-label-md'>Company Name</label>
+                                                        <Input name="companyName" 
+                                                        onChange={(event)=>handleChange(index,event)}
+                                                        defaultValue={item?.companyName} 
+                                                        className="focus:ring-2 focus:ring-stitch-primary shadow-sm"
+                                                        />
+                                                    </div>
+                                                    <div>
+                                                        <label className='font-label-md'>City</label>
+                                                        <Input name="city" 
+                                                        onChange={(event)=>handleChange(index,event)} 
+                                                        defaultValue={item?.city}
+                                                        className="focus:ring-2 focus:ring-stitch-primary shadow-sm"
+                                                        />
+                                                    </div>
+                                                    <div>
+                                                        <label className='font-label-md'>State</label>
+                                                        <Input name="state" 
+                                                        onChange={(event)=>handleChange(index,event)}
+                                                        defaultValue={item?.state}
+                                                        className="focus:ring-2 focus:ring-stitch-primary shadow-sm"
+                                                         />
+                                                    </div>
+                                                    <div>
+                                                        <label className='font-label-md'>Start Date</label>
+                                                        <Input type="date"  
+                                                        name="startDate" 
+                                                        onChange={(event)=>handleChange(index,event)} 
+                                                        defaultValue={item?.startDate}
+                                                        className="focus:ring-2 focus:ring-stitch-primary shadow-sm"
+                                                        />
+                                                    </div>
+                                                    <div>
+                                                        <label className='font-label-md'>End Date</label>
+                                                        <Input type="date" name="endDate" 
+                                                        onChange={(event)=>handleChange(index,event)} 
+                                                        defaultValue={item?.endDate}
+                                                        className="focus:ring-2 focus:ring-stitch-primary shadow-sm"
+                                                        />
+                                                    </div>
+                                                    <div className='col-span-2 relative mt-4'>
+                                                       <RichTextEditor
+                                                       index={index}
+                                                       defaultValue={item?.workSummery}
+                                                       onRichTextEditorChange={(event)=>handleRichTextEditor(event,'workSummery',index)}  />
+                                                    </div>
+                                                </div>
+                                            ) : (
+                                                <div 
+                                                    className="flex justify-between items-center bg-surface border border-outline-variant/30 p-4 rounded-xl shadow-sm hover:border-stitch-primary/30 transition-colors cursor-pointer"
+                                                    onClick={() => setExpandedIndex(index)}
                                                 >
-                                                    <Trash2 size={16} />
-                                                </Button>
-                                                <div>
-                                                    <label className='font-label-md'>Position Title</label>
-                                                    <Input name="title" 
-                                                    onChange={(event)=>handleChange(index,event)}
-                                                    defaultValue={item?.title}
-                                                    />
+                                                    <div>
+                                                        <h3 className="font-label-lg font-bold text-on-surface">{item?.title || 'New Position'}</h3>
+                                                        <p className="font-body-sm text-on-surface-variant">{item?.companyName || 'Company Name'} {item?.startDate ? `• ${item.startDate}` : ''}</p>
+                                                    </div>
+                                                    <div className="flex gap-2">
+                                                        <Button variant="ghost" size="sm" onClick={(e) => { e.stopPropagation(); setExpandedIndex(index); }}>Edit</Button>
+                                                        <Button 
+                                                            variant="ghost" 
+                                                            size="icon" 
+                                                            className="text-on-surface-variant hover:text-red-500 hover:bg-red-500/10 h-8 w-8 rounded-full"
+                                                            onClick={(e) => { e.stopPropagation(); RemoveExperience(index); }}
+                                                        >
+                                                            <Trash2 size={16} />
+                                                        </Button>
+                                                    </div>
                                                 </div>
-                                                <div>
-                                                    <label className='font-label-md'>Company Name</label>
-                                                    <Input name="companyName" 
-                                                    onChange={(event)=>handleChange(index,event)}
-                                                    defaultValue={item?.companyName} />
-                                                </div>
-                                                <div>
-                                                    <label className='font-label-md'>City</label>
-                                                    <Input name="city" 
-                                                    onChange={(event)=>handleChange(index,event)} 
-                                                    defaultValue={item?.city}/>
-                                                </div>
-                                                <div>
-                                                    <label className='font-label-md'>State</label>
-                                                    <Input name="state" 
-                                                    onChange={(event)=>handleChange(index,event)}
-                                                    defaultValue={item?.state}
-                                                     />
-                                                </div>
-                                                <div>
-                                                    <label className='font-label-md'>Start Date</label>
-                                                    <Input type="date"  
-                                                    name="startDate" 
-                                                    onChange={(event)=>handleChange(index,event)} 
-                                                    defaultValue={item?.startDate}/>
-                                                </div>
-                                                <div>
-                                                    <label className='font-label-md'>End Date</label>
-                                                    <Input type="date" name="endDate" 
-                                                    onChange={(event)=>handleChange(index,event)} 
-                                                    defaultValue={item?.endDate}
-                                                    />
-                                                </div>
-                                                <div className='col-span-2 relative mt-4'>
-                                                   <div className="flex justify-between items-center mb-2">
-                                                       <label className='font-label-md'>Work Summary</label>
-                                                       <button 
-                                                           onClick={(e) => { e.preventDefault(); handleAIGenerate(index); }}
-                                                           className="flex items-center gap-1.5 text-xs font-bold text-stitch-primary hover:bg-stitch-primary/10 px-3 py-1.5 rounded-full transition-colors"
-                                                       >
-                                                           <Wand2 className="w-3.5 h-3.5" />
-                                                           AI Generate
-                                                       </button>
-                                                   </div>
-                                                   <RichTextEditor
-                                                   index={index}
-                                                   defaultValue={item?.workSummery}
-                                                   onRichTextEditorChange={(event)=>handleRichTextEditor(event,'workSummery',index)}  />
-                                                </div>
-                                            </div>
+                                            )}
                                         </div>
                                     )}
                                 </Draggable>
@@ -223,14 +235,29 @@ function Experience() {
                 </Droppable>
             </DragDropContext>
         </div>
-        <div className='flex flex-col md:flex-row justify-between mt-6 gap-4'>
-            <div className='flex-1'>
-            <Button variant="outline" onClick={AddNewExperience} className="w-full border-dashed border-2 border-stitch-primary/30 text-stitch-primary hover:bg-stitch-primary/5 hover:border-stitch-primary transition-colors rounded-xl h-12"> + Add More Experience</Button>
+            <div className='flex justify-between items-center mt-6'>
+                <div className='flex gap-2'>
+                    <Button variant="outline" onClick={AddNewExperience} className="text-stitch-primary hover:text-stitch-primary border-stitch-primary/30 hover:bg-stitch-primary/5 rounded-xl h-10 px-4">
+                        <Plus className='w-4 h-4 mr-2' /> Add More Experience
+                    </Button>
+                </div>
+                
+                <div className='flex gap-2'>
+                    <Button 
+                        type="button" 
+                        variant="outline" 
+                        onClick={handlePrev} 
+                        disabled={!handlePrev}
+                        className="h-10 px-6 rounded-xl text-on-surface-variant hover:text-stitch-primary hover:bg-surface-variant"
+                    >
+                        <ArrowLeft className="w-4 h-4 mr-2" /> Prev
+                    </Button>
+                    <Button disabled={loading} onClick={()=>onSave()} className="bg-stitch-primary hover:bg-stitch-primary/90 text-white rounded-xl h-10 px-6 shadow-sm">
+                        {loading?<LoaderCircle className='animate-spin mr-2' />:null}
+                        Next <ArrowRight className="w-4 h-4 ml-2" />
+                    </Button>
+                </div>
             </div>
-            <Button disabled={loading} onClick={()=>onSave()} className="bg-stitch-primary hover:bg-stitch-primary/90 text-white rounded-xl h-12 px-8 shadow-sm">
-            {loading?<LoaderCircle className='animate-spin' />:'Force Save'}    
-            </Button>
-        </div>
         </div>
     </div>
   )

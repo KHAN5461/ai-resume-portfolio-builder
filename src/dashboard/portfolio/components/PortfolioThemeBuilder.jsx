@@ -81,7 +81,7 @@ export default function PortfolioThemeBuilder() {
 
               <div>
                 <label className="text-sm font-medium text-on-surface-variant block mb-3">HSL Accent Palette</label>
-                <div className="flex flex-wrap gap-3">
+                <div className="flex flex-wrap gap-3 mb-6">
                   {colors.map(c => (
                     <button
                       key={c.value}
@@ -104,6 +104,22 @@ export default function PortfolioThemeBuilder() {
                       className="absolute -top-4 -left-4 w-16 h-16 opacity-0 cursor-pointer"
                     />
                   </div>
+                </div>
+
+                <label className="text-sm font-medium text-on-surface-variant block mb-3">Color Mode</label>
+                <div className="flex bg-surface-variant/30 rounded-lg p-1 gap-1 border border-outline-variant/20">
+                  <button 
+                    onClick={() => handleUpdate('themeMode', 'light')}
+                    className={`flex-1 py-1.5 rounded-md text-sm font-medium transition-all ${portfolioData?.siteConfig?.themeMode === 'light' ? 'bg-surface shadow-sm text-stitch-primary' : 'text-on-surface-variant hover:text-on-surface'}`}
+                  >
+                    Light
+                  </button>
+                  <button 
+                    onClick={() => handleUpdate('themeMode', 'dark')}
+                    className={`flex-1 py-1.5 rounded-md text-sm font-medium transition-all ${portfolioData?.siteConfig?.themeMode === 'dark' ? 'bg-surface shadow-sm text-stitch-primary' : 'text-on-surface-variant hover:text-on-surface'}`}
+                  >
+                    Dark
+                  </button>
                 </div>
               </div>
             </motion.div>

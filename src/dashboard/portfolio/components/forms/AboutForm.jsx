@@ -6,8 +6,10 @@ import { Textarea } from '@/components/ui/textarea';
 import { updatePortfolioData } from '@/store/portfolioSlice';
 import { Button } from '@/components/ui/button';
 import { motion, AnimatePresence } from 'framer-motion';
+import { BtnBold, BtnBulletList, BtnClearFormatting, BtnItalic, BtnLink, BtnNumberedList, BtnStrikeThrough, BtnStyles, BtnUnderline, Editor, EditorProvider, HtmlButton, Separator, Toolbar } from 'react-simple-wysiwyg';
+import ImageDropzone from './ImageDropzone';
 
-export default function AboutForm() {
+const AboutForm = () => {
   const { portfolioId } = useParams();
   const dispatch = useDispatch();
   const portfolioData = useSelector((state) => state.portfolio.portfolios[portfolioId]);
@@ -48,12 +50,40 @@ export default function AboutForm() {
 
       <div className='mt-4 flex flex-col gap-4'>
         <div>
+          <ImageDropzone 
+            label="Profile Image" 
+            value={aboutSection.profileImage || ""} 
+            onChange={(val) => handleChange({ target: { name: 'profileImage', value: val }})} 
+          />
+        </div>
+        <div>
           <label className='text-sm font-semibold'>Bio Title</label>
           <Input name="bioTitle" value={aboutSection.bioTitle || ""} onChange={handleChange} placeholder="e.g. A bit about my journey" />
         </div>
         <div>
           <label className='text-sm font-semibold'>Bio Description</label>
-          <Textarea name="bioDescription" value={aboutSection.bioDescription || ""} onChange={handleChange} placeholder="Write a short bio..." />
+          <div className="bg-white border border-gray-300 rounded-md overflow-hidden focus-within:ring-2 focus-within:ring-indigo-500 transition-all mt-1">
+            <EditorProvider>
+              <Editor value={aboutSection.bioDescription || ""} onChange={handleChange} name="bioDescription" className="min-h-[150px] p-4 text-gray-800 bg-transparent focus:outline-none text-sm">
+                <Toolbar className="bg-gray-50 border-b border-gray-200 px-2 py-1 flex gap-1 flex-wrap items-center">
+                  <div className="flex gap-1 bg-white rounded-md p-1 shadow-sm border border-gray-200">
+                    <BtnBold className="hover:bg-indigo-100 rounded p-1" />
+                    <BtnItalic className="hover:bg-indigo-100 rounded p-1" />
+                    <BtnUnderline className="hover:bg-indigo-100 rounded p-1" />
+                  </div>
+                  <Separator className="mx-1 h-5 bg-gray-300 w-px" />
+                  <div className="flex gap-1 bg-white rounded-md p-1 shadow-sm border border-gray-200">
+                    <BtnNumberedList className="hover:bg-indigo-100 rounded p-1" />
+                    <BtnBulletList className="hover:bg-indigo-100 rounded p-1" />
+                  </div>
+                  <Separator className="mx-1 h-5 bg-gray-300 w-px" />
+                  <div className="flex gap-1 bg-white rounded-md p-1 shadow-sm border border-gray-200">
+                    <BtnLink className="hover:bg-indigo-100 rounded p-1" />
+                  </div>
+                </Toolbar>
+              </Editor>
+            </EditorProvider>
+          </div>
         </div>
       </div>
 
@@ -85,3 +115,5 @@ export default function AboutForm() {
     </div>
   );
 }
+
+export default React.memo(AboutForm);

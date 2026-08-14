@@ -13,6 +13,22 @@ export default function PortfolioPreview() {
 
   if (!portfolioData) return null;
 
+  const layout = portfolioData.siteConfig?.layout || [
+    { id: 'hero', visible: true },
+    { id: 'about', visible: true },
+    { id: 'projects', visible: true },
+    { id: 'skills', visible: true },
+    { id: 'contact', visible: true }
+  ];
+
+  const sectionComponents = {
+    hero: <HeroSection data={portfolioData.heroSection} />,
+    about: <AboutSection data={portfolioData.aboutSection} />,
+    projects: <ProjectsSection data={portfolioData.projectsSection} />,
+    skills: <SkillsSection data={portfolioData.skillsSection} />,
+    contact: <ContactSection data={portfolioData.contactSection} />
+  };
+
   return (
     <div className='border-l pl-10 sticky top-10 h-screen overflow-y-auto'>
       <div 
@@ -20,16 +36,15 @@ export default function PortfolioPreview() {
         style={{ backgroundColor: '#F4F6F8', color: '#2c3e50' }}
       >
         <div className="flex flex-col min-h-screen">
-          <HeroSection data={portfolioData.heroSection} />
+          {layout.map((item) => (
+            item.visible && (
+              <React.Fragment key={item.id}>
+                {sectionComponents[item.id]}
+              </React.Fragment>
+            )
+          ))}
           
-          <main className="w-full">
-            <AboutSection data={portfolioData.aboutSection} />
-            <ProjectsSection data={portfolioData.projectsSection} />
-            <SkillsSection data={portfolioData.skillsSection} />
-            <ContactSection data={portfolioData.contactSection} />
-          </main>
-          
-          <footer className="text-center p-8 mt-8 bg-white text-[#6c757d] border-t border-[#dee2e6]">
+          <footer className="text-center p-8 mt-auto bg-white text-[#6c757d] border-t border-[#dee2e6]">
             <p>&copy; {new Date().getFullYear()} {portfolioData.personalInfo?.fullName || "Portfolio"}. Created with AI Resume Builder.</p>
           </footer>
         </div>

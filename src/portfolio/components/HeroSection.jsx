@@ -4,8 +4,8 @@ export default function HeroSection({ data }) {
   if (!data) return null;
 
   return (
-    <section className="min-h-[80vh] flex items-center justify-center text-center p-8 bg-gradient-to-br from-[#5A8DEE] to-[#3366BB] text-white">
-      <div className="max-w-[600px] mx-auto">
+    <section className="min-h-[80vh] flex items-center justify-center text-center py-24 px-8 bg-gradient-to-br from-[#5A8DEE] to-[#3366BB] text-white">
+      <div className="max-w-6xl mx-auto">
         {/* We can use the Space Grotesk font by adding the font-['Space_Grotesk'] utility if loaded, or just sans-serif */}
         <h1 className="text-[clamp(2.5rem,5vw,4.5rem)] font-bold mb-4 leading-[1.1] font-['Space_Grotesk',sans-serif]">
           {data.headline || "Building Digital Experiences"}

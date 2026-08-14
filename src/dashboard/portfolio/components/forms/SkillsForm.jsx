@@ -6,7 +6,7 @@ import { updatePortfolioData } from '@/store/portfolioSlice';
 import { Button } from '@/components/ui/button';
 import { motion, AnimatePresence } from 'framer-motion';
 
-export default function SkillsForm() {
+const SkillsForm = () => {
   const { portfolioId } = useParams();
   const dispatch = useDispatch();
   const portfolioData = useSelector((state) => state.portfolio.portfolios[portfolioId]);
@@ -91,3 +91,5 @@ export default function SkillsForm() {
     </div>
   );
 }
+
+export default React.memo(SkillsForm);

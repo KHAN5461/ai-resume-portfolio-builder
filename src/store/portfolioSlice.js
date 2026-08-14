@@ -12,11 +12,19 @@ const defaultPortfolioData = {
     themePreset: "default",
     accentColor: "#6366f1",
     enableAnimations: true,
+    themeMode: "light",
     seo: {
       metaTitle: "Portfolio",
       metaDescription: "My professional portfolio",
       ogImage: ""
-    }
+    },
+    layout: [
+      { id: 'hero', visible: true, name: 'Hero' },
+      { id: 'about', visible: true, name: 'About' },
+      { id: 'projects', visible: true, name: 'Projects' },
+      { id: 'skills', visible: true, name: 'Skills' },
+      { id: 'contact', visible: true, name: 'Contact' }
+    ]
   },
   heroSection: {
     greeting: "",

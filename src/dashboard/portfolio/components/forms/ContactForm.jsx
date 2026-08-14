@@ -4,7 +4,7 @@ import { useParams } from 'react-router-dom';
 import { Input } from '@/components/ui/input';
 import { updatePortfolioData } from '@/store/portfolioSlice';
 
-export default function ContactForm() {
+const ContactForm = () => {
   const { portfolioId } = useParams();
   const dispatch = useDispatch();
   const portfolioData = useSelector((state) => state.portfolio.portfolios[portfolioId]);
@@ -39,3 +39,5 @@ export default function ContactForm() {
     </div>
   );
 }
+
+export default React.memo(ContactForm);

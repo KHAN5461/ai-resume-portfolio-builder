@@ -1,8 +1,11 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Sparkles, Send, X, Bot, User } from 'lucide-react';
+import { AIChatSession } from '../../../../service/AIModal';
+import { useSelector } from 'react-redux';
 
 export function AiCoPilot() {
+  const resumeInfo = useSelector(state => state.resume.resumeData);
   const [isOpen, setIsOpen] = useState(false);
   const [message, setMessage] = useState('');
   const [chatHistory, setChatHistory] = useState([
@@ -10,7 +13,7 @@ export function AiCoPilot() {
   ]);
   const [isTyping, setIsTyping] = useState(false);
 
-  const handleSend = (e) => {
+  const handleSend = async (e) => {
     e.preventDefault();
     if (!message.trim()) return;
 
@@ -19,11 +22,22 @@ export function AiCoPilot() {
     setMessage('');
     setIsTyping(true);
 
-    // Simulate AI response
-    setTimeout(() => {
+    try {
+        const prompt = `Context: The user has a resume with the following details:\n${JSON.stringify({
+            summary: resumeInfo?.summary || resumeInfo?.summery,
+            experience: resumeInfo?.experience || resumeInfo?.Experience,
+            skills: resumeInfo?.skills,
+            education: resumeInfo?.education
+        })}\n\nUser Question: ${userMessage}\n\nPlease provide a helpful answer based on the resume context above. Do not output markdown code blocks wrapping the entire response, just respond directly.`;
+        const result = await AIChatSession.sendMessage(prompt);
+        const aiResponse = result.response.text();
+        setChatHistory(prev => [...prev, { role: 'ai', text: aiResponse }]);
+    } catch (error) {
+        console.error("AI Error:", error);
+        setChatHistory(prev => [...prev, { role: 'ai', text: 'Sorry, I encountered an error. Please try again.' }]);
+    } finally {
         setIsTyping(false);
-        setChatHistory(prev => [...prev, { role: 'ai', text: 'I have analyzed your request. Consider highlighting your leadership metrics to make that experience stand out more. Would you like me to draft that?' }]);
-    }, 1500);
+    }
   };
 
   return (

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { LoaderCircle, X, Sparkles } from 'lucide-react'
+import { LoaderCircle, X, Sparkles, ArrowLeft, ArrowRight } from 'lucide-react'
 import { useDispatch, useSelector } from 'react-redux';
 import { setResumeData } from '@/store/resumeSlice';
 import GlobalApi from './../../../../../service/GlobalApi'
@@ -17,7 +17,7 @@ const SUGGESTIONS = [
     "Machine Learning", "Data Analysis", "SEO", "Marketing", "Sales"
 ];
 
-function Skills() {
+function Skills({handleNext, handlePrev}) {
     const {resumeId} = useParams();
     const [loading, setLoading] = useState(false);
     const dispatch = useDispatch();
@@ -25,7 +25,6 @@ function Skills() {
 
     const [skillsList, setSkillsList] = useState(() => {
         const sk = resumeInfo?.skills || resumeInfo?.Skills || [];
-        // Map to uniform structure even if it's just strings
         return sk.map(s => typeof s === 'string' ? { name: s, rating: 0 } : s);
     });
 
@@ -49,7 +48,6 @@ function Skills() {
     const addSkill = (name) => {
         if (!name.trim()) return;
         
-        // Prevent duplicates
         if (skillsList.some(s => s.name.toLowerCase() === name.toLowerCase())) {
             setInputValue("");
             setSuggestions([]);
@@ -85,6 +83,7 @@ function Skills() {
         .then(resp => {
             setLoading(false);
             toast.success('Skills updated!');
+            if (handleNext) handleNext();
         }).catch(error => {
             setLoading(false);
             toast.error('Server Error, Try again!');
@@ -99,8 +98,7 @@ function Skills() {
     }, [skillsList]);
 
     return (
-        <div onKeyDown={handleFormKeyDown} className="form-container">
-            <div className='bg-surface-container-lowest p-6 rounded-2xl border border-outline-variant/30 shadow-sm mt-4'>
+        <div onKeyDown={handleFormKeyDown} className="p-2 md:p-4">
                 <h2 className='font-headline-md font-bold text-on-surface flex items-center gap-2'>
                     <Sparkles className="w-5 h-5 text-stitch-primary" />
                     Smart Skills
@@ -125,7 +123,6 @@ function Skills() {
                         </Button>
                     </div>
 
-                    {/* Auto-suggest dropdown */}
                     {suggestions.length > 0 && (
                         <div className="absolute top-full left-0 w-full mt-2 bg-surface rounded-xl shadow-lg border border-outline-variant/20 z-50 overflow-hidden">
                             {suggestions.map((suggestion, index) => (
@@ -141,8 +138,7 @@ function Skills() {
                     )}
                 </div>
 
-                {/* Skill Tags */}
-                <div className="flex flex-wrap gap-2 min-h-[100px] p-4 bg-surface-container-low/50 rounded-xl border border-outline-variant/20">
+                <div className="flex flex-wrap gap-2 min-h-[100px] p-4 bg-surface-container-low/50 rounded-xl border border-outline-variant/20 mb-8">
                     {skillsList.length === 0 ? (
                         <p className="text-on-surface-variant font-body-sm w-full text-center py-8">No skills added yet.</p>
                     ) : (
@@ -163,13 +159,22 @@ function Skills() {
                     )}
                 </div>
 
-                <div className='flex justify-end mt-8 pt-6 border-t border-outline-variant/30'>
+                <div className='flex justify-between items-center mt-8 pt-6 border-t border-outline-variant/30'>
+                    <Button 
+                        type="button" 
+                        variant="outline" 
+                        onClick={handlePrev} 
+                        disabled={!handlePrev}
+                        className="h-12 px-6 rounded-xl text-on-surface-variant hover:text-stitch-primary hover:bg-surface-variant"
+                    >
+                        <ArrowLeft className="w-4 h-4 mr-2" /> Prev
+                    </Button>
                     <Button disabled={loading} onClick={() => onSave()} className="bg-stitch-primary hover:bg-stitch-primary/90 text-white rounded-xl h-12 px-8 shadow-sm">
-                        {loading ? <LoaderCircle className='animate-spin' /> : 'Force Save'}    
+                        {loading ? <LoaderCircle className='animate-spin mr-2' /> : null}
+                        Save <ArrowRight className="w-4 h-4 ml-2" />
                     </Button>
                 </div>
             </div>
-        </div>
     )
 }
 

@@ -3,7 +3,7 @@ import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { useDispatch, useSelector } from 'react-redux';
 import { setResumeData } from '@/store/resumeSlice';
-import { LoaderCircle, GripVertical, Trash2 } from 'lucide-react'
+import { LoaderCircle, GripVertical, Trash2, ArrowLeft, ArrowRight } from 'lucide-react'
 import React, { useContext, useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import GlobalApi from './../../../../../service/GlobalApi'
@@ -11,12 +11,13 @@ import { toast } from 'sonner'
 import { handleFormKeyDown } from '@/lib/keyboard'
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd'
 
-function Education() {
+function Education({handleNext, handlePrev}) {
 
   const [loading,setLoading]=useState(false);
   const dispatch = useDispatch();
   const resumeInfo = useSelector(state => state.resume.resumeData);
   const params=useParams();
+  const [expandedIndex, setExpandedIndex] = useState(0);
   
   const [educationalList,setEducationalList]=useState(() => {
     const edu = resumeInfo?.education || resumeInfo?.Education;
@@ -42,6 +43,7 @@ function Education() {
   }
 
   const AddNewEducation=()=>{
+    const newIndex = educationalList.length;
     setEducationalList([...educationalList,
       {
         universityName:'',
@@ -51,7 +53,8 @@ function Education() {
         endDate:'',
         description:''
       }
-    ])
+    ]);
+    setExpandedIndex(newIndex);
   }
   const RemoveEducation=(indexToRemove)=>{
     setEducationalList(educationalList.filter((_, index) => index !== indexToRemove));
@@ -68,6 +71,7 @@ function Education() {
       console.log(resp);
       setLoading(false)
       toast('Details updated !')
+      if (handleNext) handleNext();
     },(error)=>{
       setLoading(false);
       toast('Server Error, Please try again!')
@@ -90,8 +94,7 @@ function Education() {
     setEducationalList(items);
   };
   return (
-    <div onKeyDown={handleFormKeyDown} className="form-container">
-      <div className='bg-surface-container-lowest p-6 rounded-2xl border border-outline-variant/30 shadow-sm mt-4'>
+    <div onKeyDown={handleFormKeyDown} className='p-2 md:p-4'>
       <h2 className='font-headline-md font-bold text-on-surface'>Education</h2>
     <p className='font-body-sm text-on-surface-variant mb-6'>Add Your educational details</p>
 
@@ -114,53 +117,95 @@ function Education() {
                       >
                           <GripVertical size={16} />
                       </div>
-                      <div className='grid grid-cols-2 gap-3 border border-outline-variant/20 p-5 rounded-xl bg-surface hover:border-stitch-primary/30 transition-colors relative'>
-                        <Button 
-                            variant="ghost" 
-                            size="icon" 
-                            className="absolute top-2 right-2 text-on-surface-variant hover:text-red-500 hover:bg-red-500/10 h-8 w-8 rounded-full"
-                            onClick={() => RemoveEducation(index)}
+                      {expandedIndex === index ? (
+                        <div className='grid grid-cols-2 gap-3 border border-outline-variant/20 p-5 rounded-xl bg-surface hover:border-stitch-primary/30 transition-colors relative'>
+                          <Button 
+                              variant="ghost" 
+                              size="icon" 
+                              className="absolute top-2 right-2 text-on-surface-variant hover:text-red-500 hover:bg-red-500/10 h-8 w-8 rounded-full"
+                              onClick={(e) => { e.stopPropagation(); RemoveEducation(index); }}
+                          >
+                              <Trash2 size={16} />
+                          </Button>
+                          <Button 
+                              variant="ghost" 
+                              size="sm" 
+                              className="absolute top-2 right-12 text-on-surface-variant h-8 rounded-full"
+                              onClick={() => setExpandedIndex(-1)}
+                          >
+                              Collapse
+                          </Button>
+                          <div className='col-span-2'>
+                            <label className='font-label-md'>University Name</label>
+                            <Input name="universityName" 
+                            onChange={(e)=>handleChange(e,index)}
+                            defaultValue={item?.universityName}
+                            className="focus:ring-2 focus:ring-stitch-primary shadow-sm"
+                            />
+                          </div>
+                          <div>
+                            <label className='font-label-md'>Degree</label>
+                            <Input name="degree" 
+                            onChange={(e)=>handleChange(e,index)}
+                            defaultValue={item?.degree} 
+                            className="focus:ring-2 focus:ring-stitch-primary shadow-sm"
+                            />
+                          </div>
+                          <div>
+                            <label className='font-label-md'>Major</label>
+                            <Input name="major" 
+                            onChange={(e)=>handleChange(e,index)}
+                            defaultValue={item?.major} 
+                            className="focus:ring-2 focus:ring-stitch-primary shadow-sm"
+                            />
+                          </div>
+                          <div>
+                            <label className='font-label-md'>Start Date</label>
+                            <Input type="date" name="startDate" 
+                            onChange={(e)=>handleChange(e,index)}
+                            defaultValue={item?.startDate} 
+                            className="focus:ring-2 focus:ring-stitch-primary shadow-sm"
+                            />
+                          </div>
+                          <div>
+                            <label className='font-label-md'>End Date</label>
+                            <Input type="date" name="endDate" 
+                            onChange={(e)=>handleChange(e,index)}
+                            defaultValue={item?.endDate} 
+                            className="focus:ring-2 focus:ring-stitch-primary shadow-sm"
+                            />
+                          </div>
+                          <div className='col-span-2'>
+                            <label className='font-label-md'>Description</label>
+                            <Textarea name="description" 
+                            onChange={(e)=>handleChange(e,index)}
+                            defaultValue={item?.description} 
+                            className="focus:ring-2 focus:ring-stitch-primary shadow-sm"
+                            />
+                          </div>
+                        </div>
+                      ) : (
+                        <div 
+                            className="flex justify-between items-center bg-surface border border-outline-variant/30 p-4 rounded-xl shadow-sm hover:border-stitch-primary/30 transition-colors cursor-pointer"
+                            onClick={() => setExpandedIndex(index)}
                         >
-                            <Trash2 size={16} />
-                        </Button>
-                        <div className='col-span-2'>
-                          <label className='font-label-md'>University Name</label>
-                          <Input name="universityName" 
-                          onChange={(e)=>handleChange(e,index)}
-                          defaultValue={item?.universityName}
-                          />
+                            <div>
+                                <h3 className="font-label-lg font-bold text-on-surface">{item?.universityName || 'New Education'}</h3>
+                                <p className="font-body-sm text-on-surface-variant">{item?.degree || 'Degree'} {item?.startDate ? `• ${item.startDate}` : ''}</p>
+                            </div>
+                            <div className="flex gap-2">
+                                <Button variant="ghost" size="sm" onClick={(e) => { e.stopPropagation(); setExpandedIndex(index); }}>Edit</Button>
+                                <Button 
+                                    variant="ghost" 
+                                    size="icon" 
+                                    className="text-on-surface-variant hover:text-red-500 hover:bg-red-500/10 h-8 w-8 rounded-full"
+                                    onClick={(e) => { e.stopPropagation(); RemoveEducation(index); }}
+                                >
+                                    <Trash2 size={16} />
+                                </Button>
+                            </div>
                         </div>
-                        <div>
-                          <label className='font-label-md'>Degree</label>
-                          <Input name="degree" 
-                          onChange={(e)=>handleChange(e,index)}
-                          defaultValue={item?.degree} />
-                        </div>
-                        <div>
-                          <label className='font-label-md'>Major</label>
-                          <Input name="major" 
-                          onChange={(e)=>handleChange(e,index)}
-                          defaultValue={item?.major} />
-                        </div>
-                        <div>
-                          <label className='font-label-md'>Start Date</label>
-                          <Input type="date" name="startDate" 
-                          onChange={(e)=>handleChange(e,index)}
-                          defaultValue={item?.startDate} />
-                        </div>
-                        <div>
-                          <label className='font-label-md'>End Date</label>
-                          <Input type="date" name="endDate" 
-                          onChange={(e)=>handleChange(e,index)}
-                          defaultValue={item?.endDate} />
-                        </div>
-                        <div className='col-span-2'>
-                          <label className='font-label-md'>Description</label>
-                          <Textarea name="description" 
-                          onChange={(e)=>handleChange(e,index)}
-                          defaultValue={item?.description} />
-                        </div>
-                      </div>
+                      )}
                     </div>
                   )}
                 </Draggable>
@@ -171,15 +216,29 @@ function Education() {
         </Droppable>
       </DragDropContext>
     </div>
-    <div className='flex flex-col md:flex-row justify-between mt-6 gap-4'>
-            <div className='flex-1'>
-            <Button variant="outline" onClick={AddNewEducation} className="w-full border-dashed border-2 border-stitch-primary/30 text-stitch-primary hover:bg-stitch-primary/5 hover:border-stitch-primary transition-colors rounded-xl h-12"> + Add More Education</Button>
+            <div className='flex justify-between items-center mt-6'>
+                <div className='flex gap-2'>
+                    <Button variant="outline" onClick={AddNewEducation} className="text-stitch-primary hover:text-stitch-primary border-stitch-primary/30 hover:bg-stitch-primary/5 rounded-xl h-10 px-4">
+                        + Add More Education
+                    </Button>
+                </div>
+                
+                <div className='flex gap-2'>
+                    <Button 
+                        type="button" 
+                        variant="outline" 
+                        onClick={handlePrev} 
+                        disabled={!handlePrev}
+                        className="h-10 px-6 rounded-xl text-on-surface-variant hover:text-stitch-primary hover:bg-surface-variant"
+                    >
+                        <ArrowLeft className="w-4 h-4 mr-2" /> Prev
+                    </Button>
+                    <Button disabled={loading} onClick={()=>onSave()} className="bg-stitch-primary hover:bg-stitch-primary/90 text-white rounded-xl h-10 px-6 shadow-sm">
+                        {loading?<LoaderCircle className='animate-spin mr-2' />:null}
+                        Next <ArrowRight className="w-4 h-4 ml-2" />
+                    </Button>
+                </div>
             </div>
-            <Button disabled={loading} onClick={()=>onSave()} className="bg-stitch-primary hover:bg-stitch-primary/90 text-white rounded-xl h-12 px-8 shadow-sm">
-            {loading?<LoaderCircle className='animate-spin' />:'Force Save'}    
-            </Button>
-        </div>
-    </div>
     </div>
   )
 }

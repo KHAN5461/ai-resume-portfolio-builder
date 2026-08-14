@@ -114,15 +114,7 @@ function MagicImportModal({ renderTrigger }) {
         setOpenDialog(false);
         navigation('/dashboard/resume/' + resp.data.data.documentId + "/edit");
         
-        // Popup asking if they want a portfolio too (simulate for V1)
-        setTimeout(() => {
-          toast('Resume created! Generate a Portfolio next?', {
-            action: {
-              label: 'Generate',
-              onClick: () => console.log('Future: Auto-gen portfolio logic')
-            },
-          });
-        }, 1500);
+
       }
     } catch (e) {
       console.error(e);

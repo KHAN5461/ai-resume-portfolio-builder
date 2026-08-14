@@ -8,19 +8,30 @@ import GlobalApi from './../../../../../service/GlobalApi';
 import { toast } from 'sonner';
 import { motion, AnimatePresence } from 'framer-motion';
 import ErrorBoundary from '@/components/ErrorBoundary';
+import { useUser } from '@/auth.jsx';
+import { AIChatSession } from '@/service/AIModal';
+import SeoSettingsModal from '../../components/SeoSettingsModal';
+import { DeployModal } from '../../components/DeployModal';
+import { Skeleton } from '@/components/ui/skeleton';
 
 export default function EditPortfolio() {
   const { portfolioId } = useParams();
   const dispatch = useDispatch();
   const portfolioData = useSelector((state) => state.portfolio.portfolios[portfolioId]);
+  const { user } = useUser();
 
   const [view, setView] = useState('builder'); // 'builder' or 'preview'
   const [previewMode, setPreviewMode] = useState('desktop'); // 'desktop' | 'mobile'
   const [isSaving, setIsSaving] = useState(false);
+  const [isSyncing, setIsSyncing] = useState(false);
+  const [isSeoModalOpen, setIsSeoModalOpen] = useState(false);
+  const [isDeployModalOpen, setIsDeployModalOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   // On mount, set current portfolio ID to load it into focus
   useEffect(() => {
     if (portfolioId) {
+      setIsLoading(true);
       GlobalApi.GetPortfolioById(portfolioId).then(resp => {
         if (resp.data.data) {
           dispatch({ type: 'portfolio/updatePortfolioData', payload: { id: portfolioId, data: resp.data.data } });
@@ -28,6 +39,8 @@ export default function EditPortfolio() {
         }
       }).catch(err => {
         toast.error("Failed to load portfolio");
+      }).finally(() => {
+        setIsLoading(false);
       });
     }
   }, [portfolioId, dispatch]);
@@ -48,6 +61,83 @@ export default function EditPortfolio() {
        return () => clearTimeout(delayDebounceFn);
     }
   }, [portfolioData, portfolioId]);
+
+  const handleAutoFill = async () => {
+    if (!user) {
+      toast.error("You must be logged in to sync from your resume.");
+      return;
+    }
+    setIsSyncing(true);
+    const toastId = toast.loading("Fetching your resume data...");
+    
+    try {
+      const resp = await GlobalApi.GetUserResumes(user?.primaryEmailAddress?.emailAddress);
+      const resumes = resp.data.data;
+      if (!resumes || resumes.length === 0) {
+        toast.error("No resumes found in your account.", { id: toastId });
+        setIsSyncing(false);
+        return;
+      }
+      
+      const latestResume = resumes.sort((a,b) => new Date(b.createdAt) - new Date(a.createdAt))[0];
+      
+      toast.loading("AI is crafting your portfolio...", { id: toastId });
+      
+      const prompt = `
+        You are an expert personal branding copywriter. I am providing you with my resume data in JSON format.
+        Please extract the information and transform it into a highly engaging, conversational Portfolio format.
+        
+        Resume Data:
+        ${JSON.stringify(latestResume)}
+        
+        Provide the response in the following JSON structure ONLY, with no extra text:
+        {
+          "heroSection": {
+            "greeting": "Hi, I'm [FirstName]",
+            "headline": "A short, punchy 3-5 word headline (e.g. Full Stack Developer)",
+            "subheadline": "A longer, 1-2 sentence compelling summary of my value proposition"
+          },
+          "aboutSection": {
+            "bioTitle": "About Me",
+            "bioDescription": "A conversational, well-written 2-3 paragraph biography adapted from my resume summary and experience."
+          },
+          "skillsSection": {
+            "categories": [
+              { "name": "Frontend", "skills": ["React", "CSS"] }, // Extract based on my resume
+              { "name": "Backend", "skills": ["Node.js"] }
+            ]
+          }
+        }
+      `;
+      
+      const result = await AIChatSession.sendMessage(prompt);
+      const rawText = result.response.text();
+      const parsedData = JSON.parse(rawText.replace(/\`\`\`json/g, '').replace(/\`\`\`/g, ''));
+      
+      dispatch({ 
+        type: 'portfolio/updatePortfolioData', 
+        payload: { 
+          id: portfolioId, 
+          data: {
+            heroSection: parsedData.heroSection,
+            aboutSection: parsedData.aboutSection,
+            skillsSection: parsedData.skillsSection,
+            projectsSection: latestResume.projects || [],
+            experience: latestResume.experience || [],
+            education: latestResume.education || [],
+            personalInfo: latestResume.personalInfo || {}
+          } 
+        } 
+      });
+      
+      toast.success("Portfolio successfully synced and enhanced!", { id: toastId });
+    } catch (error) {
+      console.error(error);
+      toast.error("Failed to sync from resume.", { id: toastId });
+    } finally {
+      setIsSyncing(false);
+    }
+  };
 
   return (
     <ErrorBoundary>
@@ -90,33 +180,43 @@ export default function EditPortfolio() {
             </AnimatePresence>
           </div>
           <div className="flex items-center gap-md">
+            {/* SEO Settings Button */}
+            <button 
+              onClick={() => setIsSeoModalOpen(true)}
+              className="hidden md:flex h-10 px-4 bg-surface-container text-on-surface-variant border border-outline-variant/30 rounded-lg font-label-md text-[14px] hover:bg-surface-variant transition-all shadow-sm items-center gap-2 cursor-pointer"
+            >
+              <span className="material-symbols-outlined text-[18px]">search</span>
+              SEO Settings
+            </button>
+            {/* AI Sync Button */}
+            <button 
+              onClick={handleAutoFill}
+              disabled={isSyncing}
+              className={`hidden md:flex h-10 px-4 bg-primary-container text-on-primary-container rounded-lg font-label-md text-[14px] hover:bg-primary-container/90 transition-all shadow-sm items-center gap-2 cursor-pointer ${isSyncing ? 'opacity-50 cursor-not-allowed' : ''}`}
+            >
+              <span className={`material-symbols-outlined text-[18px] ${isSyncing ? 'animate-spin' : ''}`}>magic_button</span>
+              {isSyncing ? 'Crafting...' : 'Auto-Fill'}
+            </button>
             {/* Viewport Switcher */}
             <div className="hidden md:flex bg-surface-container-low rounded-lg p-xs">
               <button 
+                aria-label="Desktop preview"
                 onClick={() => setPreviewMode('desktop')}
-                className={`p-2 rounded-md transition-colors flex items-center justify-center ${previewMode === 'desktop' ? 'bg-surface shadow-sm text-stitch-primary' : 'text-on-surface-variant hover:text-stitch-primary'}`}
+                className={`p-2 rounded-md transition-colors flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-stitch-primary ${previewMode === 'desktop' ? 'bg-surface shadow-sm text-stitch-primary' : 'text-on-surface-variant hover:text-stitch-primary'}`}
               >
                 <span className="material-symbols-outlined text-[20px]">desktop_mac</span>
               </button>
               <button 
+                aria-label="Mobile preview"
                 onClick={() => setPreviewMode('mobile')}
-                className={`p-2 rounded-md transition-colors flex items-center justify-center ${previewMode === 'mobile' ? 'bg-surface shadow-sm text-stitch-primary' : 'text-on-surface-variant hover:text-stitch-primary'}`}
+                className={`p-2 rounded-md transition-colors flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-stitch-primary ${previewMode === 'mobile' ? 'bg-surface shadow-sm text-stitch-primary' : 'text-on-surface-variant hover:text-stitch-primary'}`}
               >
                 <span className="material-symbols-outlined text-[20px]">smartphone</span>
               </button>
             </div>
             {/* Publish Button */}
             <button 
-              onClick={() => {
-                setIsSaving(true);
-                GlobalApi.UpdatePortfolioDetail(portfolioId, { data: portfolioData })
-                  .then(() => {
-                    toast.success("Portfolio published successfully!");
-                    window.open(`/portfolio/${portfolioId}/view`, '_blank');
-                  })
-                  .catch(() => toast.error("Failed to publish"))
-                  .finally(() => setIsSaving(false));
-              }}
+              onClick={() => setIsDeployModalOpen(true)}
               className="h-10 px-4 bg-stitch-secondary text-white rounded-lg font-label-md text-[14px] hover:bg-stitch-secondary/90 transition-all shadow-sm flex items-center gap-2 cursor-pointer active:scale-95"
             >
               <span className="material-symbols-outlined text-[18px]">rocket_launch</span>
@@ -149,7 +249,15 @@ export default function EditPortfolio() {
           {/* Left Sidebar: Content Editor (Visible on desktop, or on mobile when 'builder' is selected) */}
           <aside className={`w-full md:w-[420px] shrink-0 bg-surface-container-lowest border-r border-outline-variant/30 h-full overflow-y-auto flex-col z-10 shadow-[4px_0px_24px_rgba(0,0,0,0.02)] ${view === 'builder' ? 'flex' : 'hidden md:flex'}`}>
             <div className="p-4 flex flex-col flex-1 pb-24 overflow-y-auto custom-scrollbar">
-                <PortfolioFormSection />
+                {isLoading ? (
+                  <div className="flex flex-col gap-4">
+                    <Skeleton className="h-10 w-full" />
+                    <Skeleton className="h-[200px] w-full" />
+                    <Skeleton className="h-[300px] w-full" />
+                  </div>
+                ) : (
+                  <PortfolioFormSection />
+                )}
             </div>
           </aside>
 
@@ -157,11 +265,22 @@ export default function EditPortfolio() {
           <section className={`h-full flex-1 overflow-hidden flex-col bg-surface-container p-0 md:p-6 relative ${view === 'preview' ? 'flex' : 'hidden md:flex'} items-center justify-center`}>
             <div className={`transition-all duration-500 ease-in-out flex flex-col bg-surface-container-lowest md:rounded-xl md:shadow-lg overflow-hidden md:border border-outline-variant/20 relative ${previewMode === 'mobile' ? 'w-[375px] h-[812px] rounded-[2rem] border-[8px] border-surface-container-highest shadow-2xl' : 'w-full h-full'}`}>
                <div className="flex-1 overflow-y-auto bg-background relative w-full h-full custom-scrollbar">
-                  <PortfolioPreview />
+                  {isLoading ? (
+                    <div className="p-10 flex flex-col gap-8">
+                      <Skeleton className="h-64 w-full rounded-xl" />
+                      <Skeleton className="h-32 w-full rounded-xl" />
+                      <Skeleton className="h-96 w-full rounded-xl" />
+                    </div>
+                  ) : (
+                    <PortfolioPreview />
+                  )}
                </div>
             </div>
           </section>
         </main>
+        
+        <SeoSettingsModal isOpen={isSeoModalOpen} onClose={() => setIsSeoModalOpen(false)} />
+        <DeployModal isOpen={isDeployModalOpen} onOpenChange={setIsDeployModalOpen} portfolioId={portfolioId} portfolioData={portfolioData} />
     </motion.div>
     </ErrorBoundary>
   );

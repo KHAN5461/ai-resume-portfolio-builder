@@ -8,8 +8,9 @@ import { useParams } from 'react-router-dom';
 import GlobalApi from './../../../../../service/GlobalApi';
 import { toast } from 'sonner';
 import { handleFormKeyDown } from '@/lib/keyboard';
+import { ArrowLeft, ArrowRight } from 'lucide-react';
 
-function PersonalDetail({enabledNext}) {
+function PersonalDetail({enabledNext, handleNext, handlePrev}) {
 
     const params=useParams();
     const dispatch = useDispatch();
@@ -54,13 +55,14 @@ function PersonalDetail({enabledNext}) {
             enabledNext(true);
             setLoading(false);
             toast("Details updated")
+            if (handleNext) handleNext();
         },(error)=>{
             setLoading(false);
         })
         
     }
   return (
-    <div className='bg-surface-container-lowest p-6 rounded-2xl border border-outline-variant/30 shadow-sm mt-4'>
+    <div className='p-2 md:p-4'>
         <h2 className='font-headline-md font-bold text-on-surface'>Personal Detail</h2>
         <p className='font-body-sm text-on-surface-variant mb-6'>Get Started with the basic information</p>
 
@@ -100,11 +102,21 @@ function PersonalDetail({enabledNext}) {
                     onChange={handleInputChange}  />
                 </div>
             </div>
-            <div className='mt-6 flex justify-end'>
+            <div className='mt-6 flex justify-between'>
+                <Button 
+                    type="button" 
+                    variant="outline" 
+                    onClick={handlePrev} 
+                    disabled={!handlePrev}
+                    className="h-12 px-6 rounded-xl text-on-surface-variant hover:text-stitch-primary hover:bg-surface-variant"
+                >
+                    <ArrowLeft className="w-4 h-4 mr-2" /> Prev
+                </Button>
                 <Button type="submit"
                 disabled={loading} className="bg-stitch-primary hover:bg-stitch-primary/90 text-white rounded-xl h-12 px-8 shadow-sm">
-                    {loading?<LoaderCircle className='animate-spin' />:'Force Save'}
-                    </Button>
+                    {loading?<LoaderCircle className='animate-spin mr-2' />:null}
+                    Next <ArrowRight className="w-4 h-4 ml-2" />
+                </Button>
             </div>
         </form>
     </div>

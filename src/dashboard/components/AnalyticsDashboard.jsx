@@ -11,7 +11,7 @@ const data = [
   { name: 'Sun', views: 34 },
 ];
 
-export function AnalyticsDashboard() {
+export function AnalyticsDashboard({ totalViews = 0 }) {
   return (
     <div className="w-full h-[250px] bg-surface-container-low rounded-2xl p-6 border border-outline-variant/30 flex flex-col shadow-sm">
         <div className="flex justify-between items-center mb-6">
@@ -20,7 +20,7 @@ export function AnalyticsDashboard() {
                 <p className="font-body-sm text-[13px] text-on-surface-variant">Profile views across all documents</p>
             </div>
             <div className="flex items-center gap-2">
-                <span className="font-headline-lg text-2xl font-black text-stitch-primary">192</span>
+                <span className="font-headline-lg text-2xl font-black text-stitch-primary">{totalViews}</span>
                 <span className="text-green-500 font-label-sm text-[12px] bg-green-500/10 px-2 py-0.5 rounded-full">+14%</span>
             </div>
         </div>

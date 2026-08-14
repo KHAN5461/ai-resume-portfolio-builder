@@ -15,6 +15,7 @@ import RawJsonEditor from '../../components/RawJsonEditor';
 import MagicImportModal from '../../components/MagicImportModal';
 import { AiCoPilot } from '../../components/AiCoPilot';
 import { Languages, Flame, MessageSquare } from 'lucide-react';
+import { Skeleton } from '@/components/ui/skeleton';
 
 function EditResume() {
     const {resumeId}=useParams();
@@ -30,6 +31,7 @@ function EditResume() {
     const [isSidebarOpen, setIsSidebarOpen] = useState(true);
     const [contextMenu, setContextMenu] = useState({ show: false, x: 0, y: 0 });
     const [zoom, setZoom] = useState(1);
+    const [isLoading, setIsLoading] = useState(true);
     
     // Calculate progress
     const calculateProgress = () => {
@@ -50,10 +52,13 @@ function EditResume() {
     },[])
 
     const GetResumeInfo=()=>{
+        setIsLoading(true);
         GlobalApi.GetResumeById(resumeId).then(resp=>{
           dispatch(setResumeData(resp.data.data));
         }).catch(err => {
           toast.error("Failed to load resume data");
+        }).finally(() => {
+          setIsLoading(false);
         })
     }
 
@@ -79,12 +84,7 @@ function EditResume() {
       return () => clearTimeout(timer);
     }, [resumeInfo, resumeId]);
 
-    const handleTranslate = () => {
-        toast.info("Translating resume to French...");
-        setTimeout(() => {
-            toast.success("Resume translated successfully! (Mock)");
-        }, 1500);
-    };
+
 
   return (
       <motion.div 
@@ -107,13 +107,6 @@ function EditResume() {
                 Draft - {resumeInfo?.title || 'Loading...'}
               </span>
               
-              {/* Progress Indicator */}
-              <div className="flex items-center gap-3 w-48">
-                  <div className="flex-1 h-1.5 bg-surface-variant/50 rounded-full overflow-hidden">
-                      <div className="h-full bg-stitch-primary transition-all duration-1000 ease-out" style={{ width: `${progress}%` }}></div>
-                  </div>
-                  <span className="font-label-sm text-[12px] text-on-surface-variant w-8">{progress}%</span>
-              </div>
             </div>
           </div>
           <div className="flex items-center gap-md">
@@ -148,36 +141,37 @@ function EditResume() {
 
             </div>
             {/* Action Buttons */}
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-1 md:gap-2">
               <MagicImportModal renderTrigger={(onClick) => (
                 <button 
                   onClick={onClick}
-                  className="hover:scale-105 transition-transform cursor-pointer bg-stitch-primary/10 text-stitch-primary p-2 rounded-full flex items-center justify-center"
+                  className="w-10 h-10 hover:bg-surface-variant transition-colors cursor-pointer text-on-surface-variant hover:text-stitch-primary rounded-full flex items-center justify-center group"
                   title="Magic Import"
                 >
-                  <span className="material-symbols-outlined text-[20px]" style={{fontVariationSettings: "'FILL' 1"}}>auto_fix_high</span>
+                  <span className="material-symbols-outlined text-[20px] group-hover:scale-110 transition-transform" style={{fontVariationSettings: "'FILL' 0"}}>auto_fix_high</span>
                 </button>
               )} />
-              <button 
-                onClick={handleTranslate}
-                className="hover:scale-105 transition-transform cursor-pointer text-on-surface-variant hover:text-stitch-primary bg-surface-container-highest p-2 rounded-full flex items-center justify-center"
-                title="Translate Resume"
-              >
-                <Languages className="w-5 h-5" />
-              </button>
+
               <button 
                 onClick={() => setIsAtsPanelOpen(true)}
-                className="hover:scale-105 transition-transform cursor-pointer bg-red-500/10 text-red-500 px-4 py-2 rounded-full flex items-center justify-center gap-2 font-label-md font-bold"
-                title="Roast My Resume"
+                className="w-10 h-10 hover:bg-red-50 transition-colors cursor-pointer text-on-surface-variant hover:text-red-500 rounded-full flex items-center justify-center group"
+                title="Roast Resume"
               >
-                <Flame className="w-5 h-5" /> Roast Resume
+                <Flame className="w-5 h-5 group-hover:scale-110 transition-transform" />
               </button>
+              <Link 
+                to={`/interview/${resumeId}`}
+                className="w-10 h-10 hover:bg-blue-50 transition-colors cursor-pointer text-on-surface-variant hover:text-blue-500 rounded-full flex items-center justify-center group mr-2 md:mr-4"
+                title="Interview Coach"
+              >
+                <MessageSquare className="w-5 h-5 group-hover:scale-110 transition-transform" />
+              </Link>
               <button 
                 onClick={() => setIsExportOpen(true)}
-                className="h-10 px-6 bg-indigo-600 text-white rounded-xl font-label-md text-[14px] hover:bg-indigo-500 transition-all shadow-[0_4px_14px_rgba(79,70,229,0.3)] flex items-center gap-2 cursor-pointer active:scale-95"
+                className="h-10 px-6 bg-stitch-primary text-white rounded-full font-label-md text-[14px] hover:bg-stitch-primary/90 transition-all shadow-md hover:shadow-lg flex items-center gap-2 cursor-pointer active:scale-95"
               >
-                <span className="material-symbols-outlined text-[18px]">rocket_launch</span>
-                Launch
+                Export
+                <span className="material-symbols-outlined text-[16px]">download</span>
               </button>
             </div>
         </header>
@@ -228,9 +222,19 @@ function EditResume() {
               </div>
               
               <div className="p-4 flex flex-col flex-1 pb-24 overflow-y-auto custom-scrollbar">
-                {activeTab === 'Content' && <FormSection />}
-                {activeTab === 'Theme' && <ThemeBuilder />}
-                {activeTab === 'Settings' && <div className="flex-1 mt-4"><RawJsonEditor /></div>}
+                {isLoading ? (
+                  <div className="flex flex-col gap-4">
+                    <Skeleton className="h-10 w-full" />
+                    <Skeleton className="h-[200px] w-full" />
+                    <Skeleton className="h-[300px] w-full" />
+                  </div>
+                ) : (
+                  <>
+                    {activeTab === 'Content' && <FormSection />}
+                    {activeTab === 'Theme' && <ThemeBuilder />}
+                    {activeTab === 'Settings' && <div className="flex-1 mt-4"><RawJsonEditor /></div>}
+                  </>
+                )}
               </div>
             </aside>
           )}
@@ -253,10 +257,18 @@ function EditResume() {
 
               {/* Viewport Switcher */}
               <div className="hidden md:flex bg-surface-container-low rounded-lg p-0.5 border border-outline-variant/20 mr-1">
-                <button onClick={() => setViewport('desktop')} className={`w-7 h-7 rounded-md ${viewport === 'desktop' ? 'bg-white shadow-sm text-stitch-primary' : 'text-on-surface-variant hover:text-stitch-primary'} transition-colors flex items-center justify-center`}>
+                <button 
+                  aria-label="Desktop preview"
+                  onClick={() => setViewport('desktop')} 
+                  className={`w-7 h-7 rounded-md focus:outline-none focus:ring-2 focus:ring-stitch-primary ${viewport === 'desktop' ? 'bg-white shadow-sm text-stitch-primary' : 'text-on-surface-variant hover:text-stitch-primary'} transition-colors flex items-center justify-center`}
+                >
                   <span className="material-symbols-outlined text-[16px]">desktop_mac</span>
                 </button>
-                <button onClick={() => setViewport('mobile')} className={`w-7 h-7 rounded-md ${viewport === 'mobile' ? 'bg-white shadow-sm text-stitch-primary' : 'text-on-surface-variant hover:text-stitch-primary'} transition-colors flex items-center justify-center`}>
+                <button 
+                  aria-label="Mobile preview"
+                  onClick={() => setViewport('mobile')} 
+                  className={`w-7 h-7 rounded-md focus:outline-none focus:ring-2 focus:ring-stitch-primary ${viewport === 'mobile' ? 'bg-white shadow-sm text-stitch-primary' : 'text-on-surface-variant hover:text-stitch-primary'} transition-colors flex items-center justify-center`}
+                >
                   <span className="material-symbols-outlined text-[16px]">smartphone</span>
                 </button>
               </div>
@@ -284,13 +296,14 @@ function EditResume() {
 
               <div className="w-px h-5 bg-outline-variant/50"></div>
               <button 
+                aria-label={isZenMode ? "Exit Zen Mode" : "Enter Zen Mode"}
                 onClick={() => setIsZenMode(!isZenMode)}
-                className={`w-7 h-7 rounded-full flex items-center justify-center transition-colors ${isZenMode ? 'bg-stitch-primary/10 text-stitch-primary' : 'text-on-surface-variant hover:text-stitch-primary hover:bg-surface-variant'}`}
+                className={`w-7 h-7 rounded-full flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-stitch-primary transition-colors ${isZenMode ? 'bg-stitch-primary/10 text-stitch-primary' : 'text-on-surface-variant hover:text-stitch-primary hover:bg-surface-variant'}`}
                 title="Zen Mode"
               >
                 <span className="material-symbols-outlined text-[18px]">{isZenMode ? 'fullscreen_exit' : 'fullscreen'}</span>
               </button>
-              <Link to={'/my-resume/'+resumeId+"/view"} target="_blank" className="w-7 h-7 rounded-full flex items-center justify-center text-on-surface-variant hover:text-stitch-primary hover:bg-surface-variant transition-colors" title="Open in new tab">
+              <Link aria-label="Open in new tab" to={'/my-resume/'+resumeId+"/view"} target="_blank" className="w-7 h-7 rounded-full flex items-center justify-center text-on-surface-variant hover:text-stitch-primary hover:bg-surface-variant focus:outline-none focus:ring-2 focus:ring-stitch-primary transition-colors" title="Open in new tab">
                 <span className="material-symbols-outlined text-[18px]">open_in_new</span>
               </Link>
             </div>
@@ -305,12 +318,21 @@ function EditResume() {
               onClick={() => setContextMenu({ show: false, x: 0, y: 0 })}
             >
               <div className={`flex-1 overflow-y-auto w-full h-full custom-scrollbar flex ${viewport === 'mobile' ? 'justify-center items-start' : 'justify-center'} pb-8 transition-all`}>
-                 <div 
-                    className={`bg-white w-[210mm] min-h-[297mm] shadow-[0_20px_60px_-15px_rgba(0,0,0,0.1)] ring-1 ring-black/5 flex-shrink-0 mt-4 break-words transition-all duration-300 origin-top`}
-                    style={{ transform: `scale(${viewport === 'mobile' ? zoom * 0.5 : zoom})`, marginBottom: `${(zoom - 1) * 297}mm` }}
-                 >
-                    <ResumePreview />
-                 </div>
+                 {isLoading ? (
+                    <div className={`bg-white w-[210mm] min-h-[297mm] shadow-[0_20px_60px_-15px_rgba(0,0,0,0.1)] ring-1 ring-black/5 flex-shrink-0 mt-4 break-words transition-all duration-300 origin-top p-10 flex flex-col gap-6`} style={{ transform: `scale(${viewport === 'mobile' ? zoom * 0.5 : zoom})`, marginBottom: `${(zoom - 1) * 297}mm` }}>
+                      <Skeleton className="h-32 w-full rounded-none" />
+                      <Skeleton className="h-12 w-3/4 rounded-none" />
+                      <Skeleton className="h-8 w-full rounded-none" />
+                      <Skeleton className="h-64 w-full rounded-none" />
+                    </div>
+                  ) : (
+                    <div 
+                        className={`bg-white w-[210mm] min-h-[297mm] shadow-[0_20px_60px_-15px_rgba(0,0,0,0.1)] ring-1 ring-black/5 flex-shrink-0 mt-4 break-words transition-all duration-300 origin-top`}
+                        style={{ transform: `scale(${viewport === 'mobile' ? zoom * 0.5 : zoom})`, marginBottom: `${(zoom - 1) * 297}mm` }}
+                    >
+                        <ResumePreview />
+                    </div>
+                  )}
               </div>
             </div>
 
@@ -355,40 +377,7 @@ function EditResume() {
         <AiCoPilot />
       </div>
 
-      {/* Mobile Chat-to-Build Override */}
-      <div className="md:hidden fixed inset-0 z-[100] bg-surface flex flex-col pt-16">
-        <div className="px-5 py-4 bg-surface-container-low border-b border-outline-variant/30 flex justify-between items-center shadow-sm z-10">
-            <div>
-                <h3 className="font-headline-sm text-[16px] font-bold text-on-surface">Mobile AI Builder</h3>
-                <p className="font-label-sm text-[11px] text-on-surface-variant">Chat to build your resume</p>
-            </div>
-            <Link to="/dashboard" className="w-8 h-8 rounded-full bg-surface-variant/50 flex items-center justify-center">
-                <span className="material-symbols-outlined text-[18px]">close</span>
-            </Link>
-        </div>
-        <div className="flex-1 overflow-y-auto p-5 flex flex-col gap-4 bg-surface-container-lowest">
-            <div className="flex gap-3 max-w-[85%]">
-                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-stitch-primary to-purple-500 text-white shrink-0 flex items-center justify-center shadow-sm">
-                    <span className="material-symbols-outlined text-[16px]">auto_awesome</span>
-                </div>
-                <div className="p-3 rounded-2xl font-body-sm text-[14px] shadow-sm bg-surface text-on-surface border border-outline-variant/20 rounded-tl-none leading-relaxed">
-                    Welcome to the mobile builder! Editing a canvas on a phone is tough, so let's just chat. What is your current job title?
-                </div>
-            </div>
-        </div>
-        <div className="p-4 bg-surface border-t border-outline-variant/20 mb-safe pb-8">
-            <div className="relative flex items-center">
-                <input
-                  type="text"
-                  placeholder="E.g., Software Engineer at Google..."
-                  className="w-full bg-surface-container-low border border-outline-variant/30 rounded-full pl-4 pr-12 py-3 font-body-sm text-[14px] text-on-surface focus:outline-none focus:border-stitch-primary shadow-sm"
-                />
-                <button className="absolute right-2 w-8 h-8 bg-stitch-primary text-white rounded-full flex items-center justify-center shadow-md">
-                  <span className="material-symbols-outlined text-[16px] -ml-0.5" style={{fontVariationSettings: "'FILL' 1"}}>send</span>
-                </button>
-            </div>
-        </div>
-      </div>
+
       </motion.div>
   )
 }

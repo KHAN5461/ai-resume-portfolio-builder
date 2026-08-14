@@ -4,7 +4,7 @@ export default function ContactSection({ data }) {
   if (!data) return null;
 
   return (
-    <section className="py-[clamp(2rem,6vw,4rem)] px-8 text-center max-w-2xl mx-auto">
+    <section className="py-24 px-8 text-center max-w-2xl mx-auto">
       <h2 className="text-[clamp(2rem,4vw,3.5rem)] font-bold mb-6 text-[#2c3e50] font-['Space_Grotesk',sans-serif]">
         {data.heading || "Get In Touch"}
       </h2>

@@ -38,13 +38,20 @@ export default function TemplateGallery() {
   const onCreate = async () => {
       setLoading(true);
       const uuid = uuidv4();
+      
+      let themeColor = '#9F5BFF'; // Default
+      if (selectedTemplateId === 'classic') themeColor = '#333333';
+      else if (selectedTemplateId === 'modern') themeColor = '#ff6666';
+      else if (selectedTemplateId === 'minimal') themeColor = '#9F5BFF';
+      else if (selectedTemplateId === 'minimal-image') themeColor = '#0066cc';
+
       const data = {
           data: {
               title: resumeTitle,
               resumeId: uuid,
               userEmail: user?.primaryEmailAddress?.emailAddress,
               userName: user?.fullName,
-              themeColor: selectedTemplateId === 'modern' ? '#ff6666' : '#9F5BFF' // Example logic to apply theme based on template
+              themeColor: themeColor
           }
       };
 

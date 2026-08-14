@@ -16,6 +16,7 @@ export default function ResumeViewPage() {
   const resumeData = useSelector((state) => state.resume.resumeData);
   const [loadingData, setLoadingData] = useState(!resumeData);
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
+  const [isExportModalOpen, setIsExportModalOpen] = useState(false);
   const [customSlug, setCustomSlug] = useState('');
   const [viewMode, setViewMode] = useState('document'); // 'document' | 'portfolio'
 
@@ -38,6 +39,63 @@ export default function ResumeViewPage() {
   const copyLink = (link) => {
     navigator.clipboard.writeText(link);
     toast.success('Link copied to clipboard!');
+  }
+
+  const handleExportTxt = () => {
+    if (!resumeData) return;
+    let txt = `${resumeData.firstName || ''} ${resumeData.lastName || ''}\n`;
+    txt += `${resumeData.jobTitle || ''}\n`;
+    txt += `${resumeData.email || ''} | ${resumeData.phone || ''}\n\n`;
+    if (resumeData.summery) {
+      txt += `SUMMARY\n${resumeData.summery.replace(/<[^>]*>?/gm, '')}\n\n`;
+    }
+    if (resumeData.Experience && resumeData.Experience.length > 0) {
+      txt += `EXPERIENCE\n`;
+      resumeData.Experience.forEach(exp => {
+        txt += `${exp.title} at ${exp.companyName}\n`;
+        txt += `${exp.startDate} - ${exp.endDate || 'Present'}\n`;
+        if (exp.workSummery) txt += `${exp.workSummery.replace(/<[^>]*>?/gm, '')}\n`;
+        txt += `\n`;
+      });
+    }
+    if (resumeData.education && resumeData.education.length > 0) {
+      txt += `EDUCATION\n`;
+      resumeData.education.forEach(edu => {
+        txt += `${edu.degree} in ${edu.major}\n`;
+        txt += `${edu.universityName}\n`;
+        txt += `${edu.startDate} - ${edu.endDate}\n`;
+        if (edu.description) txt += `${edu.description.replace(/<[^>]*>?/gm, '')}\n`;
+        txt += `\n`;
+      });
+    }
+    if (resumeData.skills && resumeData.skills.length > 0) {
+      txt += `SKILLS\n`;
+      resumeData.skills.forEach(skill => {
+        txt += `- ${skill.name}\n`;
+      });
+    }
+
+    const blob = new Blob([txt], { type: "text/plain" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `${resumeData.firstName || 'Resume'}_ATS.txt`;
+    a.click();
+    toast.success('TXT file downloaded');
+    setIsExportModalOpen(false);
+  }
+
+  const handleExportJson = () => {
+    if (!resumeData) return;
+    const json = JSON.stringify(resumeData, null, 2);
+    const blob = new Blob([json], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `${resumeData.firstName || 'Resume'}_Data.json`;
+    a.click();
+    toast.success('JSON file downloaded');
+    setIsExportModalOpen(false);
   }
 
   if (loadingData) return (
@@ -121,8 +179,37 @@ export default function ResumeViewPage() {
               <Printer className="w-4 h-4 group-hover:text-stitch-primary transition-colors" /> Print Visual
             </button>
 
-            {/* PDF Export with Settings */}
-            <div className="flex items-center bg-stitch-primary rounded-xl overflow-hidden shadow-md">
+            {/* Export Button */}
+            <button 
+              onClick={() => setIsExportModalOpen(true)}
+              className="flex items-center gap-2 px-4 py-2.5 bg-stitch-primary text-on-primary rounded-xl font-label-md hover:bg-stitch-primary/90 transition-all shadow-sm active:scale-95"
+            >
+              <Download className="w-4 h-4" /> Export
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <AnimatePresence>
+        {isExportModalOpen && (
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm">
+            <motion.div 
+              initial={{ scale: 0.95, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.95, opacity: 0 }}
+              className="bg-surface-container-lowest w-full max-w-lg rounded-3xl p-8 shadow-2xl relative"
+            >
+              <button 
+                  onClick={() => setIsExportModalOpen(false)}
+                  className="absolute top-4 right-4 p-2 text-on-surface-variant hover:bg-surface-variant rounded-full transition-colors z-10"
+              >
+                  <X className="w-5 h-5" />
+              </button>
+
+              <h2 className="font-headline-sm font-bold text-on-surface mb-2">Export Options</h2>
+              <p className="font-body-sm text-on-surface-variant mb-6">Choose a format to download your resume.</p>
+
+              <div className="flex flex-col gap-4">
                 <PDFDownloadLink
                   document={<ResumePDF resumeData={resumeData} settings={{ pageSize: 'A4', baseFontSize: 10, margins: 36 }} />}
                   fileName={`${resumeData?.firstName || 'Resume'}_ATS.pdf`}
@@ -130,24 +217,44 @@ export default function ResumeViewPage() {
                   {({ loading }) => (
                     <button 
                         disabled={loading}
-                        className="flex items-center gap-2 px-4 py-2.5 bg-stitch-primary text-on-primary font-label-md hover:bg-stitch-primary/90 transition-all border-r border-white/20"
+                        onClick={() => setIsExportModalOpen(false)}
+                        className="w-full flex items-center justify-between p-4 bg-surface border border-outline-variant/40 rounded-xl hover:border-stitch-primary/40 hover:bg-stitch-primary/5 transition-all text-left"
                       >
-                        <Download className="w-4 h-4" /> 
-                        {loading ? 'Preparing ATS...' : 'Download PDF'}
+                        <div>
+                           <div className="font-label-md text-on-surface flex items-center gap-2"><span className="material-symbols-outlined text-[18px]">picture_as_pdf</span> PDF Document</div>
+                           <div className="font-body-sm text-on-surface-variant mt-1">Best for printing and sharing visually. ATS optimized.</div>
+                        </div>
+                        <Download className="w-5 h-5 text-stitch-primary" />
                     </button>
                   )}
                 </PDFDownloadLink>
+
                 <button 
-                  className="px-3 py-2.5 bg-stitch-primary text-white hover:bg-stitch-primary/90 transition-all"
-                  title="PDF Settings"
-                  onClick={() => toast.info('PDF settings popover would open here. This allows tweaking margins, paper size (A4 vs Letter), and base font size before downloading.')}
+                    onClick={handleExportTxt}
+                    className="w-full flex items-center justify-between p-4 bg-surface border border-outline-variant/40 rounded-xl hover:border-stitch-primary/40 hover:bg-stitch-primary/5 transition-all text-left"
                 >
-                  <span className="material-symbols-outlined text-[18px]">settings</span>
+                    <div>
+                        <div className="font-label-md text-on-surface flex items-center gap-2"><span className="material-symbols-outlined text-[18px]">description</span> Plain Text (.txt)</div>
+                        <div className="font-body-sm text-on-surface-variant mt-1">100% ATS readable format without any styling.</div>
+                    </div>
+                    <Download className="w-5 h-5 text-stitch-primary" />
                 </button>
-            </div>
+
+                <button 
+                    onClick={handleExportJson}
+                    className="w-full flex items-center justify-between p-4 bg-surface border border-outline-variant/40 rounded-xl hover:border-stitch-primary/40 hover:bg-stitch-primary/5 transition-all text-left"
+                >
+                    <div>
+                        <div className="font-label-md text-on-surface flex items-center gap-2"><span className="material-symbols-outlined text-[18px]">data_object</span> JSON Resume</div>
+                        <div className="font-body-sm text-on-surface-variant mt-1">Machine-readable JSON schema of your profile.</div>
+                    </div>
+                    <Download className="w-5 h-5 text-stitch-primary" />
+                </button>
+              </div>
+            </motion.div>
           </div>
-        </div>
-      </div>
+        )}
+      </AnimatePresence>
 
       <AnimatePresence>
         {isShareModalOpen && (

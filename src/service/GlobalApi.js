@@ -157,6 +157,29 @@ const DeletePortfolioById = async (id) => {
     }
 };
 
+const IncrementPortfolioViews = async (id) => {
+    try {
+        const docRef = doc(db, "portfolios", id);
+        const docSnap = await getDoc(docRef);
+        if (docSnap.exists()) {
+            const currentViews = docSnap.data().views || 0;
+            await updateDoc(docRef, { views: currentViews + 1 });
+            return { data: { success: true, views: currentViews + 1 } };
+        }
+    } catch (error) {
+        console.error("Firestore Error on incrementing views:", error);
+        const local = JSON.parse(localStorage.getItem('local_portfolios') || '[]');
+        const idx = local.findIndex(p => p.documentId === id);
+        if(idx !== -1) {
+            const currentViews = local[idx].views || 0;
+            local[idx].views = currentViews + 1;
+            localStorage.setItem('local_portfolios', JSON.stringify(local));
+            return { data: { success: true, views: currentViews + 1 } };
+        }
+    }
+    return { data: { success: false } };
+};
+
 export default {
     GetUserResumes,
     GetUserPortfolios,
@@ -167,5 +190,6 @@ export default {
     UpdateResumeDetail,
     UpdatePortfolioDetail,
     DeleteResumeById,
-    DeletePortfolioById
+    DeletePortfolioById,
+    IncrementPortfolioViews
 };
