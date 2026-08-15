@@ -1,5 +1,5 @@
 import React from 'react';
-import { Page, Text, View, Document, StyleSheet, Font } from '@react-pdf/renderer';
+import { Page, Text, View, Document, StyleSheet, Font, Svg, Path, Image } from '@react-pdf/renderer';
 import { mapResumeInfoToTemplateData } from '@/lib/templateDataMapper';
 
 // We register fonts to ensure they render correctly in the PDF if needed.
@@ -15,6 +15,42 @@ const stripHtml = (html) => {
     .replace(/<[^>]+>/g, '')
     .trim();
 };
+
+const PhoneIcon = ({ color, size = 10 }) => (
+  <Svg viewBox="0 0 24 24" width={size} height={size} fill="none">
+    <Path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" stroke={color} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
+  </Svg>
+);
+
+const MailIcon = ({ color, size = 10 }) => (
+  <Svg viewBox="0 0 24 24" width={size} height={size} fill="none">
+    <Path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" stroke={color} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
+    <Path d="M22 6l-10 7L2 6" stroke={color} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
+  </Svg>
+);
+
+const MapPinIcon = ({ color, size = 10 }) => (
+  <Svg viewBox="0 0 24 24" width={size} height={size} fill="none">
+    <Path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" stroke={color} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
+    <Path d="M12 13a3 3 0 1 0 0-6 3 3 0 0 0 0 6z" stroke={color} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
+  </Svg>
+);
+
+const LinkedinIcon = ({ color, size = 10 }) => (
+  <Svg viewBox="0 0 24 24" width={size} height={size} fill="none">
+    <Path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z" stroke={color} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
+    <Path d="M2 9h4v12H2z" stroke={color} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
+    <Path d="M4 6a2 2 0 1 0 0-4 2 2 0 0 0 0 4z" stroke={color} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
+  </Svg>
+);
+
+const GlobeIcon = ({ color, size = 10 }) => (
+  <Svg viewBox="0 0 24 24" width={size} height={size} fill="none">
+    <Path d="M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20z" stroke={color} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
+    <Path d="M2 12h20" stroke={color} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
+    <Path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" stroke={color} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
+  </Svg>
+);
 
 export const ResumePDF = ({ resumeData, settings = { pageSize: 'A4', baseFontSize: 10, margins: 36 } }) => {
   const data = mapResumeInfoToTemplateData(resumeData);
@@ -89,7 +125,13 @@ export const ResumePDF = ({ resumeData, settings = { pageSize: 'A4', baseFontSiz
       color: '#4b5563',
     },
     contactItem: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 4,
       marginRight: 12,
+    },
+    contactText: {
+      marginLeft: 4,
     },
     section: {
       marginBottom: 20,
@@ -192,6 +234,12 @@ export const ResumePDF = ({ resumeData, settings = { pageSize: 'A4', baseFontSiz
       fontSize: baseSize * 0.9,
       color: '#ffffff',
     },
+    modernContactItem: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 4,
+      marginRight: 12,
+    },
     modernSectionTitle: {
       fontSize: baseSize * 1.4,
       fontFamily: pdfFont,
@@ -276,7 +324,45 @@ export const ResumePDF = ({ resumeData, settings = { pageSize: 'A4', baseFontSiz
     minimalDate: {
       fontSize: baseSize * 0.9,
       color: '#6b7280',
-    }
+    },
+    
+    // Minimal Image Styles
+    minimalImageGrid: {
+      flexDirection: 'row',
+      marginBottom: 0,
+    },
+    minimalImageLeftCol: {
+      width: '33%',
+      paddingRight: 20,
+      borderRightWidth: 1,
+      borderRightColor: '#e5e7eb',
+    },
+    minimalImageRightCol: {
+      width: '67%',
+      paddingLeft: 20,
+    },
+    minimalImageHeader: {
+      marginBottom: 24,
+    },
+    minimalImageProfile: {
+      width: 100,
+      height: 100,
+      borderRadius: 50,
+      marginBottom: 20,
+      objectFit: 'cover',
+    },
+    minimalImageSidebarSection: {
+      marginBottom: 20,
+    },
+    minimalImageSkillPill: {
+      backgroundColor: '#f3f4f6',
+      paddingVertical: 4,
+      paddingHorizontal: 8,
+      borderRadius: 12,
+      fontSize: baseSize * 0.85,
+      color: '#374151',
+      marginBottom: 6,
+    },
   });
 
   try {
@@ -290,11 +376,36 @@ export const ResumePDF = ({ resumeData, settings = { pageSize: 'A4', baseFontSiz
                <Text style={dynamicStyles.modernTargetTitle}>{personal_info.profession}</Text>
             )}
             <View style={dynamicStyles.modernContactRow}>
-              {personal_info?.email && <Text style={dynamicStyles.contactItem}>{personal_info.email}</Text>}
-              {personal_info?.phone && <Text style={dynamicStyles.contactItem}>{personal_info.phone}</Text>}
-              {personal_info?.location && <Text style={dynamicStyles.contactItem}>{personal_info.location}</Text>}
-              {personal_info?.linkedin && <Text style={dynamicStyles.contactItem}>{personal_info.linkedin}</Text>}
-              {personal_info?.website && <Text style={dynamicStyles.contactItem}>{personal_info.website}</Text>}
+              {personal_info?.email && (
+                <View style={dynamicStyles.modernContactItem}>
+                  <MailIcon color="#ffffff" size={12} />
+                  <Text style={dynamicStyles.contactText}>{personal_info.email}</Text>
+                </View>
+              )}
+              {personal_info?.phone && (
+                <View style={dynamicStyles.modernContactItem}>
+                  <PhoneIcon color="#ffffff" size={12} />
+                  <Text style={dynamicStyles.contactText}>{personal_info.phone}</Text>
+                </View>
+              )}
+              {personal_info?.location && (
+                <View style={dynamicStyles.modernContactItem}>
+                  <MapPinIcon color="#ffffff" size={12} />
+                  <Text style={dynamicStyles.contactText}>{personal_info.location}</Text>
+                </View>
+              )}
+              {personal_info?.linkedin && (
+                <View style={dynamicStyles.modernContactItem}>
+                  <LinkedinIcon color="#ffffff" size={12} />
+                  <Text style={dynamicStyles.contactText}>{personal_info.linkedin}</Text>
+                </View>
+              )}
+              {personal_info?.website && (
+                <View style={dynamicStyles.modernContactItem}>
+                  <GlobeIcon color="#ffffff" size={12} />
+                  <Text style={dynamicStyles.contactText}>{personal_info.website}</Text>
+                </View>
+              )}
             </View>
           </View>
 
@@ -386,11 +497,36 @@ export const ResumePDF = ({ resumeData, settings = { pageSize: 'A4', baseFontSiz
                <Text style={dynamicStyles.minimalTargetTitle}>{personal_info.profession}</Text>
             )}
             <View style={dynamicStyles.minimalContactRow}>
-              {personal_info?.email && <Text style={dynamicStyles.contactItem}>{personal_info.email}</Text>}
-              {personal_info?.phone && <Text style={dynamicStyles.contactItem}>{personal_info.phone}</Text>}
-              {personal_info?.location && <Text style={dynamicStyles.contactItem}>{personal_info.location}</Text>}
-              {personal_info?.linkedin && <Text style={dynamicStyles.contactItem}>{personal_info.linkedin}</Text>}
-              {personal_info?.website && <Text style={dynamicStyles.contactItem}>{personal_info.website}</Text>}
+              {personal_info?.email && (
+                <View style={dynamicStyles.contactItem}>
+                  <MailIcon color={accentColor} size={12} />
+                  <Text style={dynamicStyles.contactText}>{personal_info.email}</Text>
+                </View>
+              )}
+              {personal_info?.phone && (
+                <View style={dynamicStyles.contactItem}>
+                  <PhoneIcon color={accentColor} size={12} />
+                  <Text style={dynamicStyles.contactText}>{personal_info.phone}</Text>
+                </View>
+              )}
+              {personal_info?.location && (
+                <View style={dynamicStyles.contactItem}>
+                  <MapPinIcon color={accentColor} size={12} />
+                  <Text style={dynamicStyles.contactText}>{personal_info.location}</Text>
+                </View>
+              )}
+              {personal_info?.linkedin && (
+                <View style={dynamicStyles.contactItem}>
+                  <LinkedinIcon color={accentColor} size={12} />
+                  <Text style={dynamicStyles.contactText}>{personal_info.linkedin}</Text>
+                </View>
+              )}
+              {personal_info?.website && (
+                <View style={dynamicStyles.contactItem}>
+                  <GlobeIcon color={accentColor} size={12} />
+                  <Text style={dynamicStyles.contactText}>{personal_info.website}</Text>
+                </View>
+              )}
             </View>
           </View>
 
@@ -463,6 +599,131 @@ export const ResumePDF = ({ resumeData, settings = { pageSize: 'A4', baseFontSiz
     );
   }
 
+  if (templateType === 'MinimalImage') {
+    // Attempt to extract an image source (support for base64 or absolute URLs)
+    // If it's a File object (which shouldn't be the case in Redux data), react-pdf doesn't support it directly without a blob URL (which is async).
+    // Assuming personal_info.image is a base64 string or URL.
+    const imgSrc = typeof personal_info?.image === 'string' ? personal_info.image : null;
+
+    return (
+      <Document>
+        <Page size={settings.pageSize || 'A4'} style={[dynamicStyles.page, { flexDirection: 'row', paddingTop: 40 }]}>
+          
+          {/* Left Sidebar */}
+          <View style={dynamicStyles.minimalImageLeftCol}>
+            {imgSrc && (
+              <Image src={imgSrc} style={dynamicStyles.minimalImageProfile} />
+            )}
+            
+            <View style={dynamicStyles.minimalImageSidebarSection}>
+              <Text style={dynamicStyles.minimalSectionTitle}>Contact</Text>
+              <View style={{ gap: 8 }}>
+                {personal_info?.phone && (
+                  <View style={dynamicStyles.contactItem}>
+                    <PhoneIcon color={accentColor} size={12} />
+                    <Text style={dynamicStyles.contactText}>{personal_info.phone}</Text>
+                  </View>
+                )}
+                {personal_info?.email && (
+                  <View style={dynamicStyles.contactItem}>
+                    <MailIcon color={accentColor} size={12} />
+                    <Text style={dynamicStyles.contactText}>{personal_info.email}</Text>
+                  </View>
+                )}
+                {personal_info?.location && (
+                  <View style={dynamicStyles.contactItem}>
+                    <MapPinIcon color={accentColor} size={12} />
+                    <Text style={dynamicStyles.contactText}>{personal_info.location}</Text>
+                  </View>
+                )}
+                {personal_info?.linkedin && (
+                  <View style={dynamicStyles.contactItem}>
+                    <LinkedinIcon color={accentColor} size={12} />
+                    <Text style={dynamicStyles.contactText}>{personal_info.linkedin}</Text>
+                  </View>
+                )}
+              </View>
+            </View>
+
+            {education && education.length > 0 && (
+              <View style={dynamicStyles.minimalImageSidebarSection}>
+                <Text style={dynamicStyles.minimalSectionTitle}>Education</Text>
+                {education.map((edu, index) => (
+                  <View key={index} style={{ marginBottom: 12 }}>
+                    <Text style={{ fontSize: baseSize, fontFamily: pdfFontBold, color: '#111827' }}>{edu.degree}</Text>
+                    <Text style={{ fontSize: baseSize * 0.9, color: '#4b5563', marginTop: 2 }}>{edu.institution}</Text>
+                    <Text style={{ fontSize: baseSize * 0.9, color: '#6b7280', marginTop: 2 }}>{edu.graduation_date}</Text>
+                  </View>
+                ))}
+              </View>
+            )}
+
+            {skills && skills.length > 0 && (
+              <View style={dynamicStyles.minimalImageSidebarSection}>
+                <Text style={dynamicStyles.minimalSectionTitle}>Skills</Text>
+                <View style={{ flexWrap: 'wrap' }}>
+                  {skills.map((skill, index) => (
+                    <Text key={index} style={dynamicStyles.minimalImageSkillPill}>{skill}</Text>
+                  ))}
+                </View>
+              </View>
+            )}
+          </View>
+
+          {/* Right Main Content */}
+          <View style={dynamicStyles.minimalImageRightCol}>
+            <View style={dynamicStyles.minimalImageHeader}>
+              <Text style={dynamicStyles.minimalName}>{personal_info?.full_name || 'Your Name'}</Text>
+              {personal_info?.profession && (
+                 <Text style={[dynamicStyles.minimalTargetTitle, { color: accentColor }]}>{personal_info.profession}</Text>
+              )}
+            </View>
+
+            {professional_summary && (
+              <View style={dynamicStyles.section}>
+                <Text style={dynamicStyles.minimalSectionTitle}>Summary</Text>
+                <Text style={dynamicStyles.summaryText}>{stripHtml(professional_summary)}</Text>
+              </View>
+            )}
+
+            {experience && experience.length > 0 && (
+              <View style={dynamicStyles.section}>
+                <Text style={dynamicStyles.minimalSectionTitle}>Experience</Text>
+                {experience.map((exp, index) => (
+                  <View key={index} style={{ marginBottom: 20 }}>
+                    <View style={dynamicStyles.itemHeaderRow}>
+                      <Text style={dynamicStyles.minimalItemTitle}>{exp.position}</Text>
+                      <Text style={dynamicStyles.minimalDate}>{exp.start_date} – {exp.is_current ? 'Present' : exp.end_date}</Text>
+                    </View>
+                    <Text style={{ fontSize: baseSize, color: '#4b5563', marginBottom: 4 }}>{exp.company}</Text>
+                    {exp.description && (
+                      <Text style={dynamicStyles.descriptionText}>{stripHtml(exp.description)}</Text>
+                    )}
+                  </View>
+                ))}
+              </View>
+            )}
+
+            {project && project.length > 0 && (
+              <View style={dynamicStyles.section}>
+                <Text style={dynamicStyles.minimalSectionTitle}>Projects</Text>
+                {project.map((proj, index) => (
+                  <View key={index} style={{ marginBottom: 16 }}>
+                    <Text style={dynamicStyles.minimalItemTitle}>{proj.name}</Text>
+                    {proj.description && (
+                      <Text style={dynamicStyles.descriptionText}>{stripHtml(proj.description)}</Text>
+                    )}
+                  </View>
+                ))}
+              </View>
+            )}
+          </View>
+          
+        </Page>
+      </Document>
+    );
+  }
+
   // Classic Template (Default)
   return (
     <Document>
@@ -476,11 +737,36 @@ export const ResumePDF = ({ resumeData, settings = { pageSize: 'A4', baseFontSiz
           )}
           
           <View style={dynamicStyles.contactRow}>
-            {personal_info?.email && <Text style={dynamicStyles.contactItem}>{personal_info.email}</Text>}
-            {personal_info?.phone && <Text style={dynamicStyles.contactItem}>{personal_info.phone}</Text>}
-            {personal_info?.location && <Text style={dynamicStyles.contactItem}>{personal_info.location}</Text>}
-            {personal_info?.linkedin && <Text style={dynamicStyles.contactItem}>{personal_info.linkedin}</Text>}
-            {personal_info?.website && <Text style={dynamicStyles.contactItem}>{personal_info.website}</Text>}
+            {personal_info?.email && (
+              <View style={dynamicStyles.contactItem}>
+                <MailIcon color={accentColor} size={12} />
+                <Text style={dynamicStyles.contactText}>{personal_info.email}</Text>
+              </View>
+            )}
+            {personal_info?.phone && (
+              <View style={dynamicStyles.contactItem}>
+                <PhoneIcon color={accentColor} size={12} />
+                <Text style={dynamicStyles.contactText}>{personal_info.phone}</Text>
+              </View>
+            )}
+            {personal_info?.location && (
+              <View style={dynamicStyles.contactItem}>
+                <MapPinIcon color={accentColor} size={12} />
+                <Text style={dynamicStyles.contactText}>{personal_info.location}</Text>
+              </View>
+            )}
+            {personal_info?.linkedin && (
+              <View style={dynamicStyles.contactItem}>
+                <LinkedinIcon color={accentColor} size={12} />
+                <Text style={dynamicStyles.contactText}>{personal_info.linkedin}</Text>
+              </View>
+            )}
+            {personal_info?.website && (
+              <View style={dynamicStyles.contactItem}>
+                <GlobeIcon color={accentColor} size={12} />
+                <Text style={dynamicStyles.contactText}>{personal_info.website}</Text>
+              </View>
+            )}
           </View>
         </View>
 
