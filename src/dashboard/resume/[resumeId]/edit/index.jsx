@@ -16,7 +16,8 @@ import { AtsRoastPanel } from '../../components/AtsRoastPanel';
 import RawJsonEditor from '../../components/RawJsonEditor';
 import MagicImportModal from '../../components/MagicImportModal';
 import { AiCoPilot } from '../../components/AiCoPilot';
-import { Languages, Flame, MessageSquare, Undo2, Redo2 } from 'lucide-react';
+import { Languages, Flame, MessageSquare, Undo2, Redo2, Github } from 'lucide-react';
+import GitHubSyncModal from '@/components/custom/GitHubSyncModal';
 import { Skeleton } from '@/components/ui/skeleton';
 import useScrollIntoViewOnFocus from '@/hooks/useScrollIntoViewOnFocus';
 import ResponsiveBreadcrumbs from '@/components/custom/ResponsiveBreadcrumbs';
@@ -60,8 +61,12 @@ function EditResume() {
     const progress = calculateProgress();
 
     useEffect(()=>{
-        GetResumeInfo();
-    },[])
+        if (resumeId) {
+            GetResumeInfo();
+        } else {
+            setIsLoading(false); // Playground mode
+        }
+    },[resumeId])
 
     const GetResumeInfo=()=>{
         setIsLoading(true);
@@ -97,12 +102,12 @@ function EditResume() {
               <span className="font-headline-md text-[24px] font-bold text-stitch-primary">Sparkfolio</span>
             </Link>
             <div className="mx-2 flex items-center">
-              <ResponsiveBreadcrumbs paths={[{label: 'Dashboard', href: '/dashboard'}, {label: 'Resume Editor', href: '#'}]} />
+              <ResponsiveBreadcrumbs paths={[{label: 'Dashboard', href: '/dashboard'}, {label: !resumeId ? 'Playground' : 'Resume Editor', href: '#'}]} />
             </div>
             
             <div className="hidden md:flex items-center gap-4 ml-8">
               <span className="px-2 py-1 bg-surface-container-highest rounded-md font-label-sm text-[12px] text-on-surface-variant flex items-center gap-xs">
-                Draft - {resumeInfo?.title || 'Loading...'}
+                {!resumeId ? 'Playground Mode' : `Draft - ${resumeInfo?.title || 'Loading...'}`}
               </span>
               
             </div>
@@ -165,6 +170,16 @@ function EditResume() {
             </div>
             {/* Action Buttons */}
             <div className="flex items-center gap-1 md:gap-2">
+              <GitHubSyncModal renderTrigger={(onClick) => (
+                <button 
+                  onClick={onClick}
+                  className="w-10 h-10 hover:bg-surface-variant transition-colors cursor-pointer text-on-surface-variant hover:text-stitch-primary rounded-full flex items-center justify-center group"
+                  title="GitHub Sync"
+                >
+                  <Github className="w-5 h-5 group-hover:scale-110 transition-transform" />
+                </button>
+              )} />
+
               <MagicImportModal renderTrigger={(onClick) => (
                 <button 
                   onClick={onClick}
@@ -183,14 +198,20 @@ function EditResume() {
                 <Flame className="w-5 h-5 group-hover:scale-110 transition-transform" />
               </button>
               <Link 
-                to={`/interview/${resumeId}`}
+                to={!resumeId ? '/auth/sign-in' : `/interview/${resumeId}`}
                 className="w-10 h-10 hover:bg-blue-50 transition-colors cursor-pointer text-on-surface-variant hover:text-blue-500 rounded-full flex items-center justify-center group mr-2 md:mr-4"
                 title="Interview Coach"
               >
                 <MessageSquare className="w-5 h-5 group-hover:scale-110 transition-transform" />
               </Link>
               <button 
-                onClick={() => setIsExportOpen(true)}
+                onClick={() => {
+                  if (!resumeId) {
+                    window.location.href = '/auth/sign-in';
+                  } else {
+                    setIsExportOpen(true);
+                  }
+                }}
                 className="h-10 px-6 bg-stitch-primary text-white rounded-full font-label-md text-[14px] hover:bg-stitch-primary/90 transition-all shadow-md hover:shadow-lg flex items-center gap-2 cursor-pointer active:scale-95"
               >
                 Export

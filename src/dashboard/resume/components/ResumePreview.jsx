@@ -5,6 +5,8 @@ import ClassicTemplate from './templates/ClassicTemplate';
 import ModernTemplate from './templates/ModernTemplate';
 import MinimalTemplate from './templates/MinimalTemplate';
 import MinimalImageTemplate from './templates/MinimalImageTemplate';
+import DataDenseTemplate from './templates/DataDenseTemplate';
+import InteractiveTemplate from './templates/InteractiveTemplate';
 import { mapResumeInfoToTemplateData } from '@/lib/templateDataMapper';
 
 const ResumePreview = React.memo(({ resumeInfo }) => {
@@ -22,6 +24,10 @@ const ResumePreview = React.memo(({ resumeInfo }) => {
                 return <MinimalTemplate data={templateData} accentColor={accentColor} />;
             case 'MinimalImage':
                 return <MinimalImageTemplate data={templateData} accentColor={accentColor} />;
+            case 'DataDense':
+                return <DataDenseTemplate data={templateData} accentColor={accentColor} />;
+            case 'Interactive':
+                return <InteractiveTemplate data={templateData} accentColor={accentColor} />;
             case 'Classic':
             default:
                 return <ClassicTemplate data={templateData} accentColor={accentColor} />;

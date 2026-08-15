@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { updateProfileData } from '@/store/profileSlice';
-import { Code, CheckCircle2, AlertCircle, Save } from 'lucide-react';
+import { Code, CheckCircle2, AlertCircle, Save, RefreshCw } from 'lucide-react';
 import { toast } from 'sonner';
 
 const DEFAULT_TEMPLATE = {
@@ -75,36 +75,63 @@ const DEFAULT_TEMPLATE = {
 
 export default function RawJsonEditor() {
   const profileInfo = useSelector(state => state.profile.present);
+  const resumeInfo = useSelector(state => state.resume.present.resumeData);
   const dispatch = useDispatch();
   
   const [jsonText, setJsonText] = useState('');
   const [error, setError] = useState(null);
   const [isDirty, setIsDirty] = useState(false);
 
-  // Initialize the text box with the profileInfo, or the DEFAULT_TEMPLATE if it's completely empty
+  // Initialize the text box by merging Master Profile and visual form data
   useEffect(() => {
     if (!isDirty) {
-      // Check if profileInfo is effectively empty
-      const isEmpty = !profileInfo.personalInfo?.fullName && 
-                      (!profileInfo.workExperience || profileInfo.workExperience.length === 0);
+      const constructedProfile = {
+        personalInfo: {
+          fullName: profileInfo?.personalInfo?.fullName || `${resumeInfo?.firstName || ''} ${resumeInfo?.lastName || ''}`.trim(),
+          targetTitle: profileInfo?.personalInfo?.targetTitle || resumeInfo?.jobTitle || '',
+          email: profileInfo?.personalInfo?.email || resumeInfo?.email || '',
+          phone: profileInfo?.personalInfo?.phone || resumeInfo?.phone || '',
+          location: profileInfo?.personalInfo?.location || resumeInfo?.address || '',
+          portfolioUrl: profileInfo?.personalInfo?.portfolioUrl || '',
+          githubUrl: profileInfo?.personalInfo?.githubUrl || '',
+          linkedinUrl: profileInfo?.personalInfo?.linkedinUrl || resumeInfo?.linkedin || ''
+        },
+        professionalSummary: profileInfo?.professionalSummary || resumeInfo?.summery || resumeInfo?.summary || '',
+        workExperience: profileInfo?.workExperience?.length > 0 ? profileInfo.workExperience : (resumeInfo?.Experience || []).map(exp => ({
+          role: exp.title || '',
+          company: exp.companyName || '',
+          location: exp.city || exp.state ? `${exp.city || ''} ${exp.state || ''}`.trim() : '',
+          startDate: exp.startDate || '',
+          endDate: exp.endDate || '',
+          current: exp.currentlyWorking || false,
+          bullets: exp.workSummery ? exp.workSummery.split('\n') : []
+        })),
+        projects: profileInfo?.projects || [],
+        education: profileInfo?.education?.length > 0 ? profileInfo.education : (resumeInfo?.education || []).map(edu => ({
+          degree: edu.degree || '',
+          institution: edu.universityName || '',
+          location: '',
+          startDate: edu.startDate || '',
+          endDate: edu.endDate || '',
+          gpaOrHonors: edu.description || ''
+        })),
+        skills: profileInfo?.skills?.languages?.length > 0 ? profileInfo.skills : {
+           languages: (resumeInfo?.skills || []).map(s => typeof s === 'string' ? s : s.name),
+           frameworksAndLibraries: [],
+           databasesAndTools: []
+        },
+        certifications: profileInfo?.certifications || []
+      };
+
+      const isEmpty = !constructedProfile.personalInfo.fullName && constructedProfile.workExperience.length === 0;
       
       if (isEmpty) {
         setJsonText(JSON.stringify(DEFAULT_TEMPLATE, null, 2));
       } else {
-        // We only want to show the relevant keys for the Master Profile
-        const filteredProfile = {
-            personalInfo: profileInfo.personalInfo || {},
-            professionalSummary: profileInfo.professionalSummary || '',
-            workExperience: profileInfo.workExperience || [],
-            projects: profileInfo.projects || [],
-            education: profileInfo.education || [],
-            skills: profileInfo.skills || { languages: [], frameworksAndLibraries: [], databasesAndTools: [] },
-            certifications: profileInfo.certifications || []
-        };
-        setJsonText(JSON.stringify(filteredProfile, null, 2));
+        setJsonText(JSON.stringify(constructedProfile, null, 2));
       }
     }
-  }, [profileInfo, isDirty]);
+  }, [profileInfo, resumeInfo, isDirty]);
 
   const handleChange = (e) => {
     setJsonText(e.target.value);
@@ -116,6 +143,49 @@ export default function RawJsonEditor() {
     try {
       const parsed = JSON.parse(jsonText);
       dispatch(updateProfileData(parsed));
+      
+      // Bi-directional sync back to visual forms (legacy schema)
+      const [firstName = '', ...lastNames] = (parsed.personalInfo?.fullName || '').split(' ');
+      const lastName = lastNames.join(' ');
+      
+      const legacyData = {
+        ...resumeInfo,
+        firstName,
+        lastName,
+        jobTitle: parsed.personalInfo?.targetTitle || '',
+        address: parsed.personalInfo?.location || '',
+        phone: parsed.personalInfo?.phone || '',
+        email: parsed.personalInfo?.email || '',
+        summery: parsed.professionalSummary || '',
+        Experience: (parsed.workExperience || []).map(exp => ({
+          title: exp.role || '',
+          companyName: exp.company || '',
+          city: exp.location || '',
+          state: '',
+          startDate: exp.startDate || '',
+          endDate: exp.endDate || '',
+          currentlyWorking: exp.current || false,
+          workSummery: (exp.bullets || []).join('\n')
+        })),
+        education: (parsed.education || []).map(edu => ({
+          degree: edu.degree || '',
+          major: '',
+          universityName: edu.institution || '',
+          startDate: edu.startDate || '',
+          endDate: edu.endDate || '',
+          description: edu.gpaOrHonors || ''
+        })),
+        skills: [
+          ...(parsed.skills?.languages || []),
+          ...(parsed.skills?.frameworksAndLibraries || []),
+          ...(parsed.skills?.databasesAndTools || [])
+        ].map(s => ({ name: s, rating: 100 }))
+      };
+      
+      import('@/store/resumeSlice').then(mod => {
+        dispatch(mod.setResumeData(legacyData));
+      });
+
       setIsDirty(false);
       setError(null);
       toast.success("JSON data applied successfully!");
@@ -166,14 +236,25 @@ export default function RawJsonEditor() {
         </div>
       )}
 
-      <button
-        onClick={handleApply}
-        disabled={!isDirty || !!error}
-        className="flex items-center justify-center gap-2 w-full py-3 bg-stitch-primary text-white rounded-lg font-bold disabled:opacity-50 disabled:cursor-not-allowed hover:bg-stitch-primary/90 transition-colors"
-      >
-        <Save size={18} />
-        Apply Changes
-      </button>
+      <div className="flex gap-2 w-full">
+        <button
+          onClick={() => { setIsDirty(false); setError(null); }}
+          disabled={!isDirty}
+          className="flex-1 flex items-center justify-center gap-2 py-3 bg-surface-variant text-on-surface-variant rounded-lg font-bold disabled:opacity-50 disabled:cursor-not-allowed hover:bg-surface-variant/80 transition-colors"
+          title="Discard JSON changes and re-sync from visual form"
+        >
+          <RefreshCw size={18} />
+          Sync Form
+        </button>
+        <button
+          onClick={handleApply}
+          disabled={!isDirty || !!error}
+          className="flex-[2] flex items-center justify-center gap-2 py-3 bg-stitch-primary text-white rounded-lg font-bold disabled:opacity-50 disabled:cursor-not-allowed hover:bg-stitch-primary/90 transition-colors"
+        >
+          <Save size={18} />
+          Apply Changes
+        </button>
+      </div>
     </div>
   );
 }

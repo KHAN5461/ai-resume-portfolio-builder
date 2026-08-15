@@ -81,6 +81,24 @@ export const DeployModal = ({ isOpen, onOpenChange, portfolioId, portfolioData }
                     Visit Live Site
                 </a>
 
+                <button
+                    onClick={() => {
+                        import('@/lib/codeExporter').then(({ exportNextJsPortfolio }) => {
+                            const toastId = toast.loading("Generating Next.js Boilerplate...");
+                            exportNextJsPortfolio(portfolioData).then(() => {
+                                toast.success("Code downloaded successfully!", { id: toastId });
+                            }).catch(e => {
+                                console.error(e);
+                                toast.error("Failed to generate code.", { id: toastId });
+                            });
+                        });
+                    }}
+                    className="w-full flex items-center justify-center gap-2 py-3 px-4 bg-surface-variant hover:bg-outline-variant/30 text-on-surface rounded-xl font-semibold transition-all border border-outline-variant/30"
+                >
+                    <span className="material-symbols-outlined text-[20px]">data_object</span>
+                    Download Next.js Code
+                </button>
+
                 <div className="flex items-center gap-2 p-3 bg-surface border border-outline-variant/30 rounded-xl mt-2">
                     <span className="material-symbols-outlined text-on-surface-variant text-[18px]">link</span>
                     <input readOnly value={liveUrl} className="flex-1 bg-transparent text-sm text-on-surface outline-none" />

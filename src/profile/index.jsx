@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useSelector } from 'react-redux';
 import { useUser } from '../auth.jsx';
 import { auth } from '../lib/firebaseConfig';
 import { signOut } from 'firebase/auth';
@@ -6,6 +7,107 @@ import { useNavigate, Link } from 'react-router-dom';
 import { toast } from 'sonner';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Settings, User, CreditCard, Link as LinkIcon, Palette, Bell, Shield, LogOut, X, Github, Linkedin } from 'lucide-react';
+
+const PLAN_BADGES = {
+  free: { label: 'Free', className: 'bg-slate-100 text-slate-600 border-slate-200' },
+  pro: { label: 'Pro', className: 'bg-indigo-100 text-indigo-700 border-indigo-200' },
+  enterprise: { label: 'Enterprise', className: 'bg-purple-100 text-purple-700 border-purple-200' },
+};
+
+function BillingTabContent() {
+  const subscription = useSelector((state) => state.sync?.subscription);
+  const plan = subscription?.plan || 'free';
+  const badge = PLAN_BADGES[plan] || PLAN_BADGES.free;
+  const [portalLoading, setPortalLoading] = useState(false);
+
+  const handleManageSubscription = async () => {
+    if (!subscription?.stripeCustomerId) {
+      toast('No active subscription to manage.');
+      return;
+    }
+    setPortalLoading(true);
+    try {
+      const res = await fetch('/api/create-portal-session', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ stripeCustomerId: subscription.stripeCustomerId }),
+      });
+      const data = await res.json();
+      if (data.url) {
+        window.location.href = data.url;
+      } else {
+        toast.error('Could not open billing portal.');
+      }
+    } catch (err) {
+      console.error(err);
+      toast.error('Failed to connect to billing portal.');
+    } finally {
+      setPortalLoading(false);
+    }
+  };
+
+  return (
+    <div className="space-y-6">
+      {/* Current Plan Card */}
+      <div className="p-6 rounded-2xl border border-outline-variant/30 bg-surface">
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="font-bold text-lg">Current Plan</h3>
+          <span className={`px-3 py-1 rounded-full text-xs font-bold border ${badge.className}`}>
+            {badge.label}
+          </span>
+        </div>
+        {plan === 'free' ? (
+          <div>
+            <p className="text-sm text-on-surface-variant mb-4">
+              You are on the <strong>Free</strong> plan. Upgrade to unlock unlimited resumes, AI Co-Pilot, premium templates, and more.
+            </p>
+            <a href="/#pricing" className="inline-flex items-center gap-2 px-5 py-2.5 bg-indigo-600 text-white rounded-xl text-sm font-semibold hover:bg-indigo-500 transition-colors shadow-sm">
+              <CreditCard className="w-4 h-4" />
+              Upgrade Now
+            </a>
+          </div>
+        ) : (
+          <div>
+            <p className="text-sm text-on-surface-variant mb-4">
+              You are on the <strong>{badge.label}</strong> plan. All premium features are unlocked.
+            </p>
+            <div className="flex gap-3">
+              <button 
+                onClick={handleManageSubscription}
+                disabled={portalLoading}
+                className="inline-flex items-center gap-2 px-5 py-2.5 bg-surface-variant text-on-surface rounded-xl text-sm font-semibold hover:bg-outline-variant/30 transition-colors border border-outline-variant/30 disabled:opacity-50"
+              >
+                {portalLoading ? 'Opening...' : 'Manage Subscription'}
+              </button>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Feature Access Summary */}
+      <div className="p-6 rounded-2xl border border-outline-variant/30 bg-surface">
+        <h3 className="font-bold text-lg mb-4">Your Feature Access</h3>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          {[
+            { name: 'Active Resumes', free: '1', premium: 'Unlimited' },
+            { name: 'Active Portfolios', free: '1', premium: 'Unlimited' },
+            { name: 'AI Co-Pilot', free: '5/day', premium: 'Unlimited' },
+            { name: 'Premium Templates', free: '✗', premium: '✓' },
+            { name: 'ATS Score Ring', free: '✗', premium: '✓' },
+            { name: 'GitHub Sync', free: '✗', premium: '✓' },
+          ].map((feature) => (
+            <div key={feature.name} className="flex items-center justify-between py-2 px-3 rounded-lg bg-surface-container-low">
+              <span className="text-sm text-on-surface">{feature.name}</span>
+              <span className={`text-xs font-bold ${subscription?.isPremium ? 'text-emerald-600' : 'text-on-surface-variant'}`}>
+                {subscription?.isPremium ? feature.premium : feature.free}
+              </span>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
 
 export default function ProfilePage() {
   const { user } = useUser();
@@ -173,6 +275,15 @@ export default function ProfilePage() {
                                     <button className="px-4 py-1.5 bg-surface-variant text-on-surface rounded-full text-sm font-medium hover:bg-outline-variant/30">Connect</button>
                                 </div>
                             </div>
+                        </motion.div>
+                    )}
+
+                    {activeTab === 'billing' && (
+                        <motion.div key="billing" initial={{opacity:0, x:20}} animate={{opacity:1, x:0}} exit={{opacity:0, x:-20}} className="max-w-2xl">
+                            <h2 className="font-headline-md text-2xl font-bold mb-6">Billing & Subscription</h2>
+                            <p className="text-on-surface-variant mb-6 text-sm">Manage your subscription plan and payment details.</p>
+                            
+                            <BillingTabContent />
                         </motion.div>
                     )}
                 </AnimatePresence>

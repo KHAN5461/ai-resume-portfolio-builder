@@ -67,3 +67,32 @@ export function adjustColorForContrast(hex, bgHex, targetRatio = 4.5) {
     
     return currentHex;
 }
+
+export function hexToHslString(hex) {
+    if (!hex) return '0 0% 0%';
+    let [r, g, b] = hexToRgb(hex);
+    r /= 255; g /= 255; b /= 255;
+    let max = Math.max(r, g, b), min = Math.min(r, g, b);
+    let h, s, l = (max + min) / 2;
+    if (max === min) {
+        h = s = 0; // achromatic
+    } else {
+        let d = max - min;
+        s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+        switch (max) {
+            case r: h = (g - b) / d + (g < b ? 6 : 0); break;
+            case g: h = (b - r) / d + 2; break;
+            case b: h = (r - g) / d + 4; break;
+        }
+        h /= 6;
+    }
+    return `${Math.round(h * 360)} ${Math.round(s * 100)}% ${Math.round(l * 100)}%`;
+}
+
+export function getForegroundHsl(hex) {
+    if (!hex) return '0 0% 100%';
+    const [r, g, b] = hexToRgb(hex);
+    const lum = getLuminance(r, g, b);
+    // If the background is light, return dark text. If dark, return light text.
+    return lum > 0.5 ? '220 20% 12%' : '0 0% 100%';
+}

@@ -2,19 +2,24 @@ import React from 'react';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { GripVertical, Trash2, ArrowUp, ArrowDown } from 'lucide-react';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { removeBlock, moveBlockUp, moveBlockDown } from '@/store/portfolioSlice';
 import { useParams } from 'react-router-dom';
-import HeroBlock from '@/components/blocks/HeroBlock';
-import ProjectsBlock from '@/components/blocks/ProjectsBlock';
-import AboutBlock from '@/components/blocks/AboutBlock';
-import ExperienceBlock from '@/components/blocks/ExperienceBlock';
-import SkillsBlock from '@/components/blocks/SkillsBlock';
-import ContactBlock from '@/components/blocks/ContactBlock';
+
+const HeroBlock = React.lazy(() => import('@/components/blocks/HeroBlock'));
+const ProjectsBlock = React.lazy(() => import('@/components/blocks/ProjectsBlock'));
+const AboutBlock = React.lazy(() => import('@/components/blocks/AboutBlock'));
+const ExperienceBlock = React.lazy(() => import('@/components/blocks/ExperienceBlock'));
+const SkillsBlock = React.lazy(() => import('@/components/blocks/SkillsBlock'));
+const ContactBlock = React.lazy(() => import('@/components/blocks/ContactBlock'));
 
 const SortableBlock = ({ block, isActive, onClick }) => {
   const { portfolioId } = useParams();
   const dispatch = useDispatch();
+  
+  // Inject the global theme preset so blocks can adapt their layout natively
+  const portfolioData = useSelector((state) => state.portfolio?.present?.portfolios?.[portfolioId]);
+  const themePreset = portfolioData?.siteConfig?.themePreset || 'bento';
   
   const {
     attributes,
@@ -38,13 +43,19 @@ const SortableBlock = ({ block, isActive, onClick }) => {
   }, [dispatch, portfolioId, block.id]);
 
   const renderedBlock = React.useMemo(() => {
+    // Inject the theme preset into the block's data config if it doesn't already have one
+    const enhancedData = { 
+        ...block.data, 
+        config: { ...block.data?.config, layout: themePreset } 
+    };
+
     switch (block.type) {
-      case 'HeroSection': return <HeroBlock data={block.data} />;
-      case 'ProjectsGrid': return <ProjectsBlock data={block.data} />;
-      case 'AboutSection': return <AboutBlock data={block.data} />;
-      case 'WorkExperience': return <ExperienceBlock data={block.data} />;
-      case 'SkillsGrid': return <SkillsBlock data={block.data} />;
-      case 'ContactForm': return <ContactBlock data={block.data} />;
+      case 'HeroSection': return <HeroBlock data={enhancedData} />;
+      case 'ProjectsGrid': return <ProjectsBlock data={enhancedData} />;
+      case 'AboutSection': return <AboutBlock data={enhancedData} />;
+      case 'WorkExperience': return <ExperienceBlock data={enhancedData} />;
+      case 'SkillsGrid': return <SkillsBlock data={enhancedData} />;
+      case 'ContactForm': return <ContactBlock data={enhancedData} />;
       default: return (
         <div className="w-full bg-slate-50 min-h-[120px] p-8 flex items-center justify-center border-b border-slate-200">
           <div className="text-center">
@@ -54,7 +65,7 @@ const SortableBlock = ({ block, isActive, onClick }) => {
         </div>
       );
     }
-  }, [block.type, block.data]);
+  }, [block.type, block.data, themePreset]);
 
   return (
     <div 
@@ -103,7 +114,9 @@ const SortableBlock = ({ block, isActive, onClick }) => {
 
       {/* Render the actual block content */}
       <div className="w-full min-h-[120px] pointer-events-none select-none overflow-hidden relative">
-        {renderedBlock}
+        <React.Suspense fallback={<div className="p-8 text-center text-slate-400">Loading {block.type}...</div>}>
+          {renderedBlock}
+        </React.Suspense>
       </div>
     </div>
   );

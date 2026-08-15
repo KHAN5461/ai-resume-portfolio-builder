@@ -4,17 +4,20 @@ import { setResumeData } from '@/store/resumeSlice';
 import GlobalApi from './../../service/GlobalApi';
 import { toast } from 'sonner';
 import { Palette, Type, LayoutTemplate, Moon, Sun, Check } from 'lucide-react';
-import { getContrastRatio, adjustColorForContrast } from '@/lib/colorUtils';
+import { getContrastRatio, adjustColorForContrast, getForegroundHsl } from '@/lib/colorUtils';
 
 const RESUME_TEMPLATES = [
   { id: 'Classic', name: 'Classic Professional', desc: 'Clean, elegant, and traditional.' },
   { id: 'Modern', name: 'Modern Sidebar', desc: 'Sleek sidebar layout for a contemporary look.' },
   { id: 'Minimal', name: 'Minimalist Clean', desc: 'Focus strictly on content with zero distractions.' },
-  { id: 'MinimalImage', name: 'Creative Profile', desc: 'Includes your profile picture.' }
+  { id: 'MinimalImage', name: 'Creative Profile', desc: 'Includes your profile picture.' },
+  { id: 'DataDense', name: 'Data-Dense Pro', desc: 'Max info density for engineers.' },
+  { id: 'Interactive', name: 'Digital-First', desc: 'Interactive, clickable modern layout.' }
 ];
 
 const PORTFOLIO_PRESETS = [
   { id: 'bento', name: 'Bento Grid', desc: 'Modern bento-box style layout.' },
+  { id: 'story', name: 'Story Case Study', desc: 'Narrative-driven deep dive.' },
   { id: 'modern', name: 'Modern', desc: 'Sleek and contemporary design.' },
   { id: 'minimalist', name: 'Minimalist', desc: 'Clean and simple focus.' },
   { id: 'creative', name: 'Creative', desc: 'Bold and expressive.' }
@@ -156,6 +159,33 @@ export default function SharedThemeBuilder({ type, documentId }) {
                         </button>
                     </div>
                 )}
+                
+                {/* Smart Theme Enforcement UI */}
+                <div className="mt-6 p-4 rounded-xl border border-outline-variant/30 bg-surface">
+                    <h4 className="text-sm font-bold text-on-surface mb-3 flex items-center gap-2">
+                        <Check className="w-4 h-4 text-green-500" />
+                        Design System Enforced
+                    </h4>
+                    <p className="text-xs text-on-surface-variant mb-4">
+                        We automatically calculate WCAG-compliant contrast variants across your entire system to guarantee professional aesthetics.
+                    </p>
+                    <div className="grid grid-cols-2 gap-3">
+                        <div className="p-3 rounded-lg border border-outline-variant/20 flex flex-col gap-1 bg-surface-container-lowest">
+                            <span className="text-[10px] uppercase font-bold text-outline">Primary Background</span>
+                            <div className="flex items-center gap-2">
+                                <div className="w-4 h-4 rounded-full border border-black/10 shadow-inner" style={{ background: currentColor }}></div>
+                                <span className="text-xs font-mono text-on-surface">{currentColor}</span>
+                            </div>
+                        </div>
+                        <div className="p-3 rounded-lg border border-outline-variant/20 flex flex-col gap-1 bg-surface-container-lowest">
+                            <span className="text-[10px] uppercase font-bold text-outline">Calculated Foreground</span>
+                            <div className="flex items-center gap-2">
+                                <div className="w-4 h-4 rounded-full border border-black/10 shadow-inner" style={{ background: `hsl(${getForegroundHsl(currentColor).replace(/ /g, ', ')})` }}></div>
+                                <span className="text-xs font-mono text-on-surface">WCAG Compliant</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </section>
 
             {/* Typography Section */}

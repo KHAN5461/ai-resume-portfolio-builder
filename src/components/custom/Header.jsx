@@ -2,7 +2,7 @@ import React from 'react'
 import { Button } from '../ui/button'
 import { Link } from 'react-router-dom'
 import { UserButton, useUser } from '../../auth.jsx'
-import { Menu } from 'lucide-react'
+import { Menu, Cloud, CloudOff, Loader2 } from 'lucide-react'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -10,10 +10,26 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import useHideOnScroll from '../../hooks/useHideOnScroll'
+import { connectDrive } from '../../service/DriveService';
+import { useSelector, useDispatch } from 'react-redux';
+import { setDriveStatus } from '../../store/syncSlice';
 
 function Header() {
     const { user, isSignedIn } = useUser();
     const isVisible = useHideOnScroll();
+    const dispatch = useDispatch();
+    const driveStatus = useSelector(state => state.sync.driveStatus); // 'disconnected', 'connecting', 'connected'
+
+    const handleConnectDrive = async () => {
+        dispatch(setDriveStatus('connecting'));
+        try {
+            await connectDrive();
+            dispatch(setDriveStatus('connected'));
+        } catch (e) {
+            console.error("Drive connection failed", e);
+            dispatch(setDriveStatus('disconnected'));
+        }
+    };
 
     return (
         <div className={`p-4 px-8 flex justify-between items-center bg-surface/80 backdrop-blur-md border-b border-outline-variant/30 sticky top-0 z-50 shadow-sm transition-transform duration-300 ${isVisible ? 'translate-y-0' : '-translate-y-full'}`}>
@@ -42,6 +58,31 @@ function Header() {
                             </DropdownMenuContent>
                         </DropdownMenu>
                     </div>
+
+                    <div className="w-[1px] h-6 bg-outline-variant/50 mx-2 hidden md:block"></div>
+
+                    {/* Drive Sync Status Indicator */}
+                    <div className="hidden md:flex items-center" title={driveStatus === 'connected' ? 'Drive Connected (Synced)' : 'Drive Disconnected'}>
+                        {driveStatus === 'disconnected' && (
+                            <Button variant="ghost" size="sm" onClick={handleConnectDrive} className="text-red-500 hover:text-red-600 hover:bg-red-50 flex gap-2">
+                                <CloudOff className="w-4 h-4" />
+                                <span className="text-xs">Connect Drive</span>
+                            </Button>
+                        )}
+                        {driveStatus === 'connecting' && (
+                            <div className="text-yellow-500 flex gap-2 items-center px-3">
+                                <Loader2 className="w-4 h-4 animate-spin" />
+                                <span className="text-xs">Connecting...</span>
+                            </div>
+                        )}
+                        {driveStatus === 'connected' && (
+                            <div className="text-green-500 flex gap-2 items-center px-3">
+                                <Cloud className="w-4 h-4" />
+                                <span className="text-xs">Synced</span>
+                            </div>
+                        )}
+                    </div>
+
                     <div className="w-[1px] h-6 bg-outline-variant/50 mx-2 hidden md:block"></div>
                     <div className="hover:scale-110 transition-transform duration-200">
                         <UserButton />

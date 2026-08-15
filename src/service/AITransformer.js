@@ -1,5 +1,31 @@
 import { AIChatSession } from './../../service/AIModal';
 
+/**
+ * Builds a RAG context object string from the Redux state
+ * to inject into AI prompts.
+ */
+export const buildContextObject = (reduxState) => {
+    const resume = reduxState?.resume?.present?.resumeData || {};
+    
+    let contextStr = "User's Master Profile Context:\n";
+    
+    if (resume.jobTitle) {
+        contextStr += `- Target Role: ${resume.jobTitle}\n`;
+    }
+    if (resume.firstName) {
+        contextStr += `- Name: ${resume.firstName} ${resume.lastName || ''}\n`;
+    }
+    if (resume.skills && resume.skills.length > 0) {
+        const skillsStr = resume.skills.map(s => s.name).join(', ');
+        contextStr += `- Core Skills: ${skillsStr}\n`;
+    }
+    if (resume.summery) {
+        contextStr += `- Professional Summary: ${resume.summery}\n`;
+    }
+    
+    return contextStr;
+};
+
 const PROMPT_TEMPLATE = `
 You are an expert full-stack AI prompt engineer, career data architect, and JSON transformation engine. 
 

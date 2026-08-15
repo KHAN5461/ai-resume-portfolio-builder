@@ -71,6 +71,10 @@ const router=createBrowserRouter([
     ]
   },
   {
+    path:'/playground',
+    element: <Suspense fallback={<LoadingFallback />}><EditResume/></Suspense>
+  },
+  {
     path:'/auth/sign-in',
     element: <Suspense fallback={<LoadingFallback />}><SignInPage/></Suspense>
   },

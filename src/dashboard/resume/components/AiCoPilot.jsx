@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Sparkles, Send, X, Bot, User, Loader2 } from 'lucide-react';
-import { AIChatSession } from '../../../../service/AIModal';
+import { AIChatSession } from '../../../service/AIModal';
 import { useSelector, useDispatch } from 'react-redux';
 import { startLoading, stopLoading, selectIsLoading } from '../../../store/loadingSlice';
+import { buildContextObject } from '../../../service/AITransformer';
 
 export function AiCoPilot() {
   const resumeInfo = useSelector(state => state.resume.present.resumeData);
@@ -13,7 +14,9 @@ export function AiCoPilot() {
     { role: 'ai', text: 'Hi! I am your Sparkfolio AI Co-Pilot. I can help rewrite your experience, suggest skills, or fix formatting. What do you need?' }
   ]);
   const dispatch = useDispatch();
+  const fullReduxState = useSelector(state => state);
   const isAILoading = useSelector(selectIsLoading('ai-generation'));
+  const [loadingStateText, setLoadingStateText] = useState('');
 
   const handleSend = async (e) => {
     e.preventDefault();
@@ -23,14 +26,14 @@ export function AiCoPilot() {
     setChatHistory(prev => [...prev, { role: 'user', text: userMessage }]);
     setMessage('');
     dispatch(startLoading('ai-generation'));
+    setLoadingStateText('Analyzing ATS keywords & context...');
 
     try {
-        const prompt = `Context: The user has a resume with the following details:\n${JSON.stringify({
-            summary: resumeInfo?.summary || resumeInfo?.summery,
-            experience: resumeInfo?.experience || resumeInfo?.Experience,
-            skills: resumeInfo?.skills,
-            education: resumeInfo?.education
-        })}\n\nUser Question: ${userMessage}\n\nPlease provide a helpful answer based on the resume context above. Do not output markdown code blocks wrapping the entire response, just respond directly.`;
+        const contextStr = buildContextObject(fullReduxState);
+        const prompt = `Context:\n${contextStr}\n\nUser Question: ${userMessage}\n\nPlease provide a helpful answer based on the resume context above. Do not output markdown code blocks wrapping the entire response, just respond directly.`;
+        
+        setTimeout(() => setLoadingStateText('Writing draft...'), 1500);
+
         const result = await AIChatSession.sendMessage(prompt);
         const aiResponse = result.response.text();
         setChatHistory(prev => [...prev, { role: 'ai', text: aiResponse }]);
@@ -39,6 +42,7 @@ export function AiCoPilot() {
         setChatHistory(prev => [...prev, { role: 'ai', text: 'Sorry, I encountered an error. Please try again.' }]);
     } finally {
         dispatch(stopLoading('ai-generation'));
+        setLoadingStateText('');
     }
   };
 
@@ -120,7 +124,8 @@ export function AiCoPilot() {
                         <div className="w-8 h-8 rounded-full bg-gradient-to-br from-stitch-primary to-purple-500 text-white shrink-0 flex items-center justify-center shadow-sm">
                             <Sparkles className="w-4 h-4" />
                         </div>
-                        <div className="p-4 rounded-2xl bg-surface border border-outline-variant/20 rounded-tl-none flex items-center gap-1 shadow-sm">
+                        <div className="p-4 rounded-2xl bg-surface border border-outline-variant/20 rounded-tl-none flex items-center gap-2 shadow-sm">
+                            <span className="font-label-sm text-on-surface-variant italic mr-2">{loadingStateText}</span>
                             <div className="w-1.5 h-1.5 rounded-full bg-stitch-primary/50 animate-bounce" style={{ animationDelay: '0ms' }}></div>
                             <div className="w-1.5 h-1.5 rounded-full bg-stitch-primary/50 animate-bounce" style={{ animationDelay: '150ms' }}></div>
                             <div className="w-1.5 h-1.5 rounded-full bg-stitch-primary/50 animate-bounce" style={{ animationDelay: '300ms' }}></div>

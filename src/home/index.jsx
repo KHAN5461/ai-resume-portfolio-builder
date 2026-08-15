@@ -7,11 +7,14 @@ import { HeroAnimation } from './components/HeroAnimation';
 import ResumePreview from '../dashboard/resume/components/ResumePreview';
 import { useDispatch } from 'react-redux';
 import { setResumeData } from '@/store/resumeSlice';
+import { useUser } from '../auth.jsx';
 
 function Home() {
   const [checkoutOpen, setCheckoutOpen] = useState(false);
   const [selectedPlan, setSelectedPlan] = useState('pro');
+  const [selectedAnnual, setSelectedAnnual] = useState(false);
   const dispatch = useDispatch();
+  const { user } = useUser();
 
   // Inject dummy data for the demo
   React.useEffect(() => {
@@ -57,8 +60,9 @@ function Home() {
     }));
   }, [dispatch]);
 
-  const handleUpgrade = (plan) => {
+  const handleUpgrade = (plan, isAnnual) => {
     setSelectedPlan(plan);
+    setSelectedAnnual(isAnnual || false);
     setCheckoutOpen(true);
   };
 
@@ -106,14 +110,14 @@ function Home() {
 <div className="w-full max-w-6xl mb-12 flex flex-col lg:flex-row items-center gap-12">
     <div className="flex-1 text-left">
         <h1 className="font-headline-xl text-headline-xl md:text-[64px] font-extrabold leading-tight tracking-tight mb-6">
-            Craft Your Future <br className="hidden md:block"/>with <span className="gradient-text">AI Magic</span>
+            Get your resume ATS-ready in <span className="gradient-text">5 minutes</span>
         </h1>
         <p className="font-body-lg text-body-lg text-on-surface-variant mb-10">
-            Lower the barrier to professional-grade design. Sparkfolio combines intuitive tools with powerful AI to bring your creative vision to life instantly.
+            Stop guessing why you're getting rejected. Our AI analyzes, optimizes, and formats your resume to beat Applicant Tracking Systems and land you interviews.
         </p>
         <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto mt-4">
-            <Link to="/dashboard" className="bg-primary text-on-primary font-label-md text-label-md px-8 py-4 rounded-full shadow-[0_0_20px_rgba(159,91,255,0.4)] hover:-translate-y-1 hover:shadow-[0_0_30px_rgba(159,91,255,0.6)] hover:bg-primary/90 transition-all duration-300 flex items-center justify-center gap-2 min-h-[48px]">
-                Start Creating
+            <Link to="/playground" className="bg-primary text-on-primary font-label-md text-label-md px-8 py-4 rounded-full shadow-[0_0_20px_rgba(159,91,255,0.4)] hover:-translate-y-1 hover:shadow-[0_0_30px_rgba(159,91,255,0.6)] hover:bg-primary/90 transition-all duration-300 flex items-center justify-center gap-2 min-h-[48px]">
+                Try the Builder
                 <span className="material-symbols-outlined group-hover:translate-x-1 transition-transform" data-icon="arrow_forward">arrow_forward</span>
             </Link>
             <button className="bg-white/50 backdrop-blur-md text-primary border border-white/40 font-label-md text-label-md px-8 py-4 rounded-full hover:bg-white/80 hover:shadow-lg transition-all duration-300 flex items-center justify-center gap-2 min-h-[48px] hover:-translate-y-1">
@@ -147,6 +151,62 @@ function Home() {
 </div>
 </div>
 </section>
+
+{/* Before/After Transformation Showcase */}
+<section className="py-24 bg-surface-container-lowest">
+    <div className="max-w-7xl mx-auto px-container-margin md:px-lg text-center">
+        <h2 className="font-headline-lg text-headline-lg font-bold text-on-surface mb-4">From Text File to Top 1% Candidate</h2>
+        <p className="font-body-md text-body-md text-on-surface-variant mb-16 max-w-2xl mx-auto">See the difference between a standard unformatted document and a Sparkfolio optimized resume.</p>
+        
+        <div className="flex flex-col lg:flex-row gap-8 items-center justify-center">
+            {/* Before */}
+            <div className="flex-1 w-full max-w-md">
+                <div className="bg-surface-variant/30 rounded-t-xl py-3 px-4 border border-outline-variant/30 border-b-0 flex items-center gap-2">
+                    <div className="w-3 h-3 rounded-full bg-red-400"></div>
+                    <span className="text-sm font-mono text-on-surface-variant">resume_final_v3.txt</span>
+                </div>
+                <div className="bg-surface rounded-b-xl p-8 border border-outline-variant/30 text-left h-[400px] overflow-hidden shadow-sm relative grayscale opacity-70 hover:opacity-100 hover:grayscale-0 transition-all cursor-crosshair">
+                    <div className="font-mono text-xs text-on-surface-variant leading-relaxed opacity-60">
+                        <p className="mb-4">Jane Doe<br/>Senior Designer<br/>jane@example.com</p>
+                        <p className="mb-4">SUMMARY<br/>I am a designer with 8 years of experience. I make things look good and work well.</p>
+                        <p className="mb-4">EXPERIENCE<br/>Tech Corp<br/>Lead Designer<br/>2020-Present<br/>- Designed the main app.<br/>- Managed 5 people.</p>
+                        <p className="mb-4">SKILLS<br/>Figma, UI, UX, React</p>
+                    </div>
+                    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-red-500 text-white font-bold px-4 py-2 rounded-lg transform -rotate-12 shadow-lg whitespace-nowrap">
+                        ATS Rejected
+                    </div>
+                </div>
+            </div>
+
+            {/* Arrow */}
+            <div className="hidden lg:flex items-center justify-center shrink-0">
+                <span className="material-symbols-outlined text-4xl text-primary animate-pulse" data-icon="arrow_right_alt">arrow_right_alt</span>
+            </div>
+
+            {/* After */}
+            <div className="flex-1 w-full max-w-md relative group">
+                <div className="absolute -inset-1 bg-gradient-to-r from-primary to-secondary rounded-2xl blur opacity-25 group-hover:opacity-50 transition duration-1000 group-hover:duration-200"></div>
+                <div className="relative">
+                    <div className="bg-surface-container-lowest rounded-t-xl py-3 px-4 border border-outline-variant/30 border-b-0 flex items-center gap-2 justify-between">
+                        <div className="flex items-center gap-2">
+                            <div className="w-3 h-3 rounded-full bg-green-400"></div>
+                            <span className="text-sm font-bold text-primary flex items-center gap-1"><span className="material-symbols-outlined text-[14px]">auto_awesome</span> sparkfolio_optimized.pdf</span>
+                        </div>
+                    </div>
+                    <div className="bg-white rounded-b-xl border border-outline-variant/30 text-left h-[400px] overflow-hidden shadow-xl p-2 cursor-pointer transform group-hover:-translate-y-1 transition-transform">
+                        <div className="w-full h-full scale-[0.6] origin-top">
+                            <ResumePreview />
+                        </div>
+                        <div className="absolute bottom-4 right-4 bg-green-500 text-white font-bold px-4 py-2 rounded-full shadow-lg whitespace-nowrap flex items-center gap-2">
+                            <span className="material-symbols-outlined text-[18px]">check_circle</span> Top 1% Match
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
 {/*  Bento Grid Feature Showcase  */}
 <section className="py-xl max-w-7xl mx-auto px-container-margin md:px-lg w-full">
 <div className="text-center mb-xl">
@@ -214,7 +274,10 @@ function Home() {
 <CheckoutModal 
   isOpen={checkoutOpen} 
   onOpenChange={setCheckoutOpen} 
-  plan={selectedPlan} 
+  plan={selectedPlan}
+  isAnnual={selectedAnnual}
+  userEmail={user?.primaryEmailAddress?.emailAddress || ''}
+  userId={user?.id || ''}
 />
 
 </main>
@@ -246,6 +309,10 @@ function Home() {
 <span className="font-headline-md text-headline-md font-bold text-primary dark:text-primary-fixed">Sparkfolio</span>
 </div>
 <p className="font-body-sm text-body-sm text-on-surface-variant">© 2024 Sparkfolio AI. Empowering creators worldwide.</p>
+<div className="flex items-center gap-4 mt-2">
+    <span className="flex items-center gap-1 text-[11px] font-mono text-outline-variant bg-surface-container py-1 px-2 rounded"><span className="material-symbols-outlined text-[14px]">bolt</span> Powered by Vercel</span>
+    <span className="flex items-center gap-1 text-[11px] font-mono text-outline-variant bg-surface-container py-1 px-2 rounded"><span className="material-symbols-outlined text-[14px]">search</span> SEO-Optimized</span>
+</div>
 </div>
 <nav className="flex flex-wrap justify-center gap-x-6 gap-y-2">
 <a className="font-label-md text-label-md text-on-surface-variant dark:text-outline-variant hover:text-primary dark:hover:text-primary-fixed underline decoration-2 transition-all cursor-pointer" href="#">Privacy Policy</a>

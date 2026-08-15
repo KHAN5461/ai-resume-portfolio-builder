@@ -1,7 +1,14 @@
 import React, { useState } from 'react';
+import { useSelector } from 'react-redux';
 
 export const PricingSection = ({ onUpgrade }) => {
   const [isAnnual, setIsAnnual] = useState(false);
+  const subscription = useSelector((state) => state.sync?.subscription);
+  const currentPlan = subscription?.plan || 'free';
+
+  const handleUpgrade = (plan) => {
+    onUpgrade(plan, isAnnual);
+  };
 
   return (
     <section className="py-24 relative max-w-7xl mx-auto px-6 md:px-12 w-full z-10">
@@ -37,12 +44,16 @@ export const PricingSection = ({ onUpgrade }) => {
           <h3 className="text-xl font-bold text-slate-50 mb-2">Starter</h3>
           <p className="text-sm text-slate-400 mb-6">Perfect for students and job-seekers just starting out.</p>
           <div className="text-4xl font-extrabold text-slate-50 mb-8">$0<span className="text-lg text-slate-500 font-medium">/mo</span></div>
-          <button className="w-full py-3 px-4 rounded-xl font-semibold text-slate-300 bg-slate-800/50 hover:bg-slate-800 border border-slate-700 transition-all mb-8">
-            Get Started Free
+          <button 
+            disabled={currentPlan === 'free'}
+            className="w-full py-3 px-4 rounded-xl font-semibold text-slate-300 bg-slate-800/50 hover:bg-slate-800 border border-slate-700 transition-all mb-8 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {currentPlan === 'free' ? 'Current Plan' : 'Get Started Free'}
           </button>
           <div className="flex flex-col gap-4 flex-1">
             <div className="flex items-center gap-3"><span className="material-symbols-outlined text-emerald-400 text-lg">check_circle</span><span className="text-sm text-slate-300">1 Active Resume</span></div>
             <div className="flex items-center gap-3"><span className="material-symbols-outlined text-emerald-400 text-lg">check_circle</span><span className="text-sm text-slate-300">1 Live Portfolio</span></div>
+            <div className="flex items-center gap-3"><span className="material-symbols-outlined text-emerald-400 text-lg">check_circle</span><span className="text-sm text-slate-300">Standard Templates Only</span></div>
             <div className="flex items-center gap-3"><span className="material-symbols-outlined text-emerald-400 text-lg">check_circle</span><span className="text-sm text-slate-300">Standard ATS PDF Export</span></div>
             <div className="flex items-center gap-3"><span className="material-symbols-outlined text-emerald-400 text-lg">check_circle</span><span className="text-sm text-slate-300">Basic AI Text Transform</span></div>
           </div>
@@ -59,16 +70,26 @@ export const PricingSection = ({ onUpgrade }) => {
             ${isAnnual ? '7' : '9'}<span className="text-lg text-slate-500 font-medium">/mo</span>
           </div>
           <button 
-            onClick={() => onUpgrade('pro')}
-            className="w-full py-3 px-4 rounded-xl font-bold text-white bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 shadow-[0_0_20px_rgba(99,102,241,0.4)] transition-all mb-8"
+            onClick={() => handleUpgrade('pro')}
+            disabled={currentPlan === 'pro' || currentPlan === 'enterprise'}
+            className="w-full py-3 px-4 rounded-xl font-bold text-white bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 shadow-[0_0_20px_rgba(99,102,241,0.4)] transition-all mb-8 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:from-indigo-600 disabled:hover:to-purple-600"
           >
-            Upgrade to Pro
+            {currentPlan === 'pro' ? 'Current Plan' : currentPlan === 'enterprise' ? 'Included' : 'Upgrade to Pro'}
           </button>
           <div className="flex flex-col gap-4 flex-1">
             <div className="flex items-center gap-3"><span className="material-symbols-outlined text-indigo-400 text-lg">check_circle</span><span className="text-sm text-slate-300">Unlimited Resumes & Portfolios</span></div>
-            <div className="flex items-center gap-3"><span className="material-symbols-outlined text-indigo-400 text-lg">check_circle</span><span className="text-sm text-slate-300">Advanced AI STAR-Method Optimizer</span></div>
+            <div className="flex items-center gap-3">
+              <span className="material-symbols-outlined text-indigo-400 text-lg">check_circle</span>
+              <span className="text-sm text-slate-300">Advanced AI Co-Pilot</span>
+              <span className="px-2 py-0.5 rounded-md bg-indigo-500/20 text-indigo-300 text-[10px] font-bold border border-indigo-500/30 whitespace-nowrap ml-auto">Save 5 hours</span>
+            </div>
             <div className="flex items-center gap-3"><span className="material-symbols-outlined text-indigo-400 text-lg">check_circle</span><span className="text-sm text-slate-300">Real-time ATS Score Ring</span></div>
-            <div className="flex items-center gap-3"><span className="material-symbols-outlined text-indigo-400 text-lg">check_circle</span><span className="text-sm text-slate-300">Custom Accent Theme Presets</span></div>
+            <div className="flex items-center gap-3">
+              <span className="material-symbols-outlined text-indigo-400 text-lg">check_circle</span>
+              <span className="text-sm text-slate-300">Premium Template Variety</span>
+              <span className="px-2 py-0.5 rounded-md bg-purple-500/20 text-purple-300 text-[10px] font-bold border border-purple-500/30 whitespace-nowrap ml-auto">New</span>
+            </div>
+            <div className="flex items-center gap-3"><span className="material-symbols-outlined text-indigo-400 text-lg">check_circle</span><span className="text-sm text-slate-300">GitHub Analytics Sync</span></div>
             <div className="flex items-center gap-3"><span className="material-symbols-outlined text-indigo-400 text-lg">check_circle</span><span className="text-sm text-slate-300">Priority PDF Export</span></div>
           </div>
         </div>
@@ -81,10 +102,11 @@ export const PricingSection = ({ onUpgrade }) => {
             ${isAnnual ? '24' : '29'}<span className="text-lg text-slate-500 font-medium">/mo</span>
           </div>
           <button 
-            onClick={() => onUpgrade('enterprise')}
-            className="w-full py-3 px-4 rounded-xl font-semibold text-slate-300 bg-slate-800/50 hover:bg-slate-800 border border-slate-700 transition-all mb-8"
+            onClick={() => handleUpgrade('enterprise')}
+            disabled={currentPlan === 'enterprise'}
+            className="w-full py-3 px-4 rounded-xl font-semibold text-slate-300 bg-slate-800/50 hover:bg-slate-800 border border-slate-700 transition-all mb-8 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            Contact Sales
+            {currentPlan === 'enterprise' ? 'Current Plan' : 'Contact Sales'}
           </button>
           <div className="flex flex-col gap-4 flex-1">
             <div className="flex items-center gap-3"><span className="material-symbols-outlined text-emerald-400 text-lg">check_circle</span><span className="text-sm text-slate-300">Custom Domain Mapping</span></div>

@@ -1,11 +1,11 @@
 import React from 'react';
 import { useSelector } from 'react-redux';
 import { useParams } from 'react-router-dom';
-import HeroSection from '../../../portfolio/components/HeroSection';
-import AboutSection from '../../../portfolio/components/AboutSection';
-import ProjectsSection from '../../../portfolio/components/ProjectsSection';
-import SkillsSection from '../../../portfolio/components/SkillsSection';
-import ContactSection from '../../../portfolio/components/ContactSection';
+const HeroSection = React.lazy(() => import('../../../portfolio/components/HeroSection'));
+const AboutSection = React.lazy(() => import('../../../portfolio/components/AboutSection'));
+const ProjectsSection = React.lazy(() => import('../../../portfolio/components/ProjectsSection'));
+const SkillsSection = React.lazy(() => import('../../../portfolio/components/SkillsSection'));
+const ContactSection = React.lazy(() => import('../../../portfolio/components/ContactSection'));
 
 export default function PortfolioPreview() {
   const { portfolioId } = useParams();
@@ -39,7 +39,9 @@ export default function PortfolioPreview() {
           {layout.map((item) => (
             item.visible && (
               <React.Fragment key={item.id}>
-                {sectionComponents[item.id]}
+                <React.Suspense fallback={<div className="p-12 text-center text-slate-400">Loading section...</div>}>
+                  {sectionComponents[item.id]}
+                </React.Suspense>
               </React.Fragment>
             )
           ))}

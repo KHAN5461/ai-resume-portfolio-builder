@@ -107,7 +107,8 @@ export const ResumePDF = ({ resumeData, settings = { pageSize: 'A4', baseFontSiz
       fontFamily: pdfFont,
       color: accentColor,
       letterSpacing: -0.5,
-      marginBottom: 2,
+      marginBottom: 4,
+      lineHeight: 1.1,
     },
     targetTitle: {
       fontSize: baseSize * 1.1,
@@ -115,7 +116,8 @@ export const ResumePDF = ({ resumeData, settings = { pageSize: 'A4', baseFontSiz
       color: '#6b7280',
       textTransform: 'uppercase',
       letterSpacing: 1,
-      marginBottom: 12,
+      marginBottom: 16,
+      lineHeight: 1.2,
     },
     contactRow: {
       flexDirection: 'row',

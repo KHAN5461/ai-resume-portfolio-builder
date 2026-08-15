@@ -1,6 +1,9 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import { auth } from './lib/firebaseConfig';
+import { auth, db } from './lib/firebaseConfig';
 import { onAuthStateChanged, signOut } from 'firebase/auth';
+import { doc, getDoc } from 'firebase/firestore';
+import { store } from './store/store';
+import { setSubscription } from './store/syncSlice';
 
 const AuthContext = createContext({ user: null, session: null, isLoaded: false });
 
@@ -10,11 +13,37 @@ export const ClerkProvider = ({ children }) => {
   const [isLoaded, setIsLoaded] = useState(false);
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+    const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
       setUser(currentUser);
       // Firebase doesn't use the same session object as Supabase, but we can set session to currentUser for compatibility if needed.
       setSession(currentUser ? { user: currentUser } : null);
       setIsLoaded(true);
+
+      // Fetch subscription status from Firestore
+      if (currentUser) {
+        try {
+          const userDoc = await getDoc(doc(db, 'users', currentUser.uid));
+          if (userDoc.exists()) {
+            const data = userDoc.data();
+            store.dispatch(setSubscription({
+              plan: data.plan || 'free',
+              isPremium: data.isPremium || false,
+              stripeCustomerId: data.stripeCustomerId || null,
+              stripeSubscriptionId: data.stripeSubscriptionId || null,
+            }));
+          }
+        } catch (err) {
+          console.warn('Could not fetch subscription status:', err);
+        }
+      } else {
+        // Reset subscription on logout
+        store.dispatch(setSubscription({
+          plan: 'free',
+          isPremium: false,
+          stripeCustomerId: null,
+          stripeSubscriptionId: null,
+        }));
+      }
     });
 
     return () => unsubscribe();

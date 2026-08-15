@@ -14,6 +14,7 @@ import { useUser } from '@/auth.jsx';
 import { AIChatSession } from '@/service/AIModal';
 import SeoSettingsModal from '../../components/SeoSettingsModal';
 import { DeployModal } from '../../components/DeployModal';
+import { calculateSeoScore } from '@/lib/seoScorer';
 import { Skeleton } from '@/components/ui/skeleton';
 import ResponsiveBreadcrumbs from '@/components/custom/ResponsiveBreadcrumbs';
 import useHideOnScroll from '@/hooks/useHideOnScroll';
@@ -27,6 +28,7 @@ export default function EditPortfolio() {
   const pastStates = useSelector((state) => state.portfolio.past);
   const futureStates = useSelector((state) => state.portfolio.future);
   const { user } = useUser();
+  const seoData = calculateSeoScore(portfolioData, portfolioData?.blocks || []);
 
   const [view, setView] = useState('builder'); // 'builder' or 'preview'
   const [previewMode, setPreviewMode] = useState('desktop'); // 'desktop' | 'mobile'
@@ -233,6 +235,29 @@ export default function EditPortfolio() {
               <span className={`material-symbols-outlined text-[18px] ${isSyncing ? 'animate-spin' : ''}`}>magic_button</span>
               {isSyncing ? 'Crafting...' : 'Auto-Fill'}
             </button>
+            {/* Magic Layout Optimizer Button */}
+            <button 
+              onClick={() => {
+                  import('@/lib/magicLayoutOptimizer').then(({ optimizeLayout }) => {
+                      const optimizedBlocks = optimizeLayout(portfolioData);
+                      dispatch({
+                          type: 'portfolio/updatePortfolioData',
+                          payload: {
+                              id: portfolioId,
+                              data: {
+                                  ...portfolioData,
+                                  blocks: optimizedBlocks
+                              }
+                          }
+                      });
+                      toast.success("Magic Layout Applied!");
+                  });
+              }}
+              className="hidden lg:flex h-10 px-4 bg-purple-100 text-purple-700 border border-purple-200 rounded-lg font-label-md text-[14px] hover:bg-purple-200 transition-all shadow-sm items-center gap-2 cursor-pointer"
+            >
+              <span className="material-symbols-outlined text-[18px]">auto_awesome_mosaic</span>
+              Optimize Layout
+            </button>
             {/* Viewport Switcher */}
             <div className="hidden md:flex bg-surface-container-low rounded-lg p-xs">
               <button 
@@ -250,6 +275,14 @@ export default function EditPortfolio() {
                 <span className="material-symbols-outlined text-[20px]">smartphone</span>
               </button>
             </div>
+            {/* SEO Score Button */}
+            <button 
+              className="h-10 px-4 rounded-lg font-label-md text-[14px] shadow-sm flex items-center gap-2"
+              style={{ backgroundColor: seoData.color, color: '#fff' }}
+              title={seoData.warnings && seoData.warnings.length > 0 ? seoData.warnings.join('\n') : 'SEO Score Good'}
+            >
+              SEO Score: {seoData.score}
+            </button>
             {/* Publish Button */}
             <button 
               onClick={() => setIsDeployModalOpen(true)}
