@@ -5,6 +5,7 @@ import GlobalApi from './../../../../service/GlobalApi';
 import { useParams } from 'react-router-dom';
 import { toast } from 'sonner';
 import { Palette, Type, LayoutTemplate } from 'lucide-react';
+import { getContrastRatio, adjustColorForContrast } from '@/lib/colorUtils';
 
 const TEMPLATES = [
   { id: 'Classic', name: 'Classic Professional', desc: 'Clean, elegant, and traditional.' },
@@ -33,6 +34,14 @@ export default function ThemeBuilder() {
     const [selectedFont, setSelectedFont] = useState(resumeInfo?.themeFont || FONTS[0].name);
     const [selectedTemplate, setSelectedTemplate] = useState(resumeInfo?.themeTemplate || TEMPLATES[0].id);
     const { resumeId } = useParams();
+
+    const contrastRatio = getContrastRatio(selectedColor, '#FFFFFF');
+    const isLowContrast = contrastRatio < 4.5;
+
+    const handleAutoAdjust = () => {
+        const adjustedColor = adjustColorForContrast(selectedColor, '#FFFFFF');
+        onColorSelect(adjustedColor);
+    };
 
     const onColorSelect = (color) => {
         setSelectedColor(color);
@@ -117,6 +126,14 @@ export default function ThemeBuilder() {
                         </button>
                     ))}
                 </div>
+                {isLowContrast && (
+                    <div className="mt-4 p-3 bg-amber-50 border border-amber-200 rounded-lg flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                        <span className="text-amber-800 text-sm font-medium">Low contrast: This color may be hard to read on white.</span>
+                        <button onClick={handleAutoAdjust} className="text-sm px-3 py-1.5 bg-amber-100 hover:bg-amber-200 text-amber-900 rounded-md font-bold transition-colors whitespace-nowrap">
+                            Auto-adjust
+                        </button>
+                    </div>
+                )}
             </section>
 
             {/* Typography Section */}

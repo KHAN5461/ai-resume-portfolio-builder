@@ -6,7 +6,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { setResumeData } from '@/store/resumeSlice';
 import { useParams } from 'react-router-dom'
 import { toast } from 'sonner'
-import { LoaderCircle, GripVertical, Trash2, Plus, ArrowLeft, ArrowRight } from 'lucide-react'
+import { LoaderCircle, GripVertical, Trash2, Plus, ArrowLeft, ArrowRight, Briefcase } from 'lucide-react'
 import { handleFormKeyDown } from '@/lib/keyboard'
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd'
 
@@ -104,7 +104,33 @@ function Experience({handleNext, handlePrev}) {
                 <Droppable droppableId="experience-list">
                     {(provided) => (
                         <div {...provided.droppableProps} ref={provided.innerRef}>
-                            {experinceList.map((item,index)=>(
+                            {experinceList.length === 0 ? (
+                                <div className="flex flex-col items-center justify-center p-8 border-2 border-dashed border-outline-variant/50 rounded-xl bg-surface/50 text-center mb-5">
+                                    <Briefcase className="w-12 h-12 text-on-surface-variant/50 mb-4" />
+                                    <h3 className="font-label-lg font-bold text-on-surface mb-2">No Experience Added</h3>
+                                    <p className="font-body-sm text-on-surface-variant mb-4">Add your professional experience to showcase your skills.</p>
+                                    <Button 
+                                        variant="outline" 
+                                        onClick={() => {
+                                            const newIndex = 0;
+                                            setExperinceList([{
+                                                title: 'Software Engineer',
+                                                companyName: 'Tech Corp',
+                                                city: '',
+                                                state: '',
+                                                startDate: 'Jan 2020',
+                                                endDate: 'Present',
+                                                workSummery: '• Led a team of 5 engineers to develop a scalable backend system using Node.js.\n• Reduced API latency by 40% through database query optimization.',
+                                            }]);
+                                            setExpandedIndex(newIndex);
+                                        }}
+                                        className="text-stitch-primary border-stitch-primary/30 hover:bg-stitch-primary/5"
+                                    >
+                                        Load Example Entry
+                                    </Button>
+                                </div>
+                            ) : (
+                                experinceList.map((item,index)=>(
                                 <Draggable key={item.id || `exp-${index}`} draggableId={item.id || `exp-${index}`} index={index}>
                                     {(provided) => (
                                         <div 
@@ -217,7 +243,8 @@ function Experience({handleNext, handlePrev}) {
                                         </div>
                                     )}
                                 </Draggable>
-                            ))}
+                                ))
+                            )}
                             {provided.placeholder}
                         </div>
                     )}

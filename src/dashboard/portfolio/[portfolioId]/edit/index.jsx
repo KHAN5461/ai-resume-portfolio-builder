@@ -146,7 +146,7 @@ export default function EditPortfolio() {
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -10 }}
       transition={{ duration: 0.3 }}
-      className="bg-background text-on-background font-body-md h-screen w-screen overflow-hidden flex flex-col"
+      className="bg-background text-on-background font-body-md h-[100dvh] w-screen overflow-hidden flex flex-col"
     >
         {/* Top Toolbar */}
         <header className="bg-surface-container-lowest border-b border-outline-variant/30 px-gutter h-16 flex items-center justify-between shrink-0 shadow-sm z-20 relative">
@@ -226,20 +226,26 @@ export default function EditPortfolio() {
         </header>
 
         {/* Pill Tab Switcher (Mobile Only) */}
-        <div className="md:hidden w-full bg-surface py-sm px-gutter flex justify-center z-40 border-b border-outline-variant/30">
-          <div className="flex bg-surface-variant/30 rounded-full p-xs gap-xs border border-outline-variant/20">
-            <button 
-              className={`px-lg py-sm rounded-full font-label-md text-label-md transition-colors ${view === 'builder' ? 'bg-primary-container text-on-primary-container' : 'text-on-surface-variant'}`}
-              onClick={() => setView('builder')}
-            >
-              Builder
-            </button>
-            <button 
-              className={`px-lg py-sm rounded-full font-label-md text-label-md transition-colors ${view === 'preview' ? 'bg-primary-container text-on-primary-container' : 'text-on-surface-variant'}`}
-              onClick={() => setView('preview')}
-            >
-              Preview
-            </button>
+        <div className="md:hidden w-full bg-surface py-2 px-4 flex justify-center z-40 border-b border-outline-variant/30 shrink-0">
+          <div className="flex bg-surface-variant/30 rounded-full p-1 border border-outline-variant/20 relative w-full max-w-sm">
+            {['builder', 'preview'].map((tab) => (
+              <button
+                key={tab}
+                onClick={() => setView(tab)}
+                className={`flex-1 py-2 rounded-full font-label-md capitalize relative z-10 transition-colors ${
+                  view === tab ? 'text-on-primary-container font-bold' : 'text-on-surface-variant'
+                }`}
+              >
+                {view === tab && (
+                  <motion.div
+                    layoutId="portfolio-active-pill"
+                    className="absolute inset-0 bg-primary-container rounded-full -z-10 shadow-sm"
+                    transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                  />
+                )}
+                {tab}
+              </button>
+            ))}
           </div>
         </div>
 

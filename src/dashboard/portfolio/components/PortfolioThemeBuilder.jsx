@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Palette, X, Check } from 'lucide-react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useParams } from 'react-router-dom';
+import { getContrastRatio, adjustColorForContrast } from '@/lib/colorUtils';
 
 export default function PortfolioThemeBuilder() {
   const [isOpen, setIsOpen] = useState(false);
@@ -12,6 +13,16 @@ export default function PortfolioThemeBuilder() {
 
   const currentTheme = portfolioData?.siteConfig?.themePreset || 'bento';
   const currentAccent = portfolioData?.siteConfig?.accentColor || '#6366f1';
+  const themeMode = portfolioData?.siteConfig?.themeMode || 'light';
+  
+  const bgColor = themeMode === 'dark' ? '#020617' : '#FFFFFF';
+  const contrastRatio = getContrastRatio(currentAccent, bgColor);
+  const isLowContrast = contrastRatio < 4.5;
+
+  const handleAutoAdjust = () => {
+      const adjustedColor = adjustColorForContrast(currentAccent, bgColor);
+      handleUpdate('accentColor', adjustedColor);
+  };
 
   const presets = ['bento', 'modern', 'minimalist', 'creative'];
   const colors = [
@@ -105,6 +116,15 @@ export default function PortfolioThemeBuilder() {
                     />
                   </div>
                 </div>
+
+                {isLowContrast && (
+                    <div className="mb-4 p-3 bg-amber-50 border border-amber-200 rounded-lg flex flex-col items-start gap-2">
+                        <span className="text-amber-800 text-xs font-medium">Low contrast: This color may be hard to read on the {themeMode} background.</span>
+                        <button onClick={handleAutoAdjust} className="text-xs px-3 py-1.5 bg-amber-100 hover:bg-amber-200 text-amber-900 rounded-md font-bold transition-colors w-full">
+                            Auto-adjust
+                        </button>
+                    </div>
+                )}
 
                 <label className="text-sm font-medium text-on-surface-variant block mb-3">Color Mode</label>
                 <div className="flex bg-surface-variant/30 rounded-lg p-1 gap-1 border border-outline-variant/20">

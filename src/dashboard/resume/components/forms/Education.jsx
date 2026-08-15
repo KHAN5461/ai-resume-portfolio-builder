@@ -3,7 +3,7 @@ import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { useDispatch, useSelector } from 'react-redux';
 import { setResumeData } from '@/store/resumeSlice';
-import { LoaderCircle, GripVertical, Trash2, ArrowLeft, ArrowRight } from 'lucide-react'
+import { LoaderCircle, GripVertical, Trash2, ArrowLeft, ArrowRight, GraduationCap } from 'lucide-react'
 import React, { useContext, useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { toast } from 'sonner'
@@ -90,7 +90,31 @@ function Education({handleNext, handlePrev}) {
         <Droppable droppableId="education-list">
           {(provided) => (
             <div {...provided.droppableProps} ref={provided.innerRef}>
-              {educationalList.map((item,index)=>(
+              {educationalList.length === 0 ? (
+                  <div className="flex flex-col items-center justify-center p-8 border-2 border-dashed border-outline-variant/50 rounded-xl bg-surface/50 text-center mb-5">
+                      <GraduationCap className="w-12 h-12 text-on-surface-variant/50 mb-4" />
+                      <h3 className="font-label-lg font-bold text-on-surface mb-2">No Education Added</h3>
+                      <p className="font-body-sm text-on-surface-variant mb-4">Add your educational background.</p>
+                      <Button 
+                          variant="outline" 
+                          onClick={() => {
+                              setEducationalList([{
+                                  universityName: 'State University',
+                                  degree: 'Bachelor of Science',
+                                  major: 'Computer Science',
+                                  startDate: '',
+                                  endDate: '',
+                                  description: ''
+                              }]);
+                              setExpandedIndex(0);
+                          }}
+                          className="text-stitch-primary border-stitch-primary/30 hover:bg-stitch-primary/5"
+                      >
+                          Load Example Entry
+                      </Button>
+                  </div>
+              ) : (
+                educationalList.map((item,index)=>(
                 <Draggable key={item.id || `edu-${index}`} draggableId={item.id || `edu-${index}`} index={index}>
                   {(provided) => (
                     <div 
@@ -196,7 +220,8 @@ function Education({handleNext, handlePrev}) {
                     </div>
                   )}
                 </Draggable>
-              ))}
+                ))
+              )}
               {provided.placeholder}
             </div>
           )}
