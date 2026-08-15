@@ -13,6 +13,8 @@ import { AIChatSession } from '@/service/AIModal';
 import SeoSettingsModal from '../../components/SeoSettingsModal';
 import { DeployModal } from '../../components/DeployModal';
 import { Skeleton } from '@/components/ui/skeleton';
+import ResponsiveBreadcrumbs from '@/components/custom/ResponsiveBreadcrumbs';
+import useHideOnScroll from '@/hooks/useHideOnScroll';
 
 export default function EditPortfolio() {
   const { portfolioId } = useParams();
@@ -27,6 +29,9 @@ export default function EditPortfolio() {
   const [isSeoModalOpen, setIsSeoModalOpen] = useState(false);
   const [isDeployModalOpen, setIsDeployModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+
+  const scrollRef = React.useRef(null);
+  const isVisible = useHideOnScroll(scrollRef);
 
   // On mount, set current portfolio ID to load it into focus
   useEffect(() => {
@@ -149,14 +154,18 @@ export default function EditPortfolio() {
       className="bg-background text-on-background font-body-md h-[100dvh] w-screen overflow-hidden flex flex-col"
     >
         {/* Top Toolbar */}
-        <header className="bg-surface-container-lowest border-b border-t-4 border-t-purple-500 border-outline-variant/30 px-gutter h-16 flex items-center justify-between shrink-0 shadow-sm z-20 relative">
+        <header 
+          className="bg-surface-container-lowest border-b border-t-4 border-t-purple-500 border-outline-variant/30 px-gutter h-16 flex items-center justify-between shrink-0 shadow-sm z-20 relative transition-transform duration-300"
+          style={{ transform: isVisible ? 'translateY(0)' : 'translateY(-100%)' }}
+        >
           <div className="flex items-center gap-sm">
             <Link to="/dashboard" className="flex items-center gap-sm hover:opacity-80 transition-opacity">
               <span className="material-symbols-outlined text-stitch-primary font-headline-md text-[24px]" style={{fontVariationSettings: "'FILL' 1"}} translate="no">auto_awesome</span>
               <span className="font-headline-md text-[24px] font-bold text-stitch-primary">Sparkfolio</span>
             </Link>
-            <span className="text-outline-variant mx-2">/</span>
-            <span className="font-semibold text-purple-600 text-sm">Portfolio Editor</span>
+            <div className="mx-2 flex items-center">
+              <ResponsiveBreadcrumbs paths={[{label: 'Dashboard', href: '/dashboard'}, {label: 'Portfolio Editor', href: '#'}]} />
+            </div>
             <AnimatePresence mode="wait">
               {isSaving ? (
                 <motion.div 
@@ -256,7 +265,7 @@ export default function EditPortfolio() {
           
           {/* Left Sidebar: Content Editor (Visible on desktop, or on mobile when 'builder' is selected) */}
           <aside className={`w-full md:w-[420px] shrink-0 bg-surface-container-lowest border-r border-outline-variant/30 h-full overflow-y-auto flex-col z-10 shadow-[4px_0px_24px_rgba(0,0,0,0.02)] ${view === 'builder' ? 'flex' : 'hidden md:flex'}`}>
-            <div className="p-4 flex flex-col flex-1 pb-24 overflow-y-auto custom-scrollbar">
+            <div ref={scrollRef} className="p-4 flex flex-col flex-1 pb-24 overflow-y-auto custom-scrollbar">
                 {isLoading ? (
                   <div className="flex flex-col gap-4">
                     <Skeleton className="h-10 w-full" />

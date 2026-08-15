@@ -9,10 +9,14 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import useHideOnScroll from '../../hooks/useHideOnScroll'
+
 function Header() {
     const { user, isSignedIn } = useUser();
+    const isVisible = useHideOnScroll();
+
     return (
-        <div className='p-4 px-8 flex justify-between items-center bg-surface/80 backdrop-blur-md border-b border-outline-variant/30 sticky top-0 z-50 shadow-sm transition-all duration-300'>
+        <div className={`p-4 px-8 flex justify-between items-center bg-surface/80 backdrop-blur-md border-b border-outline-variant/30 sticky top-0 z-50 shadow-sm transition-transform duration-300 ${isVisible ? 'translate-y-0' : '-translate-y-full'}`}>
              <Link to={'/dashboard'} className="group">
                 <div className="font-semibold text-[22px] tracking-tight text-on-surface flex items-center gap-2 transition-transform duration-300 group-hover:scale-105">
                     <div className="w-8 h-8 bg-stitch-primary rounded-lg flex items-center justify-center text-on-primary font-bold text-lg shadow-md group-hover:shadow-lg transition-all duration-300">R</div>
@@ -24,10 +28,7 @@ function Header() {
                     <div className="hidden md:flex items-center" title="Open Command Palette">
                         <kbd className="hidden md:inline-flex items-center gap-1 bg-surface-variant/50 text-on-surface-variant text-[10px] px-1.5 py-0.5 rounded font-mono border border-outline-variant/30">Ctrl+K</kbd>
                     </div>
-                    <Link to={'/dashboard'} className="hidden md:block">
-                        <Button variant="outline" className="border-outline-variant text-on-surface hover:bg-surface-variant rounded-full px-6 font-medium text-[15px] shadow-sm hover:shadow-md transition-all duration-300 hover:-translate-y-0.5">Dashboard</Button>
-                    </Link>
-                    <div className="md:hidden flex items-center">
+                    <div className="flex items-center">
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>
                                 <Button variant="outline" size="icon" className="rounded-full">
@@ -35,9 +36,9 @@ function Header() {
                                 </Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end">
+                                <DropdownMenuItem asChild><Link to="/dashboard">Dashboard</Link></DropdownMenuItem>
                                 <DropdownMenuItem asChild><Link to="/profile">Profile</Link></DropdownMenuItem>
                                 <DropdownMenuItem asChild><Link to="/settings">Settings</Link></DropdownMenuItem>
-                                <DropdownMenuItem asChild><Link to="/dashboard">Dashboard</Link></DropdownMenuItem>
                             </DropdownMenuContent>
                         </DropdownMenu>
                     </div>
