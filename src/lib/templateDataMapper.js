@@ -3,9 +3,25 @@
  */
 
 /**
- * Handles both string array and object array formats
+ * Handles both string array and object array formats, as well as the new object schema
  */
 export const normalizeSkills = (skills) => {
+    if (!skills) return [];
+    
+    // Handle the new object format
+    if (typeof skills === 'object' && !Array.isArray(skills)) {
+        let flattened = [];
+        if (Array.isArray(skills.languages)) flattened = flattened.concat(skills.languages);
+        if (Array.isArray(skills.frameworksAndLibraries)) flattened = flattened.concat(skills.frameworksAndLibraries);
+        if (Array.isArray(skills.databasesAndTools)) flattened = flattened.concat(skills.databasesAndTools);
+        
+        return flattened.map(skill => {
+            if (typeof skill === 'string') return skill;
+            if (skill?.name) return skill.name;
+            return '';
+        }).filter(Boolean);
+    }
+    
     if (!Array.isArray(skills)) return [];
     return skills.map(skill => {
         if (typeof skill === 'string') return skill;
@@ -24,47 +40,57 @@ export const formatDateRange = (startDate, endDate, isCurrent) => {
 export const mapResumeInfoToTemplateData = (resumeInfo) => {
     if (!resumeInfo) return {};
 
-    const experienceList = Array.isArray(resumeInfo?.Experience) ? resumeInfo.Experience 
+    const personalInfo = resumeInfo?.personalInfo || resumeInfo;
+    const experienceList = Array.isArray(resumeInfo?.workExperience) ? resumeInfo.workExperience
+        : Array.isArray(resumeInfo?.Experience) ? resumeInfo.Experience 
         : Array.isArray(resumeInfo?.experience) ? resumeInfo.experience : [];
         
     const educationList = Array.isArray(resumeInfo?.education) ? resumeInfo.education 
         : Array.isArray(resumeInfo?.Education) ? resumeInfo.Education : [];
         
-    const skillsList = Array.isArray(resumeInfo?.skills) ? resumeInfo.skills
-        : Array.isArray(resumeInfo?.Skills) ? resumeInfo.Skills : [];
+    const skillsList = resumeInfo?.skills || resumeInfo?.Skills || [];
+    
+    const projectsList = Array.isArray(resumeInfo?.projects) ? resumeInfo.projects : [];
 
     return {
         personal_info: {
-            full_name: `${resumeInfo?.firstName || ''} ${resumeInfo?.lastName || ''}`.trim(),
-            profession: resumeInfo?.jobTitle || '',
-            email: resumeInfo?.email || '',
-            phone: resumeInfo?.phone || '',
-            location: resumeInfo?.address || '',
-            linkedin: resumeInfo?.linkedin || '',
-            website: resumeInfo?.website || ''
+            full_name: personalInfo?.fullName || `${resumeInfo?.firstName || ''} ${resumeInfo?.lastName || ''}`.trim(),
+            profession: personalInfo?.targetTitle || resumeInfo?.jobTitle || '',
+            email: personalInfo?.email || resumeInfo?.email || '',
+            phone: personalInfo?.phone || resumeInfo?.phone || '',
+            location: personalInfo?.location || resumeInfo?.address || '',
+            linkedin: personalInfo?.linkedinUrl || resumeInfo?.linkedin || '',
+            website: personalInfo?.portfolioUrl || resumeInfo?.website || ''
         },
-        professional_summary: typeof resumeInfo?.summery === 'string' ? resumeInfo.summery 
+        professional_summary: typeof resumeInfo?.professionalSummary === 'string' ? resumeInfo.professionalSummary
+            : typeof resumeInfo?.summery === 'string' ? resumeInfo.summery 
             : typeof resumeInfo?.summary === 'string' ? resumeInfo.summary : '',
         experience: experienceList.map(exp => ({
-            position: exp?.title || '',
-            company: exp?.companyName || '',
-            city: exp?.city || '',
+            position: exp?.role || exp?.title || '',
+            company: exp?.company || exp?.companyName || '',
+            city: exp?.location || exp?.city || '',
             state: exp?.state || '',
             start_date: exp?.startDate || '',
             end_date: exp?.endDate || '',
-            is_current: exp?.currentlyWorking || false,
-            description: typeof exp?.workSummery === 'string' ? exp.workSummery 
+            is_current: exp?.current || exp?.currentlyWorking || false,
+            description: (exp?.bullets && exp.bullets.length > 0) ? exp.bullets.join('\n') 
+                : typeof exp?.workSummery === 'string' ? exp.workSummery 
                 : typeof exp?.workSummary === 'string' ? exp.workSummary : '' 
         })),
         education: educationList.map(edu => ({
             degree: edu?.degree || '',
             field: edu?.major || '',
-            institution: edu?.universityName || '',
+            institution: edu?.institution || edu?.universityName || '',
             graduation_date: edu?.endDate || '',
-            description: edu?.description || ''
+            description: edu?.description || '',
+            gpa: edu?.gpaOrHonors || edu?.gpa || ''
         })),
         skills: normalizeSkills(skillsList),
-        project: [] // Not implemented in current form
+        project: projectsList.map(proj => ({
+            name: proj?.name || '',
+            description: (proj?.highlights && proj.highlights.length > 0) ? proj.highlights.join('\n') : '',
+            type: proj?.role || '',
+        }))
     };
 };
 

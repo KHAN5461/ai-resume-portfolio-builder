@@ -127,11 +127,11 @@ export const ResumePDF = ({ resumeData, settings = { pageSize: 'A4', baseFontSiz
     contactItem: {
       flexDirection: 'row',
       alignItems: 'center',
-      gap: 4,
       marginRight: 12,
+      paddingBottom: 2, // Slight vertical adjustment
     },
     contactText: {
-      marginLeft: 4,
+      marginLeft: 6,
     },
     section: {
       marginBottom: 20,
@@ -219,6 +219,7 @@ export const ResumePDF = ({ resumeData, settings = { pageSize: 'A4', baseFontSiz
       fontFamily: pdfFont,
       color: '#ffffff',
       marginBottom: 6,
+      lineHeight: 1.1,
     },
     modernTargetTitle: {
       fontSize: baseSize * 1.2,
@@ -230,15 +231,14 @@ export const ResumePDF = ({ resumeData, settings = { pageSize: 'A4', baseFontSiz
     modernContactRow: {
       flexDirection: 'row',
       flexWrap: 'wrap',
-      gap: 12,
       fontSize: baseSize * 0.9,
       color: '#ffffff',
     },
     modernContactItem: {
       flexDirection: 'row',
       alignItems: 'center',
-      gap: 4,
-      marginRight: 12,
+      marginRight: 16,
+      marginBottom: 6,
     },
     modernSectionTitle: {
       fontSize: baseSize * 1.4,
@@ -292,6 +292,7 @@ export const ResumePDF = ({ resumeData, settings = { pageSize: 'A4', baseFontSiz
       color: '#111827',
       letterSpacing: 2,
       marginBottom: 8,
+      lineHeight: 1.1,
     },
     minimalTargetTitle: {
       fontSize: baseSize * 1.1,
@@ -300,13 +301,14 @@ export const ResumePDF = ({ resumeData, settings = { pageSize: 'A4', baseFontSiz
       textTransform: 'uppercase',
       letterSpacing: 1.5,
       marginBottom: 16,
+      lineHeight: 1.2,
     },
     minimalContactRow: {
       flexDirection: 'row',
       flexWrap: 'wrap',
-      gap: 16,
       fontSize: baseSize * 0.9,
       color: '#4b5563',
+      gap: 16,
     },
     minimalSectionTitle: {
       fontSize: baseSize * 0.85,

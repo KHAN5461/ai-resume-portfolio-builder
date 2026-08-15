@@ -1,52 +1,128 @@
 import React, { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { setResumeData } from '@/store/resumeSlice';
-import { Code, CheckCircle2, AlertCircle } from 'lucide-react';
+import { updateProfileData } from '@/store/profileSlice';
+import { Code, CheckCircle2, AlertCircle, Save } from 'lucide-react';
+import { toast } from 'sonner';
+
+const DEFAULT_TEMPLATE = {
+  "personalInfo": {
+    "fullName": "",
+    "targetTitle": "",
+    "email": "",
+    "phone": "",
+    "location": "",
+    "portfolioUrl": "",
+    "githubUrl": "",
+    "linkedinUrl": ""
+  },
+  "professionalSummary": "",
+  "workExperience": [
+    {
+      "role": "",
+      "company": "",
+      "location": "",
+      "startDate": "",
+      "endDate": "",
+      "current": false,
+      "bullets": [
+        ""
+      ]
+    }
+  ],
+  "projects": [
+    {
+      "name": "",
+      "role": "",
+      "startDate": "",
+      "endDate": "",
+      "highlights": [
+        ""
+      ],
+      "technologies": [
+        ""
+      ]
+    }
+  ],
+  "education": [
+    {
+      "degree": "",
+      "institution": "",
+      "location": "",
+      "startDate": "",
+      "endDate": "",
+      "gpaOrHonors": ""
+    }
+  ],
+  "skills": {
+    "languages": [
+      ""
+    ],
+    "frameworksAndLibraries": [
+      ""
+    ],
+    "databasesAndTools": [
+      ""
+    ]
+  },
+  "certifications": [
+    {
+      "title": "",
+      "issuer": "",
+      "date": ""
+    }
+  ]
+};
 
 export default function RawJsonEditor() {
-  const resumeInfo = useSelector(state => state.resume.present.resumeData);
+  const profileInfo = useSelector(state => state.profile.present);
   const dispatch = useDispatch();
+  
   const [jsonText, setJsonText] = useState('');
   const [error, setError] = useState(null);
-  const [syncStatus, setSyncStatus] = useState('synced'); // 'synced', 'typing', 'error'
+  const [isDirty, setIsDirty] = useState(false);
 
+  // Initialize the text box with the profileInfo, or the DEFAULT_TEMPLATE if it's completely empty
   useEffect(() => {
-    // When external state changes (like forms updating) and we are synced
-    // update the local editor text to stay in sync.
-    if (syncStatus === 'synced') {
-      const currentJson = JSON.stringify(resumeInfo, null, 2);
-      if (jsonText !== currentJson) {
-         setJsonText(currentJson);
+    if (!isDirty) {
+      // Check if profileInfo is effectively empty
+      const isEmpty = !profileInfo.personalInfo?.fullName && 
+                      (!profileInfo.workExperience || profileInfo.workExperience.length === 0);
+      
+      if (isEmpty) {
+        setJsonText(JSON.stringify(DEFAULT_TEMPLATE, null, 2));
+      } else {
+        // We only want to show the relevant keys for the Master Profile
+        const filteredProfile = {
+            personalInfo: profileInfo.personalInfo || {},
+            professionalSummary: profileInfo.professionalSummary || '',
+            workExperience: profileInfo.workExperience || [],
+            projects: profileInfo.projects || [],
+            education: profileInfo.education || [],
+            skills: profileInfo.skills || { languages: [], frameworksAndLibraries: [], databasesAndTools: [] },
+            certifications: profileInfo.certifications || []
+        };
+        setJsonText(JSON.stringify(filteredProfile, null, 2));
       }
     }
-  }, [resumeInfo, syncStatus, jsonText]);
-
-  useEffect(() => {
-    if (syncStatus === 'typing') {
-      const timer = setTimeout(() => {
-        try {
-          const parsed = JSON.parse(jsonText);
-          
-          // Only dispatch if it's actually different to avoid redundant renders
-          if (JSON.stringify(parsed) !== JSON.stringify(resumeInfo)) {
-              dispatch(setResumeData(parsed));
-          }
-          setError(null);
-          setSyncStatus('synced');
-        } catch (e) {
-          setError(e.message);
-          setSyncStatus('error');
-        }
-      }, 1000); // Auto-apply after 1 second of inactivity
-
-      return () => clearTimeout(timer);
-    }
-  }, [jsonText, syncStatus, dispatch, resumeInfo]);
+  }, [profileInfo, isDirty]);
 
   const handleChange = (e) => {
     setJsonText(e.target.value);
-    setSyncStatus('typing');
+    setIsDirty(true);
     setError(null);
+  };
+
+  const handleApply = () => {
+    try {
+      const parsed = JSON.parse(jsonText);
+      dispatch(updateProfileData(parsed));
+      setIsDirty(false);
+      setError(null);
+      toast.success("JSON data applied successfully!");
+    } catch (e) {
+      setError(e.message);
+      toast.error("Invalid JSON format");
+    }
   };
 
   return (
@@ -54,21 +130,16 @@ export default function RawJsonEditor() {
       <div className="flex items-center justify-between">
         <h3 className="font-bold flex items-center gap-2 text-stitch-primary">
           <Code size={18} />
-          Data Editor (Live Sync)
+          Master Profile JSON
         </h3>
         
         <div className="flex items-center gap-2">
-            {syncStatus === 'synced' && (
+            {!isDirty && !error && (
                 <span className="flex items-center gap-1.5 text-[12px] font-bold text-green-500 bg-green-500/10 px-3 py-1.5 rounded-full transition-all">
                     <CheckCircle2 size={14} /> Synced
                 </span>
             )}
-            {syncStatus === 'typing' && (
-                <span className="flex items-center gap-1.5 text-[12px] font-bold text-yellow-500 bg-yellow-500/10 px-3 py-1.5 rounded-full transition-all">
-                    <span className="w-1.5 h-1.5 rounded-full bg-yellow-500 animate-ping" /> Editing
-                </span>
-            )}
-            {syncStatus === 'error' && (
+            {error && (
                 <span className="flex items-center gap-1.5 text-[12px] font-bold text-red-500 bg-red-500/10 px-3 py-1.5 rounded-full transition-all">
                     <AlertCircle size={14} /> Invalid JSON
                 </span>
@@ -77,10 +148,10 @@ export default function RawJsonEditor() {
       </div>
 
       <p className="text-sm text-on-surface-variant">
-        Edit the raw data directly. Changes are automatically synced to your forms and resume after 1 second.
+        Edit your unified Master Profile data. Click Apply to sync changes across both your Resume and Portfolio forms.
       </p>
 
-      <div className={`flex-1 relative border-2 rounded-xl overflow-hidden shadow-inner transition-colors duration-300 ${syncStatus === 'error' ? 'border-red-500/50 bg-red-950/20' : 'border-slate-700 bg-slate-900'}`}>
+      <div className={`flex-1 relative border-2 rounded-xl overflow-hidden shadow-inner transition-colors duration-300 ${error ? 'border-red-500/50 bg-red-950/20' : 'border-slate-700 bg-slate-900'}`}>
         <textarea
           value={jsonText}
           onChange={handleChange}
@@ -94,6 +165,15 @@ export default function RawJsonEditor() {
           Error: {error}
         </div>
       )}
+
+      <button
+        onClick={handleApply}
+        disabled={!isDirty || !!error}
+        className="flex items-center justify-center gap-2 w-full py-3 bg-stitch-primary text-white rounded-lg font-bold disabled:opacity-50 disabled:cursor-not-allowed hover:bg-stitch-primary/90 transition-colors"
+      >
+        <Save size={18} />
+        Apply Changes
+      </button>
     </div>
   );
 }
