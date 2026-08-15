@@ -15,6 +15,7 @@ import { toast } from 'sonner';
 import { Input } from "@/components/ui/input"
 import { Grid, List as ListIcon } from 'lucide-react'
 import { Skeleton } from '@/components/ui/skeleton'
+import MobileBottomNav from '../components/custom/MobileBottomNav';
 
 function Dashboard() {
   const {user}=useUser();
@@ -393,8 +394,8 @@ function Dashboard() {
                 </motion.div>
               ))}
               {!isLoadingPortfolios && showPortfolios && processedPortfolios.map((portfolio) => (
-                <motion.div variants={itemVariants} key={portfolio.documentId} onClick={() => navigate(`/dashboard/portfolio/${portfolio.documentId}/edit`)} className="group flex flex-col bg-surface-container-lowest/80 backdrop-blur-sm rounded-xl border border-outline-variant/40 overflow-hidden hover:shadow-[0px_12px_24px_rgba(0,0,0,0.12)] hover:-translate-y-2 transition-all duration-300 cursor-pointer h-[280px]">
-                  <div className="relative h-40 bg-surface-container overflow-hidden flex items-center justify-center bg-secondary-container/20">
+                <motion.div variants={itemVariants} key={portfolio.documentId} onClick={() => navigate(`/dashboard/portfolio/${portfolio.documentId}/edit`)} className="group flex flex-col sm:flex-col max-sm:flex-row bg-surface-container-lowest/80 backdrop-blur-sm rounded-xl border border-outline-variant/40 overflow-hidden hover:shadow-[0px_12px_24px_rgba(0,0,0,0.12)] hover:-translate-y-2 transition-all duration-300 cursor-pointer h-auto sm:h-[280px]">
+                  <div className="relative w-full max-sm:w-28 h-40 max-sm:h-auto max-sm:min-h-full bg-surface-container overflow-hidden flex items-center justify-center bg-secondary-container/20">
                     <span className="material-symbols-outlined text-stitch-secondary text-4xl group-hover:scale-110 transition-transform">view_cozy</span>
                     <div className="absolute top-2 right-2 bg-surface/90 backdrop-blur-sm px-2 py-1 rounded-full flex items-center gap-1 shadow-sm">
                       <span className="w-2 h-2 rounded-full bg-[#FBBC04]"></span>
@@ -473,27 +474,7 @@ function Dashboard() {
         </div>
       </main>
 
-      {/* Bottom Navigation (Mobile Only) */}
-      <nav className="fixed bottom-0 left-0 w-full flex justify-around items-center py-2 px-4 md:hidden bg-surface shadow-[0px_-2px_10px_rgba(0,0,0,0.05)] rounded-t-xl z-50">
-        <Link to="/" className="flex flex-col items-center justify-center text-on-surface-variant hover:bg-surface-variant/50 rounded-full px-4 py-1 active:scale-90 transition-transform duration-150">
-          <span className="material-symbols-outlined font-label-sm text-[14px]">home</span>
-          <span className="font-label-sm text-[12px] mt-1">Home</span>
-        </Link>
-        <Link to="/dashboard" className="flex flex-col items-center justify-center bg-primary-container text-on-primary-container rounded-full px-4 py-1 active:scale-90 transition-transform duration-150">
-          <span className="material-symbols-outlined font-label-sm text-[14px]" style={{fontVariationSettings: "'FILL' 1"}}>description</span>
-          <span className="font-label-sm text-[12px] mt-1">Drafts</span>
-        </Link>
-        <MagicImportModal renderTrigger={(onClick) => (
-          <button onClick={onClick} className="flex flex-col items-center justify-center text-on-surface-variant hover:bg-surface-variant/50 rounded-full px-4 py-1 active:scale-90 transition-transform duration-150">
-            <span className="material-symbols-outlined font-label-sm text-[14px]">auto_fix_high</span>
-            <span className="font-label-sm text-[12px] mt-1">AI Import</span>
-          </button>
-        )} />
-        <Link className="flex flex-col items-center justify-center text-on-surface-variant hover:bg-surface-variant/50 rounded-full px-4 py-1 active:scale-90 transition-transform duration-150" to="/profile">
-          <span className="material-symbols-outlined font-label-sm text-[14px]">person</span>
-          <span className="font-label-sm text-[12px] mt-1">Profile</span>
-        </Link>
-      </nav>
+      <MobileBottomNav />
 
       {/* FAB (Mobile Only) */}
       <AddResume renderTrigger={(onClick) => (

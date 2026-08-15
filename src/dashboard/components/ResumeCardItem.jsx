@@ -1,4 +1,4 @@
-import { Loader2Icon, MoreVertical } from 'lucide-react'
+import { Loader2Icon, MoreVertical, Edit2, Trash } from 'lucide-react'
 import React, { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import {
@@ -51,8 +51,8 @@ function ResumeCardItem({resume,refreshData, optimisticDelete, rollbackDelete, v
 
   return (
     <>
-      <div className="group flex flex-col bg-surface-container-lowest/80 backdrop-blur-sm rounded-xl border border-outline-variant/40 overflow-hidden hover:shadow-[0px_12px_24px_rgba(0,0,0,0.12)] hover:-translate-y-2 transition-all duration-300 cursor-pointer hardware-accelerated h-[280px]">
-        <Link to={'/dashboard/resume/'+resume.documentId+"/edit"} className="relative h-40 bg-surface-container overflow-hidden flex items-center justify-center bg-surface-variant/30 group-hover:bg-surface-variant/50 transition-colors">
+      <div className="group flex flex-col sm:flex-col max-sm:flex-row bg-surface-container-lowest/80 backdrop-blur-sm rounded-xl border border-outline-variant/40 overflow-hidden hover:shadow-[0px_12px_24px_rgba(0,0,0,0.12)] hover:-translate-y-2 transition-all duration-300 cursor-pointer hardware-accelerated h-auto sm:h-[280px]">
+        <Link to={'/dashboard/resume/'+resume.documentId+"/edit"} className="relative w-full max-sm:w-28 h-40 max-sm:h-auto max-sm:min-h-full bg-surface-container overflow-hidden flex items-center justify-center bg-surface-variant/30 group-hover:bg-surface-variant/50 transition-colors">
           <span className="material-symbols-outlined text-outline text-4xl group-hover:scale-110 transition-transform">description</span>
           <div className="absolute top-2 right-2 bg-surface/90 backdrop-blur-sm px-2 py-1 rounded-full flex items-center gap-1 shadow-sm">
             <span className="w-2 h-2 rounded-full bg-[#34A853]"></span>
@@ -76,15 +76,24 @@ function ResumeCardItem({resume,refreshData, optimisticDelete, rollbackDelete, v
           <div className="mt-auto flex justify-between items-center pt-3 border-t border-outline-variant/30">
             <span className="inline-flex items-center rounded-full bg-stitch-primary/10 px-2.5 py-0.5 font-label-sm text-[12px] text-stitch-primary">Resume</span>
             
+            <div className="flex sm:hidden items-center gap-2">
+              <button onClick={(e) => { e.stopPropagation(); e.preventDefault(); navigation('/dashboard/resume/'+resume.documentId+"/edit"); }} className="p-1.5 text-on-surface-variant hover:bg-surface-variant rounded-full">
+                <Edit2 className="w-4 h-4" />
+              </button>
+              <button onClick={(e) => { e.stopPropagation(); e.preventDefault(); setOpenAlert(true); }} className="p-1.5 text-error hover:bg-error-container rounded-full">
+                <Trash className="w-4 h-4" />
+              </button>
+            </div>
+
             <DropdownMenu>
-              <DropdownMenuTrigger className="text-on-surface-variant hover:text-stitch-primary p-1 rounded-full hover:bg-surface-variant transition-colors focus:outline-none">
+              <DropdownMenuTrigger className="hidden sm:block text-on-surface-variant hover:text-stitch-primary p-1 rounded-full hover:bg-surface-variant transition-colors focus:outline-none">
                 <span className="material-symbols-outlined">more_horiz</span>
               </DropdownMenuTrigger>
               <DropdownMenuContent className="bg-surface-container-lowest border border-outline-variant/40 text-on-surface rounded-lg shadow-sm">
-                <DropdownMenuItem className="hover:bg-surface-container cursor-pointer" onClick={()=>navigation('/dashboard/resume/'+resume.documentId+"/edit")}>Edit</DropdownMenuItem>
-                <DropdownMenuItem className="hover:bg-surface-container cursor-pointer" onClick={()=>navigation('/my-resume/'+resume.documentId+"/view")}>View</DropdownMenuItem>
-                <DropdownMenuItem className="hover:bg-surface-container cursor-pointer" onClick={()=>navigation('/my-resume/'+resume.documentId+"/view")}>Download</DropdownMenuItem>
-                <DropdownMenuItem className="hover:bg-error-container hover:text-error cursor-pointer text-error" onClick={()=>setOpenAlert(true)}>Delete</DropdownMenuItem>
+                <DropdownMenuItem className="hover:bg-surface-container cursor-pointer" onClick={(e)=> { e.stopPropagation(); navigation('/dashboard/resume/'+resume.documentId+"/edit")}}>Edit</DropdownMenuItem>
+                <DropdownMenuItem className="hover:bg-surface-container cursor-pointer" onClick={(e)=> { e.stopPropagation(); navigation('/my-resume/'+resume.documentId+"/view")}}>View</DropdownMenuItem>
+                <DropdownMenuItem className="hover:bg-surface-container cursor-pointer" onClick={(e)=> { e.stopPropagation(); navigation('/my-resume/'+resume.documentId+"/view")}}>Download</DropdownMenuItem>
+                <DropdownMenuItem className="hover:bg-error-container hover:text-error cursor-pointer text-error" onClick={(e)=> { e.stopPropagation(); setOpenAlert(true)}}>Delete</DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
