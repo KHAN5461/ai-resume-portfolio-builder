@@ -5,6 +5,8 @@ import ThemeBuilder from '../../components/ThemeBuilder';
 import ResumePreview from '../../components/ResumePreview';
 import { useDispatch, useSelector } from 'react-redux';
 import { setResumeData } from '@/store/resumeSlice';
+import { ActionCreators } from 'redux-undo';
+import useUndoRedoKeyboard from '@/hooks/useUndoRedoKeyboard';
 import GlobalApi from './../../../../../service/GlobalApi';
 import { toast } from 'sonner';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -14,7 +16,7 @@ import { AtsRoastPanel } from '../../components/AtsRoastPanel';
 import RawJsonEditor from '../../components/RawJsonEditor';
 import MagicImportModal from '../../components/MagicImportModal';
 import { AiCoPilot } from '../../components/AiCoPilot';
-import { Languages, Flame, MessageSquare } from 'lucide-react';
+import { Languages, Flame, MessageSquare, Undo2, Redo2 } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import useScrollIntoViewOnFocus from '@/hooks/useScrollIntoViewOnFocus';
 import ResponsiveBreadcrumbs from '@/components/custom/ResponsiveBreadcrumbs';
@@ -23,8 +25,11 @@ import useHideOnScroll from '@/hooks/useHideOnScroll';
 function EditResume() {
     const {resumeId}=useParams();
     useScrollIntoViewOnFocus();
+    useUndoRedoKeyboard();
     const dispatch = useDispatch();
-    const resumeInfo = useSelector(state => state.resume.resumeData);
+    const resumeInfo = useSelector(state => state.resume.present.resumeData);
+    const pastStates = useSelector(state => state.resume.past);
+    const futureStates = useSelector(state => state.resume.future);
     const [activeTab, setActiveTab] = useState('Content');
     const [view, setView] = useState('builder'); // 'builder' or 'preview'
     const [isExportOpen, setIsExportOpen] = useState(false);
@@ -138,6 +143,25 @@ function EditResume() {
               )}
             </div>
 
+            </div>
+            {/* Undo / Redo Buttons */}
+            <div className="flex items-center gap-1 border-r border-outline-variant/30 pr-2 md:pr-4 mr-1 md:mr-2">
+              <button
+                onClick={() => dispatch(ActionCreators.undo())}
+                disabled={pastStates.length === 0}
+                className="w-10 h-10 hover:bg-surface-variant transition-colors cursor-pointer text-on-surface-variant hover:text-stitch-primary rounded-full flex items-center justify-center disabled:opacity-30 disabled:cursor-not-allowed group"
+                title="Undo (Ctrl+Z)"
+              >
+                <Undo2 className="w-5 h-5 group-hover:-translate-x-0.5 transition-transform" />
+              </button>
+              <button
+                onClick={() => dispatch(ActionCreators.redo())}
+                disabled={futureStates.length === 0}
+                className="w-10 h-10 hover:bg-surface-variant transition-colors cursor-pointer text-on-surface-variant hover:text-stitch-primary rounded-full flex items-center justify-center disabled:opacity-30 disabled:cursor-not-allowed group"
+                title="Redo (Ctrl+Y)"
+              >
+                <Redo2 className="w-5 h-5 group-hover:translate-x-0.5 transition-transform" />
+              </button>
             </div>
             {/* Action Buttons */}
             <div className="flex items-center gap-1 md:gap-2">

@@ -72,7 +72,7 @@ export const syncMiddleware = store => {
           if (apiSaveTimeout) clearTimeout(apiSaveTimeout);
           apiSaveTimeout = setTimeout(() => {
             const state = store.getState();
-            const resumeData = state.resume.resumeData;
+            const resumeData = state.resume.present.resumeData;
   
             if (navigator.onLine) {
               store.dispatch(setSyncStatus('saving'));

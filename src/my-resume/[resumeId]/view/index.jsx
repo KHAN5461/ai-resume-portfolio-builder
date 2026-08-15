@@ -13,7 +13,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 export default function ResumeViewPage() {
   const { resumeId } = useParams();
   const dispatch = useDispatch();
-  const resumeData = useSelector((state) => state.resume.resumeData);
+  const resumeData = useSelector((state) => state.resume.present.resumeData);
   const [loadingData, setLoadingData] = useState(!resumeData);
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);

@@ -14,7 +14,7 @@ import axios from 'axios';
 const ProjectsForm = () => {
   const { portfolioId } = useParams();
   const dispatch = useDispatch();
-  const portfolioData = useSelector((state) => state.portfolio.portfolios[portfolioId]);
+  const portfolioData = useSelector((state) => state.portfolio.present.portfolios[portfolioId]);
   const [isFetchingGithub, setIsFetchingGithub] = useState(false);
   const [isGithubModalOpen, setIsGithubModalOpen] = useState(false);
   const [githubUsername, setGithubUsername] = useState("");

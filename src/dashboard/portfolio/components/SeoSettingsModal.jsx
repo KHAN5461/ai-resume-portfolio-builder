@@ -7,7 +7,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 export default function SeoSettingsModal({ isOpen, onClose }) {
   const { portfolioId } = useParams();
   const dispatch = useDispatch();
-  const portfolioData = useSelector((state) => state.portfolio.portfolios[portfolioId]);
+  const portfolioData = useSelector((state) => state.portfolio.present.portfolios[portfolioId]);
   
   const seo = portfolioData?.siteConfig?.seo || {
       metaTitle: "Portfolio",

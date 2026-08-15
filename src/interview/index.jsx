@@ -12,7 +12,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 export default function InterviewCoach() {
   const { resumeId } = useParams();
   const dispatch = useDispatch();
-  const resumeData = useSelector((state) => state.resume.resumeData);
+  const resumeData = useSelector((state) => state.resume.present.resumeData);
   const [loading, setLoading] = useState(true);
   const [messages, setMessages] = useState([]);
   const [inputMessage, setInputMessage] = useState('');

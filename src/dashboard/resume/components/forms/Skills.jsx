@@ -20,7 +20,7 @@ function Skills({handleNext, handlePrev}) {
     const {resumeId} = useParams();
     const [loading, setLoading] = useState(false);
     const dispatch = useDispatch();
-    const resumeInfo = useSelector(state => state.resume.resumeData);
+    const resumeInfo = useSelector(state => state.resume.present.resumeData);
 
     const [skillsList, setSkillsList] = useState(() => {
         const sk = resumeInfo?.skills || resumeInfo?.Skills || [];

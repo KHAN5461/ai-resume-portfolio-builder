@@ -3,7 +3,7 @@ import { useSelector } from 'react-redux';
 import { calculateLocalAtsScore } from '@/lib/atsCalculator';
 
 export const AtsScoreRing = () => {
-  const resumeInfo = useSelector(state => state.resume.resumeData);
+  const resumeInfo = useSelector(state => state.resume.present.resumeData);
 
   const { score, missingKeywords } = useMemo(() => calculateLocalAtsScore(resumeInfo), [resumeInfo]);
   const circumference = 2 * Math.PI * 20;

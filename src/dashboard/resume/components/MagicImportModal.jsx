@@ -2,24 +2,24 @@ import React, { useState, useContext } from 'react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { LoaderCircle, Sparkles } from 'lucide-react';
+import { Loader2, Sparkles } from 'lucide-react';
 import { transformResumeData } from '@/service/AITransformer';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { importAIState } from '@/store/resumeSlice';
-import { useSelector } from 'react-redux';
+import { startLoading, stopLoading, selectIsLoading } from '@/store/loadingSlice';
 import { toast } from 'sonner';
 
 export default function MagicImportModal() {
     const [open, setOpen] = useState(false);
     const [rawText, setRawText] = useState('');
-    const [loading, setLoading] = useState(false);
     
     const dispatch = useDispatch();
-    const resumeInfo = useSelector(state => state.resume.resumeData);
+    const resumeInfo = useSelector(state => state.resume.present.resumeData);
+    const isAILoading = useSelector(selectIsLoading('ai-generation'));
 
     const handleImport = async () => {
         if (!rawText.trim()) return;
-        setLoading(true);
+        dispatch(startLoading('ai-generation'));
         try {
             const transformedJson = await transformResumeData(rawText);
             
@@ -67,7 +67,7 @@ export default function MagicImportModal() {
         } catch (error) {
             toast('Failed to process data. Please try again.');
         } finally {
-            setLoading(false);
+            dispatch(stopLoading('ai-generation'));
         }
     };
 
@@ -95,8 +95,8 @@ export default function MagicImportModal() {
                 </div>
                 <div className="flex justify-end gap-3">
                     <Button variant="ghost" onClick={() => setOpen(false)}>Cancel</Button>
-                    <Button onClick={handleImport} disabled={loading || !rawText.trim()}>
-                        {loading ? <LoaderCircle className="animate-spin" /> : 'Import to Profile'}
+                    <Button onClick={handleImport} disabled={isAILoading || !rawText.trim()}>
+                        {isAILoading ? <Loader2 className="animate-spin" /> : 'Import to Profile'}
                     </Button>
                 </div>
             </DialogContent>

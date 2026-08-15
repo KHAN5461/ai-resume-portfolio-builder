@@ -1,7 +1,9 @@
 import { configureStore } from '@reduxjs/toolkit';
+import undoable from 'redux-undo';
 import resumeReducer from './resumeSlice';
 import portfolioReducer from './portfolioSlice';
 import syncReducer from './syncSlice';
+import loadingReducer from './loadingSlice';
 import { syncMiddleware } from './syncMiddleware';
 import { auth, db } from '../lib/firebaseConfig';
 import { doc, setDoc } from 'firebase/firestore';
@@ -23,9 +25,10 @@ const preloadedState = loadState();
 
 export const store = configureStore({
   reducer: {
-    resume: resumeReducer,
-    portfolio: portfolioReducer,
+    resume: undoable(resumeReducer, { limit: 50 }),
+    portfolio: undoable(portfolioReducer, { limit: 50 }),
     sync: syncReducer,
+    loading: loadingReducer,
   },
   middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat(syncMiddleware),
   preloadedState,

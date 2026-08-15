@@ -4,7 +4,7 @@ import { setResumeData } from '@/store/resumeSlice';
 import { Code, CheckCircle2, AlertCircle } from 'lucide-react';
 
 export default function RawJsonEditor() {
-  const resumeInfo = useSelector(state => state.resume.resumeData);
+  const resumeInfo = useSelector(state => state.resume.present.resumeData);
   const dispatch = useDispatch();
   const [jsonText, setJsonText] = useState('');
   const [error, setError] = useState(null);

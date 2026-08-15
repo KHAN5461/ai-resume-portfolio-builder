@@ -10,7 +10,7 @@ import { handleFormKeyDown } from '@/lib/keyboard';
 function PersonalDetail({enabledNext, handleNext, handlePrev}) {
     const params=useParams();
     const dispatch = useDispatch();
-    const resumeInfo = useSelector(state => state.resume.resumeData);
+    const resumeInfo = useSelector(state => state.resume.present.resumeData);
 
     const [formData,setFormData]=useState(resumeInfo || {});
     const [loading,setLoading]=useState(false);

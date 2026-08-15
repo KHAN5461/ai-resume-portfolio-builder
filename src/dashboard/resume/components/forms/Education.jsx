@@ -14,7 +14,7 @@ function Education({handleNext, handlePrev}) {
 
   const [loading,setLoading]=useState(false);
   const dispatch = useDispatch();
-  const resumeInfo = useSelector(state => state.resume.resumeData);
+  const resumeInfo = useSelector(state => state.resume.present.resumeData);
   const params=useParams();
   const [expandedIndex, setExpandedIndex] = useState(0);
   

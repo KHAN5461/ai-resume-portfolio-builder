@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { setCurrentPortfolio } from '@/store/portfolioSlice';
+import { ActionCreators } from 'redux-undo';
+import useUndoRedoKeyboard from '@/hooks/useUndoRedoKeyboard';
 import PortfolioFormSection from '../../components/PortfolioFormSection';
 import PortfolioPreview from '../../components/PortfolioPreview';
 import GlobalApi from './../../../../../service/GlobalApi';
@@ -15,11 +17,15 @@ import { DeployModal } from '../../components/DeployModal';
 import { Skeleton } from '@/components/ui/skeleton';
 import ResponsiveBreadcrumbs from '@/components/custom/ResponsiveBreadcrumbs';
 import useHideOnScroll from '@/hooks/useHideOnScroll';
+import { Undo2, Redo2 } from 'lucide-react';
 
 export default function EditPortfolio() {
   const { portfolioId } = useParams();
+  useUndoRedoKeyboard();
   const dispatch = useDispatch();
-  const portfolioData = useSelector((state) => state.portfolio.portfolios[portfolioId]);
+  const portfolioData = useSelector((state) => state.portfolio.present.portfolios[portfolioId]);
+  const pastStates = useSelector((state) => state.portfolio.past);
+  const futureStates = useSelector((state) => state.portfolio.future);
   const { user } = useUser();
 
   const [view, setView] = useState('builder'); // 'builder' or 'preview'
@@ -191,6 +197,25 @@ export default function EditPortfolio() {
             </AnimatePresence>
           </div>
           <div className="flex items-center gap-md">
+            {/* Undo / Redo Buttons */}
+            <div className="flex items-center gap-1 border-r border-outline-variant/30 pr-2 md:pr-4 mr-1 md:mr-2">
+              <button
+                onClick={() => dispatch(ActionCreators.undo())}
+                disabled={pastStates.length === 0}
+                className="w-10 h-10 hover:bg-surface-variant transition-colors cursor-pointer text-on-surface-variant hover:text-stitch-primary rounded-full flex items-center justify-center disabled:opacity-30 disabled:cursor-not-allowed group"
+                title="Undo (Ctrl+Z)"
+              >
+                <Undo2 className="w-5 h-5 group-hover:-translate-x-0.5 transition-transform" />
+              </button>
+              <button
+                onClick={() => dispatch(ActionCreators.redo())}
+                disabled={futureStates.length === 0}
+                className="w-10 h-10 hover:bg-surface-variant transition-colors cursor-pointer text-on-surface-variant hover:text-stitch-primary rounded-full flex items-center justify-center disabled:opacity-30 disabled:cursor-not-allowed group"
+                title="Redo (Ctrl+Y)"
+              >
+                <Redo2 className="w-5 h-5 group-hover:translate-x-0.5 transition-transform" />
+              </button>
+            </div>
             {/* SEO Settings Button */}
             <button 
               onClick={() => setIsSeoModalOpen(true)}

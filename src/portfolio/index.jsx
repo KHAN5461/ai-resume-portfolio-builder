@@ -16,7 +16,7 @@ import BentoTemplate from './templates/BentoTemplate';
 export default function Portfolio({ isPublic = false }) {
   const { portfolioId } = useParams();
   const dispatch = useDispatch();
-  const reduxPortfolioData = useSelector((state) => state.portfolio.portfolios[portfolioId]);
+  const reduxPortfolioData = useSelector((state) => state.portfolio.present.portfolios[portfolioId]);
   const [localData, setLocalData] = useState(reduxPortfolioData);
   const [loading, setLoading] = useState(!reduxPortfolioData);
   const [isThemePanelOpen, setIsThemePanelOpen] = useState(false);

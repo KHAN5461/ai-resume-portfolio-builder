@@ -13,7 +13,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 const prompt="Job Title: {jobTitle}. Based on this job title, give me a list of summaries for 3 experience levels (Fresher, Mid Level, Senior Level) in 3-4 lines in an array format. Return ONLY a valid JSON array of objects with 'summary' and 'experience_level' fields."
 function Summery({enabledNext, handleNext, handlePrev}) {
     const dispatch = useDispatch();
-    const resumeInfo = useSelector(state => state.resume.resumeData);
+    const resumeInfo = useSelector(state => state.resume.present.resumeData);
     const [summery,setSummery]=useState();
     const [loading,setLoading]=useState(false);
     const params=useParams();

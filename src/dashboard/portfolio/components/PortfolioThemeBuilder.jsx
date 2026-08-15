@@ -9,7 +9,7 @@ export default function PortfolioThemeBuilder() {
   const [isOpen, setIsOpen] = useState(false);
   const { portfolioId } = useParams();
   const dispatch = useDispatch();
-  const portfolioData = useSelector((state) => state.portfolio.portfolios[portfolioId]);
+  const portfolioData = useSelector((state) => state.portfolio.present.portfolios[portfolioId]);
 
   const currentTheme = portfolioData?.siteConfig?.themePreset || 'bento';
   const currentAccent = portfolioData?.siteConfig?.accentColor || '#6366f1';

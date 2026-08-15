@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { AIChatSession } from '@/service/AIModal';
 
 export function AtsRoastPanel({ isOpen, onClose }) {
-    const resumeInfo = useSelector(state => state.resume.resumeData);
+    const resumeInfo = useSelector(state => state.resume.present.resumeData);
     const [isScanning, setIsScanning] = useState(false);
     const [scanComplete, setScanComplete] = useState(false);
     const [jobDescription, setJobDescription] = useState('');

@@ -21,7 +21,7 @@ function ThemeColor() {
     ]
 
     const dispatch = useDispatch();
-    const resumeInfo = useSelector(state => state.resume.resumeData);
+    const resumeInfo = useSelector(state => state.resume.present.resumeData);
     const [selectedColor,setSelectedColor]=useState();
     const {resumeId}=useParams();
     const onColorSelect=(color)=>{

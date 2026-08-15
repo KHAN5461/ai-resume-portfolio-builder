@@ -15,6 +15,7 @@ import { db } from './lib/firebaseConfig'
 import { doc, getDoc } from 'firebase/firestore'
 import { useDispatch } from 'react-redux'
 import { setResumeData, setPortfolioData } from './store/resumeSlice'
+import GlobalLoadingOverlay from './components/custom/GlobalLoadingOverlay'
 
 function App() {
   const [count, setCount] = useState(0)
@@ -56,6 +57,7 @@ function App() {
 
   return (
     <>
+      <GlobalLoadingOverlay />
       <OfflineBanner />
       <AnimatePresence mode="wait">
         {element && React.cloneElement(element, { key: location.pathname })}

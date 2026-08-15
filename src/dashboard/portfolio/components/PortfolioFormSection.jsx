@@ -97,7 +97,7 @@ function SortableItem(props) {
 export default function PortfolioFormSection() {
   const { portfolioId } = useParams();
   const dispatch = useDispatch();
-  const portfolioData = useSelector((state) => state.portfolio.portfolios[portfolioId]);
+  const portfolioData = useSelector((state) => state.portfolio.present.portfolios[portfolioId]);
   
   const layout = portfolioData?.siteConfig?.layout || defaultLayout;
   

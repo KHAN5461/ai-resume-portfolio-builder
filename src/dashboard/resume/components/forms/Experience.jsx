@@ -22,7 +22,7 @@ const formField={
 
 function Experience({handleNext, handlePrev}) {
     const dispatch = useDispatch();
-    const resumeInfo = useSelector(state => state.resume.resumeData);
+    const resumeInfo = useSelector(state => state.resume.present.resumeData);
     const params=useParams();
     const [loading,setLoading]=useState(false);
     const [expandedIndex, setExpandedIndex] = useState(0);

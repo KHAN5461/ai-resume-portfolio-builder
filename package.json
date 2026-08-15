@@ -46,6 +46,7 @@
     "react-to-pdf": "^1.0.1",
     "react-web-share": "^2.0.2",
     "recharts": "^3.10.1",
+    "redux-undo": "^1.1.0",
     "sonner": "^1.5.0",
     "tailwind-merge": "^2.6.1",
     "tailwindcss-animate": "^1.0.7",

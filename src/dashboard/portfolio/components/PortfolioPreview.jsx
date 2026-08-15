@@ -9,7 +9,7 @@ import ContactSection from '../../../portfolio/components/ContactSection';
 
 export default function PortfolioPreview() {
   const { portfolioId } = useParams();
-  const portfolioData = useSelector((state) => state.portfolio.portfolios[portfolioId]);
+  const portfolioData = useSelector((state) => state.portfolio.present.portfolios[portfolioId]);
 
   if (!portfolioData) return null;
 

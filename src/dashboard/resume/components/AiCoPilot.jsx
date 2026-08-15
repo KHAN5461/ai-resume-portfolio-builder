@@ -1,17 +1,19 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Sparkles, Send, X, Bot, User } from 'lucide-react';
+import { Sparkles, Send, X, Bot, User, Loader2 } from 'lucide-react';
 import { AIChatSession } from '../../../../service/AIModal';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
+import { startLoading, stopLoading, selectIsLoading } from '../../../store/loadingSlice';
 
 export function AiCoPilot() {
-  const resumeInfo = useSelector(state => state.resume.resumeData);
+  const resumeInfo = useSelector(state => state.resume.present.resumeData);
   const [isOpen, setIsOpen] = useState(false);
   const [message, setMessage] = useState('');
   const [chatHistory, setChatHistory] = useState([
     { role: 'ai', text: 'Hi! I am your Sparkfolio AI Co-Pilot. I can help rewrite your experience, suggest skills, or fix formatting. What do you need?' }
   ]);
-  const [isTyping, setIsTyping] = useState(false);
+  const dispatch = useDispatch();
+  const isAILoading = useSelector(selectIsLoading('ai-generation'));
 
   const handleSend = async (e) => {
     e.preventDefault();
@@ -20,7 +22,7 @@ export function AiCoPilot() {
     const userMessage = message;
     setChatHistory(prev => [...prev, { role: 'user', text: userMessage }]);
     setMessage('');
-    setIsTyping(true);
+    dispatch(startLoading('ai-generation'));
 
     try {
         const prompt = `Context: The user has a resume with the following details:\n${JSON.stringify({
@@ -36,7 +38,7 @@ export function AiCoPilot() {
         console.error("AI Error:", error);
         setChatHistory(prev => [...prev, { role: 'ai', text: 'Sorry, I encountered an error. Please try again.' }]);
     } finally {
-        setIsTyping(false);
+        dispatch(stopLoading('ai-generation'));
     }
   };
 
@@ -109,7 +111,7 @@ export function AiCoPilot() {
                     </motion.div>
                 ))}
                 
-                {isTyping && (
+                {isAILoading && (
                     <motion.div 
                         initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
@@ -139,10 +141,10 @@ export function AiCoPilot() {
                 />
                 <button 
                     type="submit"
-                    disabled={!message.trim()}
+                    disabled={isAILoading || !message.trim()}
                     className="absolute right-2 w-8 h-8 bg-stitch-primary text-white rounded-full flex items-center justify-center shadow-md disabled:opacity-50 disabled:cursor-not-allowed hover:bg-stitch-primary/90 transition-colors"
                 >
-                  <Send className="w-4 h-4 -ml-0.5" />
+                  {isAILoading ? <Loader2 className="animate-spin w-4 h-4" /> : <Send className="w-4 h-4 -ml-0.5" />}
                 </button>
               </form>
             </div>

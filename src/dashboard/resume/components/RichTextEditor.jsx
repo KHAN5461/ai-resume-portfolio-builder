@@ -16,7 +16,7 @@ Return ONLY valid HTML ul and li tags, without markdown wrappers or conversation
 
 function RichTextEditor({onRichTextEditorChange,index,defaultValue}) {
     const [value,setValue]=useState(defaultValue);
-    const resumeInfo = useSelector(state => state.resume.resumeData);
+    const resumeInfo = useSelector(state => state.resume.present.resumeData);
     const [loading,setLoading]=useState(false);
     
     const GenerateSummeryFromAI=async()=>{

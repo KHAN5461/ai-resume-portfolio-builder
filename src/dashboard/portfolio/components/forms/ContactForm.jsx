@@ -7,7 +7,7 @@ import { updatePortfolioData } from '@/store/portfolioSlice';
 const ContactForm = () => {
   const { portfolioId } = useParams();
   const dispatch = useDispatch();
-  const portfolioData = useSelector((state) => state.portfolio.portfolios[portfolioId]);
+  const portfolioData = useSelector((state) => state.portfolio.present.portfolios[portfolioId]);
   
   if (!portfolioData) return null;
   const contact = portfolioData.contactSection || { heading: "", subheading: "", email: "", socialLinks: [] };

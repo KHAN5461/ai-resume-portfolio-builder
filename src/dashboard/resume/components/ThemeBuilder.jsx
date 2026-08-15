@@ -29,7 +29,7 @@ const FONTS = [
 
 export default function ThemeBuilder() {
     const dispatch = useDispatch();
-    const resumeInfo = useSelector(state => state.resume.resumeData);
+    const resumeInfo = useSelector(state => state.resume.present.resumeData);
     const [selectedColor, setSelectedColor] = useState(resumeInfo?.themeColor || COLORS[0]);
     const [selectedFont, setSelectedFont] = useState(resumeInfo?.themeFont || FONTS[0].name);
     const [selectedTemplate, setSelectedTemplate] = useState(resumeInfo?.themeTemplate || TEMPLATES[0].id);
