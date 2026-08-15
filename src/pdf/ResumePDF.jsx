@@ -1,6 +1,6 @@
 import React from 'react';
 import { Page, Text, View, Document, StyleSheet, Font } from '@react-pdf/renderer';
-import { mapResumeInfoToTemplateData } from '@/dashboard/resume/components/ResumePreview';
+import { mapResumeInfoToTemplateData } from '@/lib/templateDataMapper';
 
 // We register fonts to ensure they render correctly in the PDF if needed.
 // Helvetica is built-in and works out of the box.
@@ -279,7 +279,8 @@ export const ResumePDF = ({ resumeData, settings = { pageSize: 'A4', baseFontSiz
     }
   });
 
-  if (templateType === 'Modern') {
+  try {
+    if (templateType === 'Modern') {
     return (
       <Document>
         <Page size={settings.pageSize || 'A4'} style={dynamicStyles.modernPage}>
@@ -563,4 +564,14 @@ export const ResumePDF = ({ resumeData, settings = { pageSize: 'A4', baseFontSiz
       </Page>
     </Document>
   );
+  } catch (error) {
+    return (
+      <Document>
+        <Page size="A4" style={{ padding: 40 }}>
+          <Text>Error generating PDF. Please check your resume data and try again.</Text>
+          <Text style={{ fontSize: 10, color: 'gray', marginTop: 10 }}>{error.message}</Text>
+        </Page>
+      </Document>
+    );
+  }
 };

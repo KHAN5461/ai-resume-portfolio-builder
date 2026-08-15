@@ -12,7 +12,7 @@ import ExperienceBlock from '@/components/blocks/ExperienceBlock';
 import SkillsBlock from '@/components/blocks/SkillsBlock';
 import ContactBlock from '@/components/blocks/ContactBlock';
 
-export default function SortableBlock({ block, isActive, onClick }) {
+const SortableBlock = ({ block, isActive, onClick }) => {
   const { portfolioId } = useParams();
   const dispatch = useDispatch();
   
@@ -32,10 +32,29 @@ export default function SortableBlock({ block, isActive, onClick }) {
     opacity: isDragging ? 0.8 : 1,
   };
 
-  const handleDelete = (e) => {
+  const handleDelete = React.useCallback((e) => {
     e.stopPropagation();
     dispatch(removeBlock({ portfolioId, blockId: block.id }));
-  };
+  }, [dispatch, portfolioId, block.id]);
+
+  const renderedBlock = React.useMemo(() => {
+    switch (block.type) {
+      case 'HeroSection': return <HeroBlock data={block.data} />;
+      case 'ProjectsGrid': return <ProjectsBlock data={block.data} />;
+      case 'AboutSection': return <AboutBlock data={block.data} />;
+      case 'WorkExperience': return <ExperienceBlock data={block.data} />;
+      case 'SkillsGrid': return <SkillsBlock data={block.data} />;
+      case 'ContactForm': return <ContactBlock data={block.data} />;
+      default: return (
+        <div className="w-full bg-slate-50 min-h-[120px] p-8 flex items-center justify-center border-b border-slate-200">
+          <div className="text-center">
+            <div className="text-sm font-bold text-slate-400 uppercase tracking-wider mb-2">{block.type}</div>
+            <p className="text-slate-500">Placeholder for {block.type}</p>
+          </div>
+        </div>
+      );
+    }
+  }, [block.type, block.data]);
 
   return (
     <div 
@@ -68,27 +87,14 @@ export default function SortableBlock({ block, isActive, onClick }) {
 
       {/* Render the actual block content */}
       <div className="w-full min-h-[120px] pointer-events-none select-none overflow-hidden relative">
-        {block.type === 'HeroSection' ? (
-          <HeroBlock data={block.data} />
-        ) : block.type === 'ProjectsGrid' ? (
-          <ProjectsBlock data={block.data} />
-        ) : block.type === 'AboutSection' ? (
-          <AboutBlock data={block.data} />
-        ) : block.type === 'WorkExperience' ? (
-          <ExperienceBlock data={block.data} />
-        ) : block.type === 'SkillsGrid' ? (
-          <SkillsBlock data={block.data} />
-        ) : block.type === 'ContactForm' ? (
-          <ContactBlock data={block.data} />
-        ) : (
-          <div className="w-full bg-slate-50 min-h-[120px] p-8 flex items-center justify-center border-b border-slate-200">
-             <div className="text-center">
-               <div className="text-sm font-bold text-slate-400 uppercase tracking-wider mb-2">{block.type}</div>
-               <p className="text-slate-500">Placeholder for {block.type}</p>
-             </div>
-          </div>
-        )}
+        {renderedBlock}
       </div>
     </div>
   );
-}
+};
+
+export default React.memo(SortableBlock, (prevProps, nextProps) => {
+  return prevProps.block.id === nextProps.block.id && 
+         prevProps.block.type === nextProps.block.type &&
+         prevProps.isActive === nextProps.isActive;
+});

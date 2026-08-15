@@ -1,4 +1,8 @@
 import { Mail, Phone, MapPin } from "lucide-react";
+import ExperienceCard from "./shared/ExperienceCard";
+import EducationCard from "./shared/EducationCard";
+import SkillBadge from "./shared/SkillBadge";
+import SectionHeading from "./shared/SectionHeading";
 
 const MinimalImageTemplate = ({ data, accentColor }) => {
     const formatDate = (dateStr) => {
@@ -45,9 +49,7 @@ const MinimalImageTemplate = ({ data, accentColor }) => {
 
                     {/* Contact */}
                     <section className="mb-8">
-                        <h2 className="text-sm font-semibold tracking-widest text-zinc-600 mb-3">
-                            CONTACT
-                        </h2>
+                        <SectionHeading title="CONTACT" accentColor={accentColor} variant="modern" />
                         <div className="space-y-2 text-sm">
                             {data.personal_info?.phone && (
                                 <div className="flex items-center gap-2">
@@ -73,18 +75,10 @@ const MinimalImageTemplate = ({ data, accentColor }) => {
                     {/* Education */}
                     {data.education && data.education.length > 0 && (
                         <section className="mb-8">
-                            <h2 className="text-sm font-semibold tracking-widest text-zinc-600 mb-3">
-                                EDUCATION
-                            </h2>
+                            <SectionHeading title="EDUCATION" accentColor={accentColor} variant="modern" />
                             <div className="space-y-4 text-sm">
                                 {data.education.map((edu, index) => (
-                                    <div key={index}>
-                                        <p className="font-semibold uppercase">{edu.degree}</p>
-                                        <p className="text-zinc-600">{edu.institution}</p>
-                                        <p className="text-xs text-zinc-500">
-                                            {formatDate(edu.graduation_date)}
-                                        </p>
-                                    </div>
+                                    <EducationCard key={index} education={edu} accentColor={accentColor} variant="modern" />
                                 ))}
                             </div>
                         </section>
@@ -93,14 +87,18 @@ const MinimalImageTemplate = ({ data, accentColor }) => {
                     {/* Skills */}
                     {data.skills && data.skills.length > 0 && (
                         <section>
-                            <h2 className="text-sm font-semibold tracking-widest text-zinc-600 mb-3">
-                                SKILLS
-                            </h2>
-                            <ul className="space-y-1 text-sm">
+                            <SectionHeading title="SKILLS" accentColor={accentColor} variant="modern" />
+                            <div className="flex flex-col gap-2">
                                 {data.skills.map((skill, index) => (
-                                    <li key={index}>{skill}</li>
+                                    <SkillBadge 
+                                        key={index} 
+                                        name={typeof skill === 'string' ? skill : skill.name} 
+                                        rating={skill.rating || 0} 
+                                        accentColor={accentColor} 
+                                        variant="pill" 
+                                    />
                                 ))}
-                            </ul>
+                            </div>
                         </section>
                     )}
                 </aside>
@@ -111,9 +109,7 @@ const MinimalImageTemplate = ({ data, accentColor }) => {
                     {/* Summary */}
                     {data.professional_summary && (
                         <section className="mb-8">
-                            <h2 className="text-sm font-semibold tracking-widest mb-3" style={{ color: accentColor }} >
-                                SUMMARY
-                            </h2>
+                            <SectionHeading title="SUMMARY" accentColor={accentColor} variant="modern" />
                             <p className="text-zinc-700 leading-relaxed">
                                 {data.professional_summary}
                             </p>
@@ -123,32 +119,10 @@ const MinimalImageTemplate = ({ data, accentColor }) => {
                     {/* Experience */}
                     {data.experience && data.experience.length > 0 && (
                         <section>
-                            <h2 className="text-sm font-semibold tracking-widest mb-4" style={{ color: accentColor }} >
-                                EXPERIENCE
-                            </h2>
+                            <SectionHeading title="EXPERIENCE" accentColor={accentColor} variant="modern" />
                             <div className="space-y-6 mb-8">
                                 {data.experience.map((exp, index) => (
-                                    <div key={index}>
-                                        <div className="flex justify-between items-center">
-                                            <h3 className="font-semibold text-zinc-900">
-                                                {exp.position}
-                                            </h3>
-                                            <span className="text-xs text-zinc-500">
-                                                {formatDate(exp.start_date)} -{" "}
-                                                {exp.is_current ? "Present" : formatDate(exp.end_date)}
-                                            </span>
-                                        </div>
-                                        <p className="text-sm mb-2" style={{ color: accentColor }} >
-                                            {exp.company}
-                                        </p>
-                                        {exp.description && (
-                                            <ul className="list-disc list-inside text-sm text-zinc-700 leading-relaxed space-y-1">
-                                                {exp.description.split("\n").map((line, i) => (
-                                                    <li key={i}>{line}</li>
-                                                ))}
-                                            </ul>
-                                        )}
-                                    </div>
+                                    <ExperienceCard key={index} experience={exp} accentColor={accentColor} variant="modern" />
                                 ))}
                             </div>
                         </section>
@@ -157,9 +131,7 @@ const MinimalImageTemplate = ({ data, accentColor }) => {
                     {/* Projects */}
                     {data.project && data.project.length > 0 && (
                         <section>
-                            <h2 className="text-sm uppercase tracking-widest font-semibold" style={{ color: accentColor }}>
-                                PROJECTS
-                            </h2>
+                            <SectionHeading title="PROJECTS" accentColor={accentColor} variant="modern" />
                             <div className="space-y-4">
                                 {data.project.map((project, index) => (
                                     <div key={index}>
@@ -184,6 +156,5 @@ const MinimalImageTemplate = ({ data, accentColor }) => {
         </div>
     );
 }
-
 
 export default MinimalImageTemplate;

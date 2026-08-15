@@ -26,7 +26,7 @@ function EditResume() {
     const [isExportOpen, setIsExportOpen] = useState(false);
     const [isAtsPanelOpen, setIsAtsPanelOpen] = useState(false);
     const [viewport, setViewport] = useState('desktop');
-    const [saveStatus, setSaveStatus] = useState('saved'); // 'saved', 'saving', 'error', 'unsaved'
+    const syncStatus = useSelector(state => state.sync.syncStatus);
     const [isZenMode, setIsZenMode] = useState(false);
     const [isSidebarOpen, setIsSidebarOpen] = useState(true);
     const [contextMenu, setContextMenu] = useState({ show: false, x: 0, y: 0 });
@@ -62,27 +62,7 @@ function EditResume() {
         })
     }
 
-    // Auto-Save Effect
-    useEffect(() => {
-      // Skip initial load
-      if (!resumeInfo || Object.keys(resumeInfo).length === 0) return;
-      
-      setSaveStatus('unsaved');
-      
-      const timer = setTimeout(() => {
-        setSaveStatus('saving');
-        GlobalApi.UpdateResumeDetail(resumeId, { data: resumeInfo })
-          .then(() => {
-            setSaveStatus('saved');
-          })
-          .catch(() => {
-            setSaveStatus('error');
-            toast.error('Auto-save failed. Please check your connection.');
-          });
-      }, 2000); // 2 second debounce
 
-      return () => clearTimeout(timer);
-    }, [resumeInfo, resumeId]);
 
 
 
@@ -113,28 +93,34 @@ function EditResume() {
             
             {/* Save Status Indicator */}
             <div className="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-full bg-surface-variant/30 border border-outline-variant/20 mr-2">
-              {saveStatus === 'saved' && (
+              {syncStatus === 'saved' && (
                 <>
                   <span className="material-symbols-outlined text-[16px] text-green-500">cloud_done</span>
                   <span className="font-label-sm text-[12px] text-on-surface-variant">Saved to Cloud</span>
                 </>
               )}
-              {saveStatus === 'saving' && (
+              {syncStatus === 'saving' && (
                 <>
                   <span className="material-symbols-outlined text-[16px] text-stitch-primary animate-pulse">cloud_sync</span>
                   <span className="font-label-sm text-[12px] text-on-surface-variant">Saving...</span>
                 </>
               )}
-              {saveStatus === 'unsaved' && (
+              {syncStatus === 'unsaved' && (
                 <>
                   <span className="material-symbols-outlined text-[16px] text-yellow-500">edit_note</span>
                   <span className="font-label-sm text-[12px] text-on-surface-variant">Unsaved changes</span>
                 </>
               )}
-              {saveStatus === 'error' && (
+              {syncStatus === 'error' && (
                 <>
                   <span className="material-symbols-outlined text-[16px] text-red-500">cloud_off</span>
                   <span className="font-label-sm text-[12px] text-on-surface-variant">Save Failed</span>
+                </>
+              )}
+              {syncStatus === 'offline-queued' && (
+                <>
+                  <span className="material-symbols-outlined text-[16px] text-orange-500">wifi_off</span>
+                  <span className="font-label-sm text-[12px] text-on-surface-variant">Queued offline</span>
                 </>
               )}
             </div>

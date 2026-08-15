@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import SortableBlock from './SortableBlock';
 
@@ -6,6 +6,8 @@ export default function CanvasArea({ blocks, previewMode, activeBlockId, setActi
   const containerClass = previewMode === 'mobile' 
     ? 'w-[375px] h-[812px] rounded-[2.5rem] border-[12px] border-[#151b2d] shadow-2xl mt-12 bg-white flex flex-col overflow-hidden relative transition-all duration-500'
     : 'w-full max-w-[1200px] h-full bg-white shadow-lg mx-auto flex flex-col overflow-y-auto relative transition-all duration-500';
+
+  const blockIds = useMemo(() => blocks?.map(b => b.id) || [], [blocks]);
 
   if (!blocks || blocks.length === 0) {
     return (
@@ -25,7 +27,7 @@ export default function CanvasArea({ blocks, previewMode, activeBlockId, setActi
     <div className="flex-1 w-full overflow-y-auto custom-scrollbar p-6 flex justify-center pb-32">
       <div className={containerClass}>
         <div className="flex-1 overflow-y-auto custom-scrollbar bg-white w-full h-full text-slate-900">
-          <SortableContext items={blocks.map(b => b.id)} strategy={verticalListSortingStrategy}>
+          <SortableContext items={blockIds} strategy={verticalListSortingStrategy}>
             {blocks.map((block) => (
               <SortableBlock 
                 key={block.id} 

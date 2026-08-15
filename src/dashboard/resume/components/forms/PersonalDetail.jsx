@@ -2,16 +2,12 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { useDispatch, useSelector } from 'react-redux';
 import { setResumeData } from '@/store/resumeSlice';
-import { LoaderCircle } from 'lucide-react';
-import React, { useContext, useEffect, useState } from 'react'
+import { LoaderCircle, ArrowLeft, ArrowRight } from 'lucide-react';
+import React, { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom';
-import GlobalApi from './../../../../../service/GlobalApi';
-import { toast } from 'sonner';
 import { handleFormKeyDown } from '@/lib/keyboard';
-import { ArrowLeft, ArrowRight } from 'lucide-react';
 
 function PersonalDetail({enabledNext, handleNext, handlePrev}) {
-
     const params=useParams();
     const dispatch = useDispatch();
     const resumeInfo = useSelector(state => state.resume.resumeData);
@@ -46,20 +42,13 @@ function PersonalDetail({enabledNext, handleNext, handlePrev}) {
 
     const onSave=(e)=>{
         e.preventDefault();
-        setLoading(true)
-        const data={
-            data:formData
-        }
-        GlobalApi.UpdateResumeDetail(params?.resumeId,data).then(resp=>{
-            console.log(resp);
+        setLoading(true);
+        dispatch(setResumeData(formData));
+        setTimeout(() => {
+            setLoading(false);
             enabledNext(true);
-            setLoading(false);
-            toast("Details updated")
             if (handleNext) handleNext();
-        },(error)=>{
-            setLoading(false);
-        })
-        
+        }, 10);
     }
   return (
     <div className='p-2 md:p-4'>

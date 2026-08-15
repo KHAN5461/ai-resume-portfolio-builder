@@ -40,22 +40,16 @@ function Summery({enabledNext, handleNext, handlePrev}) {
 
     const onSave=(e)=>{
         e.preventDefault();
-       
-        setLoading(true)
-        const data={
-            data:{
-                summery:summery
-            }
-        }
-        GlobalApi.UpdateResumeDetail(params?.resumeId,data).then(resp=>{
-            console.log(resp);
+        setLoading(true);
+        dispatch(setResumeData({
+            ...resumeInfo,
+            summery:summery
+        }));
+        setTimeout(() => {
+            setLoading(false);
             enabledNext(true);
-            setLoading(false);
-            toast("Details updated");
             if (handleNext) handleNext();
-        },(error)=>{
-            setLoading(false);
-        })
+        }, 10);
     }
     return (
     <div>

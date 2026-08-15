@@ -5,43 +5,7 @@ import ClassicTemplate from './templates/ClassicTemplate';
 import ModernTemplate from './templates/ModernTemplate';
 import MinimalTemplate from './templates/MinimalTemplate';
 import MinimalImageTemplate from './templates/MinimalImageTemplate';
-
-// Map our Redux resume schema to the schema expected by the templates
-export const mapResumeInfoToTemplateData = (resumeInfo) => {
-    if (!resumeInfo) return {};
-
-    return {
-        personal_info: {
-            full_name: `${resumeInfo?.firstName || ''} ${resumeInfo?.lastName || ''}`.trim(),
-            profession: resumeInfo?.jobTitle || '',
-            email: resumeInfo?.email || '',
-            phone: resumeInfo?.phone || '',
-            location: resumeInfo?.address || '',
-            linkedin: resumeInfo?.linkedin || '',
-            website: resumeInfo?.website || ''
-        },
-        professional_summary: resumeInfo?.summery || resumeInfo?.summary || '',
-        experience: (resumeInfo?.Experience || resumeInfo?.experience || []).map(exp => ({
-            position: exp?.title || '',
-            company: exp?.companyName || '',
-            city: exp?.city || '',
-            state: exp?.state || '',
-            start_date: exp?.startDate || '',
-            end_date: exp?.endDate || '',
-            is_current: exp?.currentlyWorking || false,
-            description: exp?.workSummery || exp?.workSummary || '' 
-        })),
-        education: (resumeInfo?.education || resumeInfo?.Education || []).map(edu => ({
-            degree: edu?.degree || '',
-            field: edu?.major || '',
-            institution: edu?.universityName || '',
-            graduation_date: edu?.endDate || '',
-            description: edu?.description || ''
-        })),
-        skills: (resumeInfo?.skills || resumeInfo?.Skills || []).map(skill => skill?.name || (typeof skill === 'string' ? skill : '')),
-        project: [] // Not implemented in current form
-    };
-};
+import { mapResumeInfoToTemplateData } from '@/lib/templateDataMapper';
 
 const ResumePreview = React.memo(() => {
     const resumeInfo = useSelector(state => state.resume.resumeData);

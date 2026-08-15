@@ -5,7 +5,6 @@ import RichTextEditor from '../RichTextEditor'
 import { useDispatch, useSelector } from 'react-redux';
 import { setResumeData } from '@/store/resumeSlice';
 import { useParams } from 'react-router-dom'
-import GlobalApi from './../../../../../service/GlobalApi'
 import { toast } from 'sonner'
 import { LoaderCircle, GripVertical, Trash2, Plus, ArrowLeft, ArrowRight } from 'lucide-react'
 import { handleFormKeyDown } from '@/lib/keyboard'
@@ -89,21 +88,11 @@ function Experience({handleNext, handlePrev}) {
 
 
     const onSave=()=>{
-        setLoading(true)
-        const data={
-            data:{
-                Experience:experinceList.map(({ id, ...rest }) => rest)
-            }
-        }
-
-        GlobalApi.UpdateResumeDetail(params?.resumeId,data).then(res=>{
+        setLoading(true);
+        setTimeout(() => {
             setLoading(false);
-            toast('Details updated !')
             if (handleNext) handleNext();
-        },(error)=>{
-            setLoading(false);
-        })
-
+        }, 10);
     }
   return (
     <div onKeyDown={handleFormKeyDown} className="form-container">

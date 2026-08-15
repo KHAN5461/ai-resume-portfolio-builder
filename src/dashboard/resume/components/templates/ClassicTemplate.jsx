@@ -1,4 +1,8 @@
 import { Mail, Phone, MapPin, Linkedin, Globe } from "lucide-react";
+import ExperienceCard from "./shared/ExperienceCard";
+import EducationCard from "./shared/EducationCard";
+import SkillBadge from "./shared/SkillBadge";
+import SectionHeading from "./shared/SectionHeading";
 
 const ClassicTemplate = ({ data, accentColor }) => {
     const formatDate = (dateStr) => {
@@ -67,9 +71,7 @@ const ClassicTemplate = ({ data, accentColor }) => {
             {/* Professional Summary */}
             {data.professional_summary && (
                 <section className="mb-8">
-                    <h2 className="text-sm font-bold tracking-widest uppercase mb-4 border-b pb-1" style={{ color: accentColor, borderColor: accentColor }}>
-                        Professional Summary
-                    </h2>
+                    <SectionHeading title="Professional Summary" accentColor={accentColor} variant="classic" />
                     <p className="text-gray-700 leading-relaxed">{data.professional_summary}</p>
                 </section>
             )}
@@ -77,37 +79,10 @@ const ClassicTemplate = ({ data, accentColor }) => {
             {/* Experience */}
             {data.experience && data.experience.length > 0 && (
                 <section className="mb-8">
-                    <h2 className="text-sm font-bold tracking-widest uppercase mb-5 border-b pb-1" style={{ color: accentColor, borderColor: accentColor }}>
-                        Professional Experience
-                    </h2>
-
+                    <SectionHeading title="Professional Experience" accentColor={accentColor} variant="classic" />
                     <div className="space-y-4">
                         {data.experience.map((exp, index) => (
-                            <div key={index} className="border-l-3 pl-4" style={{ borderColor: accentColor }}>
-                                <div className="flex justify-between items-start mb-2">
-                                    <div>
-                                        <h3 className="font-semibold text-gray-900">{exp.position}</h3>
-                                        <p className="text-gray-700 font-medium">
-                                            {exp.company}
-                                            {(exp.city || exp.state) && (
-                                                <span>
-                                                    {exp.company ? ', ' : ''}
-                                                    {exp.city}{exp.city && exp.state ? ', ' : ''}{exp.state}
-                                                </span>
-                                            )}
-                                        </p>
-                                    </div>
-                                    <div className="text-right text-sm text-gray-600">
-                                        <p>{formatDate(exp.start_date)} - {exp.is_current ? "Present" : formatDate(exp.end_date)}</p>
-                                    </div>
-                                </div>
-                                {exp.description && (
-                                    <div 
-                                        className="text-gray-700 leading-relaxed preview-html-content" 
-                                        dangerouslySetInnerHTML={{ __html: exp.description }} 
-                                    />
-                                )}
-                            </div>
+                            <ExperienceCard key={index} experience={exp} accentColor={accentColor} variant="classic" />
                         ))}
                     </div>
                 </section>
@@ -116,11 +91,8 @@ const ClassicTemplate = ({ data, accentColor }) => {
             {/* Projects */}
             {data.project && data.project.length > 0 && (
                 <section className="mb-8">
-                    <h2 className="text-sm font-bold tracking-widest uppercase mb-5 border-b pb-1" style={{ color: accentColor, borderColor: accentColor }}>
-                        Projects
-                    </h2>
-
-                    <ul className="space-y-3 ">
+                    <SectionHeading title="Projects" accentColor={accentColor} variant="classic" />
+                    <ul className="space-y-3">
                         {data.project.map((proj, index) => (
                             <div key={index} className="flex justify-between items-start border-l-3 border-gray-300 pl-6">
                                 <div>
@@ -136,29 +108,10 @@ const ClassicTemplate = ({ data, accentColor }) => {
             {/* Education */}
             {data.education && data.education.length > 0 && (
                 <section className="mb-8">
-                    <h2 className="text-sm font-bold tracking-widest uppercase mb-5 border-b pb-1" style={{ color: accentColor, borderColor: accentColor }}>
-                        Education
-                    </h2>
-
+                    <SectionHeading title="Education" accentColor={accentColor} variant="classic" />
                     <div className="space-y-3">
                         {data.education.map((edu, index) => (
-                            <div key={index} className="mb-4">
-                                <div className="flex justify-between items-start">
-                                    <div>
-                                        <h3 className="font-semibold text-gray-900">
-                                            {edu.degree} {edu.field && `in ${edu.field}`}
-                                        </h3>
-                                        <p className="text-gray-700">{edu.institution}</p>
-                                        {edu.gpa && <p className="text-sm text-gray-600">GPA: {edu.gpa}</p>}
-                                    </div>
-                                    <div className="text-right text-sm text-gray-600">
-                                        <p>{formatDate(edu.graduation_date)}</p>
-                                    </div>
-                                </div>
-                                {edu.description && (
-                                    <p className="text-sm text-gray-700 mt-2 leading-relaxed whitespace-pre-wrap">{edu.description}</p>
-                                )}
-                            </div>
+                            <EducationCard key={index} education={edu} accentColor={accentColor} variant="classic" />
                         ))}
                     </div>
                 </section>
@@ -167,15 +120,16 @@ const ClassicTemplate = ({ data, accentColor }) => {
             {/* Skills */}
             {data.skills && data.skills.length > 0 && (
                 <section className="mb-8">
-                    <h2 className="text-sm font-bold tracking-widest uppercase mb-5 border-b pb-1" style={{ color: accentColor, borderColor: accentColor }}>
-                        Core Skills
-                    </h2>
-
+                    <SectionHeading title="Core Skills" accentColor={accentColor} variant="classic" />
                     <div className="flex gap-x-4 gap-y-2 flex-wrap">
                         {data.skills.map((skill, index) => (
-                            <div key={index} className="text-gray-700 bg-gray-50 px-3 py-1 rounded-md text-sm border border-gray-100">
-                                {skill}
-                            </div>
+                            <SkillBadge 
+                                key={index} 
+                                name={typeof skill === 'string' ? skill : skill.name} 
+                                rating={skill.rating || 0} 
+                                accentColor={accentColor} 
+                                variant="bar" 
+                            />
                         ))}
                     </div>
                 </section>

@@ -1,4 +1,8 @@
 import { Mail, Phone, MapPin, Linkedin, Globe } from "lucide-react";
+import ExperienceCard from "./shared/ExperienceCard";
+import EducationCard from "./shared/EducationCard";
+import SkillBadge from "./shared/SkillBadge";
+import SectionHeading from "./shared/SectionHeading";
 
 const ModernTemplate = ({ data, accentColor }) => {
 	const formatDate = (dateStr) => {
@@ -61,9 +65,7 @@ const ModernTemplate = ({ data, accentColor }) => {
 				{/* Professional Summary */}
 				{data.professional_summary && (
 					<section className="mb-8">
-						<h2 className="text-2xl font-light mb-4 pb-2 border-b border-gray-200">
-							Professional Summary
-						</h2>
+						<SectionHeading title="Professional Summary" accentColor={accentColor} variant="modern" />
 						<p className="text-gray-700 ">{data.professional_summary}</p>
 					</section>
 				)}
@@ -71,29 +73,11 @@ const ModernTemplate = ({ data, accentColor }) => {
 				{/* Experience */}
 				{data.experience && data.experience.length > 0 && (
 					<section className="mb-8">
-						<h2 className="text-2xl font-light mb-6 pb-2 border-b border-gray-200">
-							Experience
-						</h2>
+						<SectionHeading title="Experience" accentColor={accentColor} variant="modern" />
 
 						<div className="space-y-6">
 							{data.experience.map((exp, index) => (
-								<div key={index} className="relative pl-6 border-l border-gray-200">
-
-									<div className="flex justify-between items-start mb-2">
-										<div>
-											<h3 className="text-xl font-medium text-gray-900">{exp.position}</h3>
-											<p className="font-medium" style={{ color: accentColor }}>{exp.company}</p>
-										</div>
-										<div className="text-sm text-gray-500 bg-gray-100 px-3 py-1 rounded">
-											{formatDate(exp.start_date)} - {exp.is_current ? "Present" : formatDate(exp.end_date)}
-										</div>
-									</div>
-									{exp.description && (
-										<div className="text-gray-700 leading-relaxed mt-3 whitespace-pre-line">
-											{exp.description}
-										</div>
-									)}
-								</div>
+								<ExperienceCard key={index} experience={exp} accentColor={accentColor} variant="modern" />
 							))}
 						</div>
 					</section>
@@ -102,15 +86,11 @@ const ModernTemplate = ({ data, accentColor }) => {
 				{/* Projects */}
 				{data.project && data.project.length > 0 && (
 					<section className="mb-8">
-						<h2 className="text-2xl font-light mb-4 pb-2 border-b border-gray-200">
-							Projects
-						</h2>
+						<SectionHeading title="Projects" accentColor={accentColor} variant="modern" />
 
 						<div className="space-y-6">
 							{data.project.map((p, index) => (
 								<div key={index} className="relative pl-6 border-l border-gray-200" style={{borderLeftColor: accentColor}}>
-
-
 									<div className="flex justify-between items-start">
 										<div>
 											<h3 className="text-lg font-medium text-gray-900">{p.name}</h3>
@@ -131,22 +111,11 @@ const ModernTemplate = ({ data, accentColor }) => {
 					{/* Education */}
 					{data.education && data.education.length > 0 && (
 						<section>
-							<h2 className="text-2xl font-light mb-4 pb-2 border-b border-gray-200">
-								Education
-							</h2>
+							<SectionHeading title="Education" accentColor={accentColor} variant="modern" />
 
 							<div className="space-y-4">
 								{data.education.map((edu, index) => (
-									<div key={index}>
-										<h3 className="font-semibold text-gray-900">
-											{edu.degree} {edu.field && `in ${edu.field}`}
-										</h3>
-										<p style={{ color: accentColor }}>{edu.institution}</p>
-										<div className="flex justify-between items-center text-sm text-gray-600">
-											<span>{formatDate(edu.graduation_date)}</span>
-											{edu.gpa && <span>GPA: {edu.gpa}</span>}
-										</div>
-									</div>
+									<EducationCard key={index} education={edu} accentColor={accentColor} variant="modern" />
 								))}
 							</div>
 						</section>
@@ -155,19 +124,17 @@ const ModernTemplate = ({ data, accentColor }) => {
 					{/* Skills */}
 					{data.skills && data.skills.length > 0 && (
 						<section>
-							<h2 className="text-2xl font-light mb-4 pb-2 border-b border-gray-200">
-								Skills
-							</h2>
+							<SectionHeading title="Skills" accentColor={accentColor} variant="modern" />
 
 							<div className="flex flex-wrap gap-2">
 								{data.skills.map((skill, index) => (
-									<span
-										key={index}
-										className="px-3 py-1 text-sm text-white rounded-full"
-										style={{ backgroundColor: accentColor }}
-									>
-										{skill}
-									</span>
+									<SkillBadge 
+										key={index} 
+										name={typeof skill === 'string' ? skill : skill.name} 
+										rating={skill.rating || 0} 
+										accentColor={accentColor} 
+										variant="pill" 
+									/>
 								))}
 							</div>
 						</section>

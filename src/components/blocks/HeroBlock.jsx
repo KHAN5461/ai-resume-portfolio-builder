@@ -1,7 +1,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 
-export default function HeroBlock({ data }) {
+const HeroBlock = ({ data }) => {
   const headline = data?.headline || "Hi, I'm a Developer";
   const subheadline = data?.subheadline || "I build amazing things and craft beautiful digital experiences.";
   const ctaText = data?.primaryCta?.text || "Let's Talk";
@@ -37,4 +37,6 @@ export default function HeroBlock({ data }) {
       </motion.div>
     </div>
   );
-}
+};
+
+export default React.memo(HeroBlock);

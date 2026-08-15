@@ -6,7 +6,6 @@ import { setResumeData } from '@/store/resumeSlice';
 import { LoaderCircle, GripVertical, Trash2, ArrowLeft, ArrowRight } from 'lucide-react'
 import React, { useContext, useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
-import GlobalApi from './../../../../../service/GlobalApi'
 import { toast } from 'sonner'
 import { handleFormKeyDown } from '@/lib/keyboard'
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd'
@@ -60,23 +59,11 @@ function Education({handleNext, handlePrev}) {
     setEducationalList(educationalList.filter((_, index) => index !== indexToRemove));
   }
   const onSave=()=>{
-    setLoading(true)
-    const data={
-      data:{
-        education:educationalList.map(({ id, ...rest }) => rest)
-      }
-    }
-
-    GlobalApi.UpdateResumeDetail(params.resumeId,data).then(resp=>{
-      console.log(resp);
-      setLoading(false)
-      toast('Details updated !')
-      if (handleNext) handleNext();
-    },(error)=>{
-      setLoading(false);
-      toast('Server Error, Please try again!')
-    })
-
+    setLoading(true);
+    setTimeout(() => {
+        setLoading(false);
+        if (handleNext) handleNext();
+    }, 10);
   }
 
   useEffect(()=>{

@@ -1,5 +1,7 @@
 import { Document, Packer, Paragraph, TextRun, HeadingLevel, AlignmentType } from 'docx';
 import { saveAs } from 'file-saver';
+import { mapResumeInfoToTemplateData, validateTemplateData } from '@/lib/templateDataMapper';
+import { toast } from 'sonner';
 
 // Utility to parse basic HTML from Rich Text Editor to TextRuns
 const htmlToTextRuns = (htmlString) => {
@@ -28,6 +30,9 @@ const htmlToTextRuns = (htmlString) => {
 export const generateDocx = async (resumeInfo) => {
     if (!resumeInfo) return;
 
+    const mappedData = mapResumeInfoToTemplateData(resumeInfo);
+    validateTemplateData(mappedData);
+
     const doc = new Document({
         sections: [{
             properties: {},
@@ -37,7 +42,7 @@ export const generateDocx = async (resumeInfo) => {
                     alignment: AlignmentType.CENTER,
                     children: [
                         new TextRun({
-                            text: `${resumeInfo?.firstName || ''} ${resumeInfo?.lastName || ''}`,
+                            text: mappedData.personal_info.full_name || 'Your Name',
                             bold: true,
                             size: 32, // Half-points (16pt)
                         }),
@@ -47,7 +52,7 @@ export const generateDocx = async (resumeInfo) => {
                     alignment: AlignmentType.CENTER,
                     children: [
                         new TextRun({
-                            text: resumeInfo?.jobTitle || '',
+                            text: mappedData.personal_info.profession || '',
                             size: 24,
                             color: "666666",
                         }),
@@ -57,7 +62,7 @@ export const generateDocx = async (resumeInfo) => {
                     alignment: AlignmentType.CENTER,
                     children: [
                         new TextRun({
-                            text: [resumeInfo?.address, resumeInfo?.phone, resumeInfo?.email].filter(Boolean).join(' | '),
+                            text: [mappedData.personal_info.location, mappedData.personal_info.phone, mappedData.personal_info.email, mappedData.personal_info.linkedin].filter(Boolean).join(' | '),
                             size: 20,
                         }),
                     ],
@@ -65,60 +70,60 @@ export const generateDocx = async (resumeInfo) => {
                 }),
 
                 // Summary
-                ...(resumeInfo?.summery ? [
+                ...(mappedData.professional_summary ? [
                     new Paragraph({
                         heading: HeadingLevel.HEADING_2,
                         children: [new TextRun({ text: 'Professional Summary', color: resumeInfo?.themeColor?.replace('#','') || "000000" })],
                         spacing: { before: 200, after: 100 },
                     }),
                     new Paragraph({
-                        children: [new TextRun({ text: resumeInfo.summery })],
+                        children: [new TextRun({ text: mappedData.professional_summary })],
                     })
                 ] : []),
 
                 // Experience
-                ...(resumeInfo?.Experience?.length > 0 ? [
+                ...(mappedData.experience?.length > 0 ? [
                     new Paragraph({
                         heading: HeadingLevel.HEADING_2,
                         children: [new TextRun({ text: 'Experience', color: resumeInfo?.themeColor?.replace('#','') || "000000" })],
                         spacing: { before: 300, after: 100 },
                     }),
-                    ...resumeInfo.Experience.flatMap(exp => [
+                    ...mappedData.experience.flatMap(exp => [
                         new Paragraph({
                             children: [
-                                new TextRun({ text: exp.title, bold: true }),
-                                new TextRun({ text: ` | ${exp.companyName}`, italics: true }),
+                                new TextRun({ text: exp.position, bold: true }),
+                                new TextRun({ text: ` | ${exp.company}`, italics: true }),
                             ],
                             spacing: { before: 100 },
                         }),
                         new Paragraph({
                             children: [
-                                new TextRun({ text: `${exp.city}, ${exp.state} | ${exp.startDate} - ${exp.endDate || 'Present'}` }),
+                                new TextRun({ text: [exp.city, exp.state].filter(Boolean).join(', ') + ` | ${exp.start_date} - ${exp.is_current ? 'Present' : exp.end_date}` }),
                             ],
                         }),
                         new Paragraph({
-                            children: htmlToTextRuns(exp.workSummery),
+                            children: htmlToTextRuns(exp.description),
                         }),
                     ])
                 ] : []),
 
                 // Education
-                ...(resumeInfo?.education?.length > 0 ? [
+                ...(mappedData.education?.length > 0 ? [
                     new Paragraph({
                         heading: HeadingLevel.HEADING_2,
                         children: [new TextRun({ text: 'Education', color: resumeInfo?.themeColor?.replace('#','') || "000000" })],
                         spacing: { before: 300, after: 100 },
                     }),
-                    ...resumeInfo.education.flatMap(edu => [
+                    ...mappedData.education.flatMap(edu => [
                         new Paragraph({
                             children: [
-                                new TextRun({ text: edu.universityName, bold: true }),
+                                new TextRun({ text: edu.institution, bold: true }),
                             ],
                             spacing: { before: 100 },
                         }),
                         new Paragraph({
                             children: [
-                                new TextRun({ text: `${edu.degree} in ${edu.major} | ${edu.startDate} - ${edu.endDate}` }),
+                                new TextRun({ text: `${edu.degree} ${edu.field ? 'in ' + edu.field : ''} | ${edu.graduation_date}` }),
                             ],
                         }),
                         new Paragraph({
@@ -128,7 +133,7 @@ export const generateDocx = async (resumeInfo) => {
                 ] : []),
 
                 // Skills
-                ...(resumeInfo?.skills?.length > 0 ? [
+                ...(mappedData.skills?.length > 0 ? [
                     new Paragraph({
                         heading: HeadingLevel.HEADING_2,
                         children: [new TextRun({ text: 'Skills', color: resumeInfo?.themeColor?.replace('#','') || "000000" })],
@@ -136,7 +141,7 @@ export const generateDocx = async (resumeInfo) => {
                     }),
                     new Paragraph({
                         children: [
-                            new TextRun({ text: resumeInfo.skills.map(s => s.name).join(', ') })
+                            new TextRun({ text: mappedData.skills.join(', ') })
                         ],
                     })
                 ] : []),
@@ -144,6 +149,10 @@ export const generateDocx = async (resumeInfo) => {
         }],
     });
 
-    const blob = await Packer.toBlob(doc);
-    saveAs(blob, `${resumeInfo?.firstName || 'Resume'}_ATS.docx`);
+    try {
+        const blob = await Packer.toBlob(doc);
+        saveAs(blob, `${mappedData.personal_info.full_name || 'Resume'}_ATS.docx`);
+    } catch (error) {
+        toast.error('Failed to generate Word document. Please try again.');
+    }
 };

@@ -4,7 +4,6 @@ import { Input } from '@/components/ui/input'
 import { LoaderCircle, X, Sparkles, ArrowLeft, ArrowRight } from 'lucide-react'
 import { useDispatch, useSelector } from 'react-redux';
 import { setResumeData } from '@/store/resumeSlice';
-import GlobalApi from './../../../../../service/GlobalApi'
 import { useParams } from 'react-router-dom'
 import { toast } from 'sonner'
 import { handleFormKeyDown } from '@/lib/keyboard'
@@ -73,21 +72,10 @@ function Skills({handleNext, handlePrev}) {
 
     const onSave = () => {
         setLoading(true);
-        const data = {
-            data: {
-                skills: skillsList.map(({ id, ...rest }) => rest)
-            }
-        }
-
-        GlobalApi.UpdateResumeDetail(resumeId, data)
-        .then(resp => {
+        setTimeout(() => {
             setLoading(false);
-            toast.success('Skills updated!');
             if (handleNext) handleNext();
-        }).catch(error => {
-            setLoading(false);
-            toast.error('Server Error, Try again!');
-        });
+        }, 10);
     }
 
     useEffect(() => {
