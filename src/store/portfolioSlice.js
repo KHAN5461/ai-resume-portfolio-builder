@@ -95,9 +95,35 @@ export const portfolioSlice = createSlice({
         projectsSection: data.projectsSection || current.projectsSection || defaultPortfolioData.projectsSection,
         skillsSection: data.skillsSection || current.skillsSection || defaultPortfolioData.skillsSection,
       };
+    },
+    moveBlockUp: (state, action) => {
+      const { portfolioId, blockId } = action.payload;
+      const portfolio = state.portfolios[portfolioId];
+      if (portfolio && portfolio.siteConfig && portfolio.siteConfig.layout) {
+        const layout = portfolio.siteConfig.layout;
+        const index = layout.findIndex(b => b.id === blockId);
+        if (index > 0) {
+          const temp = layout[index];
+          layout[index] = layout[index - 1];
+          layout[index - 1] = temp;
+        }
+      }
+    },
+    moveBlockDown: (state, action) => {
+      const { portfolioId, blockId } = action.payload;
+      const portfolio = state.portfolios[portfolioId];
+      if (portfolio && portfolio.siteConfig && portfolio.siteConfig.layout) {
+        const layout = portfolio.siteConfig.layout;
+        const index = layout.findIndex(b => b.id === blockId);
+        if (index >= 0 && index < layout.length - 1) {
+          const temp = layout[index];
+          layout[index] = layout[index + 1];
+          layout[index + 1] = temp;
+        }
+      }
     }
   },
 });
 
-export const { createPortfolio, setCurrentPortfolio, updateHeroSection, updateAboutSection, updatePortfolioData } = portfolioSlice.actions;
+export const { createPortfolio, setCurrentPortfolio, updateHeroSection, updateAboutSection, updatePortfolioData, moveBlockUp, moveBlockDown } = portfolioSlice.actions;
 export default portfolioSlice.reducer;

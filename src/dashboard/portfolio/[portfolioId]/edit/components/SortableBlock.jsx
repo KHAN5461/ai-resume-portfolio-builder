@@ -1,9 +1,9 @@
 import React from 'react';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { GripVertical, Trash2 } from 'lucide-react';
+import { GripVertical, Trash2, ArrowUp, ArrowDown } from 'lucide-react';
 import { useDispatch } from 'react-redux';
-import { removeBlock } from '@/store/portfolioSlice';
+import { removeBlock, moveBlockUp, moveBlockDown } from '@/store/portfolioSlice';
 import { useParams } from 'react-router-dom';
 import HeroBlock from '@/components/blocks/HeroBlock';
 import ProjectsBlock from '@/components/blocks/ProjectsBlock';
@@ -65,7 +65,23 @@ const SortableBlock = ({ block, isActive, onClick }) => {
     >
       {/* Block Controls (Hover/Active) */}
       {(isActive || isDragging) && (
-        <div className="absolute top-2 right-2 bg-surface-container rounded-lg shadow-lg border border-outline-variant flex items-center p-1 z-10 gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+        <div className="absolute top-2 right-2 bg-surface-container rounded-lg shadow-lg border border-outline-variant flex items-center p-1 z-10 gap-1 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity">
+          {/* Mobile Reorder Buttons */}
+          <button
+            onClick={(e) => { e.stopPropagation(); dispatch(moveBlockUp({ portfolioId, blockId: block.id })); }}
+            className="md:hidden p-1.5 text-outline hover:text-stitch-primary hover:bg-surface-variant rounded"
+            title="Move up"
+          >
+            <ArrowUp size={16} />
+          </button>
+          <button
+            onClick={(e) => { e.stopPropagation(); dispatch(moveBlockDown({ portfolioId, blockId: block.id })); }}
+            className="md:hidden p-1.5 text-outline hover:text-stitch-primary hover:bg-surface-variant rounded"
+            title="Move down"
+          >
+            <ArrowDown size={16} />
+          </button>
+          
           <button 
             {...attributes} 
             {...listeners}

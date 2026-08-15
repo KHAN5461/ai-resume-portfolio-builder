@@ -30,7 +30,7 @@ export default function PortfolioPreview() {
   };
 
   return (
-    <div className='border-l pl-10 sticky top-10 h-screen overflow-y-auto'>
+    <div className='border-l pl-10 sticky top-10 h-screen overflow-y-auto overflow-x-hidden max-w-full'>
       <div 
         className="w-full min-h-screen relative origin-top-left shadow-lg overflow-x-hidden font-['Inter']" 
         style={{ backgroundColor: '#F4F6F8', color: '#2c3e50' }}

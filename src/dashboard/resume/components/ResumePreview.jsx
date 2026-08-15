@@ -33,9 +33,11 @@ const ResumePreview = React.memo(() => {
         <PreviewErrorBoundary>
             <div 
                 id="print-area" 
-                className={`shadow-lg h-full overflow-y-auto bg-gray-50 custom-scrollbar font-${(resumeInfo?.themeFont || 'sans').toLowerCase().replace(' ', '-')}`}
+                className={`shadow-lg h-full overflow-y-auto overflow-x-hidden max-w-full bg-gray-50 custom-scrollbar font-${(resumeInfo?.themeFont || 'sans').toLowerCase().replace(' ', '-')}`}
             >
-                {getTemplateComponent()}
+                <div className="max-md:scale-[0.5] max-sm:scale-[0.4] max-md:origin-top-left w-full">
+                    {getTemplateComponent()}
+                </div>
             </div>
         </PreviewErrorBoundary>
     )

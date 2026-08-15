@@ -16,9 +16,11 @@ import MagicImportModal from '../../components/MagicImportModal';
 import { AiCoPilot } from '../../components/AiCoPilot';
 import { Languages, Flame, MessageSquare } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
+import useScrollIntoViewOnFocus from '@/hooks/useScrollIntoViewOnFocus';
 
 function EditResume() {
     const {resumeId}=useParams();
+    useScrollIntoViewOnFocus();
     const dispatch = useDispatch();
     const resumeInfo = useSelector(state => state.resume.resumeData);
     const [activeTab, setActiveTab] = useState('Content');
