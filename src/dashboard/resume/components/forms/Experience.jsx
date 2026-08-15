@@ -3,7 +3,7 @@ import { Input } from '@/components/ui/input'
 import React, { useContext, useEffect, useState } from 'react'
 import RichTextEditor from '../RichTextEditor'
 import { useDispatch, useSelector } from 'react-redux';
-import { setResumeData } from '@/store/resumeSlice';
+import { updateProfileData } from '@/store/profileSlice';
 import { useParams } from 'react-router-dom'
 import { toast } from 'sonner'
 import { LoaderCircle, GripVertical, Trash2, Plus, ArrowLeft, ArrowRight, Briefcase } from 'lucide-react'
@@ -69,11 +69,7 @@ function Experience({handleNext, handlePrev}) {
     }
 
     useEffect(()=>{
-        dispatch(setResumeData({
-            ...resumeInfo,
-            Experience:experinceList
-        }));
-     
+        dispatch(updateProfileData({ workExperience: experinceList }));
     },[experinceList]);
 
 

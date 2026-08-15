@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { LoaderCircle, X, Sparkles, ArrowLeft, ArrowRight } from 'lucide-react'
 import { useDispatch, useSelector } from 'react-redux';
-import { setResumeData } from '@/store/resumeSlice';
+import { updateProfileData } from '@/store/profileSlice';
 import { useParams } from 'react-router-dom'
 import { toast } from 'sonner'
 import { handleFormKeyDown } from '@/lib/keyboard'
@@ -79,10 +79,7 @@ function Skills({handleNext, handlePrev}) {
     }
 
     useEffect(() => {
-        dispatch(setResumeData({
-            ...resumeInfo,
-            skills: skillsList
-        }));
+        dispatch(updateProfileData({ skills: skillsList }));
     }, [skillsList]);
 
     return (

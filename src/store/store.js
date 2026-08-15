@@ -2,6 +2,7 @@ import { configureStore } from '@reduxjs/toolkit';
 import undoable from 'redux-undo';
 import resumeReducer from './resumeSlice';
 import portfolioReducer from './portfolioSlice';
+import profileReducer from './profileSlice';
 import syncReducer from './syncSlice';
 import loadingReducer from './loadingSlice';
 import { syncMiddleware } from './syncMiddleware';
@@ -27,6 +28,7 @@ export const store = configureStore({
   reducer: {
     resume: undoable(resumeReducer, { limit: 50 }),
     portfolio: undoable(portfolioReducer, { limit: 50 }),
+    profile: undoable(profileReducer, { limit: 50 }),
     sync: syncReducer,
     loading: loadingReducer,
   },

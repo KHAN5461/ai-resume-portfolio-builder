@@ -1,7 +1,7 @@
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { useDispatch, useSelector } from 'react-redux';
-import { setResumeData } from '@/store/resumeSlice';
+import { updatePersonalInfo } from '@/store/profileSlice';
 import { LoaderCircle, ArrowLeft, ArrowRight } from 'lucide-react';
 import React, { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom';
@@ -33,9 +33,7 @@ function PersonalDetail({enabledNext, handleNext, handlePrev}) {
     // Debounced sync to Redux
     useEffect(() => {
         const timer = setTimeout(() => {
-            if (formData && Object.keys(formData).length > 0) {
-                dispatch(setResumeData(formData));
-            }
+                dispatch(updatePersonalInfo(formData));
         }, 500);
         return () => clearTimeout(timer); // Cleanup memory leak
     }, [formData, dispatch]);
@@ -43,7 +41,7 @@ function PersonalDetail({enabledNext, handleNext, handlePrev}) {
     const onSave=(e)=>{
         e.preventDefault();
         setLoading(true);
-        dispatch(setResumeData(formData));
+        dispatch(updatePersonalInfo(formData));
         setTimeout(() => {
             setLoading(false);
             enabledNext(true);

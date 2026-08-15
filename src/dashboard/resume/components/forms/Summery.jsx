@@ -1,7 +1,7 @@
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
 import { useDispatch, useSelector } from 'react-redux';
-import { setResumeData } from '@/store/resumeSlice';
+import { updatePersonalInfo } from '@/store/profileSlice';
 import React, { useContext, useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom';
 import GlobalApi from './../../../../../service/GlobalApi';
@@ -20,10 +20,7 @@ function Summery({enabledNext, handleNext, handlePrev}) {
     const [aiGeneratedSummeryList,setAiGenerateSummeryList]=useState();
     useEffect(()=>{
         if (summery) {
-            dispatch(setResumeData({
-                ...resumeInfo,
-                summery:summery
-            }));
+            dispatch(updatePersonalInfo({ summery }));
         }
     },[summery])
 
@@ -41,10 +38,7 @@ function Summery({enabledNext, handleNext, handlePrev}) {
     const onSave=(e)=>{
         e.preventDefault();
         setLoading(true);
-        dispatch(setResumeData({
-            ...resumeInfo,
-            summery:summery
-        }));
+        dispatch(updatePersonalInfo({ summery }));
         setTimeout(() => {
             setLoading(false);
             enabledNext(true);

@@ -7,8 +7,7 @@ import MinimalTemplate from './templates/MinimalTemplate';
 import MinimalImageTemplate from './templates/MinimalImageTemplate';
 import { mapResumeInfoToTemplateData } from '@/lib/templateDataMapper';
 
-const ResumePreview = React.memo(() => {
-    const resumeInfo = useSelector(state => state.resume.present.resumeData);
+const ResumePreview = React.memo(({ resumeInfo }) => {
     const templateData = mapResumeInfoToTemplateData(resumeInfo);
 
     // Get the accent color, defaulting to a basic color if none is chosen

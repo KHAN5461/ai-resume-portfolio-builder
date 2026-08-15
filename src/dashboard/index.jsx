@@ -22,18 +22,10 @@ function Dashboard() {
   const [resumeList,setResumeList]=useState([]);
   const [portfolioList, setPortfolioList] = useState([]);
   const [filter, setFilter] = useState('All'); // 'All' | 'Resumes' | 'Portfolios'
-  const [selectedFolder, setSelectedFolder] = useState('All Drafts');
   const [searchTerm, setSearchTerm] = useState('');
   const [sortBy, setSortBy] = useState('updated'); // 'updated' | 'alphabetical'
   const [isLoadingResumes, setIsLoadingResumes] = useState(true);
   const [isLoadingPortfolios, setIsLoadingPortfolios] = useState(true);
-
-  const folders = [
-    { id: 'all', name: 'All Drafts', count: resumeList.length },
-    { id: '1', name: 'Tech Roles', count: 2 },
-    { id: '2', name: 'Design Roles', count: 1 },
-    { id: '3', name: 'Archived', count: 0 },
-  ];
 
   useEffect(()=>{
     if(user) {
@@ -246,37 +238,8 @@ function Dashboard() {
             )} />
           </section>
 
-          {/* Document Grid Section with Folders */}
-          <section className="flex gap-8 w-full mt-8 border-t border-outline-variant/30 pt-8">
-            {/* Folders Sidebar */}
-            <div className="w-64 flex-shrink-0 flex flex-col gap-6">
-                <div>
-                    <div className="flex justify-between items-center mb-4">
-                        <h2 className="font-headline-sm font-bold text-on-surface">Folders</h2>
-                        <button className="text-on-surface-variant hover:text-stitch-primary hover:bg-stitch-primary/10 p-1.5 rounded-full transition-colors">
-                            <Plus className="w-4 h-4" />
-                        </button>
-                    </div>
-                    <div className="flex flex-col gap-1">
-                        {folders.map(folder => (
-                            <button 
-                                key={folder.id}
-                                onClick={() => setSelectedFolder(folder.name)}
-                                className={`flex items-center justify-between p-3 rounded-xl text-left transition-colors ${selectedFolder === folder.name ? 'bg-stitch-primary/10 text-stitch-primary font-bold' : 'text-on-surface-variant hover:bg-surface-variant'}`}
-                            >
-                                <div className="flex items-center gap-3">
-                                    {selectedFolder === folder.name ? <FolderOpen className="w-4 h-4" /> : <Folder className="w-4 h-4" />}
-                                    <span className="font-label-md">{folder.name}</span>
-                                </div>
-                                <span className={`text-xs ${selectedFolder === folder.name ? 'text-stitch-primary' : 'text-outline-variant'} font-medium px-2 py-0.5 rounded-full bg-surface-container-highest`}>
-                                    {folder.count}
-                                </span>
-                            </button>
-                        ))}
-                    </div>
-                </div>
-            </div>
-
+          {/* Document Grid Section */}
+          <section className="flex gap-8 w-full mt-8">
             {/* Main Documents Area */}
             <div className="flex-1 w-full flex flex-col gap-lg">
 
@@ -325,7 +288,7 @@ function Dashboard() {
 
               {/* Filters and Search */}
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-md mt-4">
-              <h2 className="font-headline-md text-[24px] font-bold text-on-surface">{selectedFolder}</h2>
+              <h2 className="font-headline-md text-[24px] font-bold text-on-surface">All Drafts</h2>
               <div className="flex p-1 bg-surface-container-low rounded-lg w-full sm:w-auto">
                 <button onClick={() => setFilter('All')} className={`flex-1 sm:flex-none px-4 py-2 rounded-md font-label-md text-[14px] transition-all ${filter === 'All' ? 'bg-surface shadow-sm text-stitch-primary' : 'text-on-surface-variant hover:text-on-surface'}`}>All</button>
                 <button onClick={() => setFilter('Resumes')} className={`flex-1 sm:flex-none px-4 py-2 rounded-md font-label-md text-[14px] transition-all ${filter === 'Resumes' ? 'bg-surface shadow-sm text-stitch-primary' : 'text-on-surface-variant hover:text-on-surface'}`}>Resumes</button>

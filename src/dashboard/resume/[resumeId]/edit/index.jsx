@@ -27,7 +27,7 @@ function EditResume() {
     useScrollIntoViewOnFocus();
     useUndoRedoKeyboard();
     const dispatch = useDispatch();
-    const resumeInfo = useSelector(state => state.resume.present.resumeData);
+    const resumeInfo = { ...useSelector(s => s.resume.present.resumeData), ...useSelector(s => s.profile.present) };
     const pastStates = useSelector(state => state.resume.past);
     const futureStates = useSelector(state => state.resume.future);
     const [activeTab, setActiveTab] = useState('Content');
@@ -359,7 +359,7 @@ function EditResume() {
                         className={`bg-white w-[210mm] min-h-[297mm] shadow-[0_20px_60px_-15px_rgba(0,0,0,0.1)] ring-1 ring-black/5 flex-shrink-0 mt-4 break-words transition-all duration-300 origin-top`}
                         style={{ transform: `scale(${viewport === 'mobile' ? zoom * 0.5 : zoom})`, marginBottom: `${(zoom - 1) * 297}mm` }}
                     >
-                        <ResumePreview />
+                        <ResumePreview resumeInfo={resumeInfo} />
                     </div>
                   )}
               </div>

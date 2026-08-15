@@ -2,7 +2,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { useDispatch, useSelector } from 'react-redux';
-import { setResumeData } from '@/store/resumeSlice';
+import { updateProfileData } from '@/store/profileSlice';
 import { LoaderCircle, GripVertical, Trash2, ArrowLeft, ArrowRight, GraduationCap } from 'lucide-react'
 import React, { useContext, useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
@@ -67,10 +67,7 @@ function Education({handleNext, handlePrev}) {
   }
 
   useEffect(()=>{
-    dispatch(setResumeData({
-      ...resumeInfo,
-      education:educationalList
-    }));
+    dispatch(updateProfileData({ education: educationalList }));
   },[educationalList])
 
   const onDragEnd = (result) => {
