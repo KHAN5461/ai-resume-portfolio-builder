@@ -15,6 +15,9 @@ function Header() {
             </Link>
             {isSignedIn ?
                 <div className='flex gap-4 items-center'>
+                    <div className="hidden md:flex items-center" title="Open Command Palette">
+                        <kbd className="hidden md:inline-flex items-center gap-1 bg-surface-variant/50 text-on-surface-variant text-[10px] px-1.5 py-0.5 rounded font-mono border border-outline-variant/30">Ctrl+K</kbd>
+                    </div>
                     <Link to={'/dashboard'}>
                         <Button variant="outline" className="border-outline-variant text-on-surface hover:bg-surface-variant rounded-full px-6 font-medium text-[15px] shadow-sm hover:shadow-md transition-all duration-300 hover:-translate-y-0.5">Dashboard</Button>
                     </Link>

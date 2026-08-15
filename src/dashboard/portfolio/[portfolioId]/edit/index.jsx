@@ -149,12 +149,14 @@ export default function EditPortfolio() {
       className="bg-background text-on-background font-body-md h-[100dvh] w-screen overflow-hidden flex flex-col"
     >
         {/* Top Toolbar */}
-        <header className="bg-surface-container-lowest border-b border-outline-variant/30 px-gutter h-16 flex items-center justify-between shrink-0 shadow-sm z-20 relative">
+        <header className="bg-surface-container-lowest border-b border-t-4 border-t-purple-500 border-outline-variant/30 px-gutter h-16 flex items-center justify-between shrink-0 shadow-sm z-20 relative">
           <div className="flex items-center gap-sm">
             <Link to="/dashboard" className="flex items-center gap-sm hover:opacity-80 transition-opacity">
               <span className="material-symbols-outlined text-stitch-primary font-headline-md text-[24px]" style={{fontVariationSettings: "'FILL' 1"}} translate="no">auto_awesome</span>
               <span className="font-headline-md text-[24px] font-bold text-stitch-primary">Sparkfolio</span>
             </Link>
+            <span className="text-outline-variant mx-2">/</span>
+            <span className="font-semibold text-purple-600 text-sm">Portfolio Editor</span>
             <AnimatePresence mode="wait">
               {isSaving ? (
                 <motion.div 

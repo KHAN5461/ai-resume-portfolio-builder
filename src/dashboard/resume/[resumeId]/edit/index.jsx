@@ -75,12 +75,14 @@ function EditResume() {
         className="bg-background text-on-background font-body-md h-[100dvh] w-screen overflow-hidden flex flex-col"
       >
         {/* Top Toolbar */}
-        <header className="bg-surface/70 backdrop-blur-md border-b border-white/20 dark:border-white/10 px-gutter h-16 flex items-center justify-between shrink-0 shadow-sm z-20 relative">
+        <header className="bg-surface/70 backdrop-blur-md border-b border-t-4 border-t-stitch-primary border-white/20 dark:border-white/10 px-gutter h-16 flex items-center justify-between shrink-0 shadow-sm z-20 relative">
           <div className="flex items-center gap-sm">
             <Link to="/dashboard" className="flex items-center gap-sm hover:opacity-80 transition-opacity">
               <span className="material-symbols-outlined text-stitch-primary font-headline-md text-[24px]" style={{fontVariationSettings: "'FILL' 1"}}>auto_awesome</span>
               <span className="font-headline-md text-[24px] font-bold text-stitch-primary">Sparkfolio</span>
             </Link>
+            <span className="text-outline-variant mx-2">/</span>
+            <span className="font-semibold text-stitch-primary text-sm">Resume Editor</span>
             
             <div className="hidden md:flex items-center gap-4 ml-8">
               <span className="px-2 py-1 bg-surface-container-highest rounded-md font-label-sm text-[12px] text-on-surface-variant flex items-center gap-xs">

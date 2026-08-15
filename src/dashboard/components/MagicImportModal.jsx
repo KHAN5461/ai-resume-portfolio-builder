@@ -66,6 +66,8 @@ Here is the raw text to parse:
 function MagicImportModal({ renderTrigger }) {
   const [openDialog, setOpenDialog] = useState(false);
   const [rawText, setRawText] = useState("");
+  const [step, setStep] = useState('input'); // 'input' | 'preview'
+  const [parsedData, setParsedData] = useState(null);
   const { user } = useUser();
   const [loading, setLoading] = useState(false);
   const navigation = useNavigate();
@@ -83,8 +85,20 @@ function MagicImportModal({ renderTrigger }) {
       // Clean up response if it contains markdown code blocks
       responseText = responseText.replace(/```json/g, '').replace(/```/g, '').trim();
       
-      const parsedData = JSON.parse(responseText);
+      const data = JSON.parse(responseText);
+      setParsedData(data);
+      setStep('preview');
+    } catch (e) {
+      console.error(e);
+      toast.error("Failed to parse text. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
+  const handleConfirmAndCreate = async () => {
+    setLoading(true);
+    try {
       // 2. Create in Strapi DB
       const uuid = uuidv4();
       const payload = {
@@ -112,13 +126,14 @@ function MagicImportModal({ renderTrigger }) {
       if (resp && resp.data.data.documentId) {
         toast.success("Magic Import successful!");
         setOpenDialog(false);
+        setStep('input');
+        setRawText("");
+        setParsedData(null);
         navigation('/dashboard/resume/' + resp.data.data.documentId + "/edit");
-        
-
       }
     } catch (e) {
       console.error(e);
-      toast.error("Failed to parse text. Please try again.");
+      toast.error("Failed to create resume. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -145,44 +160,97 @@ function MagicImportModal({ renderTrigger }) {
           </DialogHeader>
           
           <div className="p-6">
-            {/* Tabs */}
-            <div className="flex gap-2 mb-6 border-b border-outline-variant/20 pb-2">
-              <button className="px-4 py-2 font-label-md text-stitch-primary border-b-2 border-stitch-primary transition-colors flex items-center gap-2">
-                <span className="material-symbols-outlined text-[18px]">content_paste</span>
-                Paste Text
-              </button>
-              <button className="px-4 py-2 font-label-md text-on-surface-variant hover:text-on-surface transition-colors flex items-center gap-2 opacity-50 cursor-not-allowed" title="Coming soon">
-                <span className="material-symbols-outlined text-[18px]">link</span>
-                LinkedIn URL
-              </button>
-              <button className="px-4 py-2 font-label-md text-on-surface-variant hover:text-on-surface transition-colors flex items-center gap-2 opacity-50 cursor-not-allowed" title="Coming soon">
-                <span className="material-symbols-outlined text-[18px]">upload_file</span>
-                Upload PDF
-              </button>
-            </div>
+            {step === 'input' ? (
+              <>
+                {/* Tabs */}
+                <div className="flex gap-2 mb-6 border-b border-outline-variant/20 pb-2">
+                  <button className="px-4 py-2 font-label-md text-stitch-primary border-b-2 border-stitch-primary transition-colors flex items-center gap-2">
+                    <span className="material-symbols-outlined text-[18px]">content_paste</span>
+                    Paste Text
+                  </button>
+                  <button className="px-4 py-2 font-label-md text-on-surface-variant hover:text-on-surface transition-colors flex items-center gap-2 opacity-50 cursor-not-allowed" title="Coming soon">
+                    <span className="material-symbols-outlined text-[18px]">link</span>
+                    LinkedIn URL
+                  </button>
+                  <button className="px-4 py-2 font-label-md text-on-surface-variant hover:text-on-surface transition-colors flex items-center gap-2 opacity-50 cursor-not-allowed" title="Coming soon">
+                    <span className="material-symbols-outlined text-[18px]">upload_file</span>
+                    Upload PDF
+                  </button>
+                </div>
 
-            <div className="my-4">
-              <textarea
-                value={rawText}
-                onChange={(e) => setRawText(e.target.value)}
-                className="w-full h-[250px] p-4 bg-surface text-on-surface border border-outline-variant/30 rounded-xl focus:ring-2 focus:ring-stitch-primary/50 focus:border-stitch-primary outline-none resize-none custom-scrollbar font-body-sm shadow-inner transition-all placeholder:text-outline"
-                placeholder="Paste your raw LinkedIn dump, old resume text, or bio here..."
-              />
-            </div>
+                <div className="my-4">
+                  <textarea
+                    value={rawText}
+                    onChange={(e) => setRawText(e.target.value)}
+                    className="w-full h-[250px] p-4 bg-surface text-on-surface border border-outline-variant/30 rounded-xl focus:ring-2 focus:ring-stitch-primary/50 focus:border-stitch-primary outline-none resize-none custom-scrollbar font-body-sm shadow-inner transition-all placeholder:text-outline"
+                    placeholder="Paste your raw LinkedIn dump, old resume text, or bio here..."
+                  />
+                </div>
 
-            <div className="flex justify-end gap-3 mt-6">
-              <Button onClick={() => setOpenDialog(false)} variant="ghost" className="rounded-full text-on-surface-variant hover:bg-surface-variant">Cancel</Button>
-              <div className="relative group">
-                <div className={`absolute -inset-1 rounded-full bg-gradient-to-r from-stitch-primary to-purple-600 blur opacity-75 group-hover:opacity-100 transition duration-1000 group-hover:duration-200 animate-pulse ${loading || !rawText ? 'hidden' : ''}`}></div>
-                <Button 
-                  disabled={!rawText || loading}
-                  onClick={handleImport}
-                  className="relative bg-stitch-primary hover:bg-stitch-primary/90 text-white rounded-full flex items-center gap-2 px-8 h-10 shadow-md transition-all active:scale-95"
-                >
-                  {loading ? <Loader2 className='animate-spin' /> : <><Wand2 size={16} /> Extract & Generate</>}
-                </Button>
-              </div>
-            </div>
+                <div className="flex justify-end gap-3 mt-6">
+                  <Button onClick={() => setOpenDialog(false)} variant="ghost" className="rounded-full text-on-surface-variant hover:bg-surface-variant">Cancel</Button>
+                  <div className="relative group">
+                    <div className={`absolute -inset-1 rounded-full bg-gradient-to-r from-stitch-primary to-purple-600 blur opacity-75 group-hover:opacity-100 transition duration-1000 group-hover:duration-200 animate-pulse ${loading || !rawText ? 'hidden' : ''}`}></div>
+                    <Button 
+                      disabled={!rawText || loading}
+                      onClick={handleImport}
+                      className="relative bg-stitch-primary hover:bg-stitch-primary/90 text-white rounded-full flex items-center gap-2 px-8 h-10 shadow-md transition-all active:scale-95"
+                    >
+                      {loading ? <Loader2 className='animate-spin' /> : <><Wand2 size={16} /> Extract & Generate</>}
+                    </Button>
+                  </div>
+                </div>
+              </>
+            ) : (
+              <>
+                <div className="mb-6">
+                  <h3 className="text-lg font-semibold text-on-surface mb-4">Extraction Summary</h3>
+                  <div className="space-y-4">
+                    <div className="p-4 bg-surface rounded-xl border border-outline-variant/30 flex items-center gap-4">
+                       <div className="w-12 h-12 flex items-center justify-center bg-stitch-primary/10 text-stitch-primary rounded-full">
+                          <span className="material-symbols-outlined text-2xl">person</span>
+                       </div>
+                       <div>
+                         <p className="text-sm text-on-surface-variant">Personal Info</p>
+                         <p className="font-medium text-on-surface">
+                           {parsedData?.firstName || ''} {parsedData?.lastName || ''} 
+                           {parsedData?.jobTitle ? ` - ${parsedData?.jobTitle}` : ''}
+                         </p>
+                         {(parsedData?.email || parsedData?.phone) && (
+                            <p className="text-xs text-on-surface-variant mt-0.5">
+                              {parsedData?.email || ''} {parsedData?.phone ? `• ${parsedData?.phone}` : ''}
+                            </p>
+                         )}
+                       </div>
+                    </div>
+                    <div className="grid grid-cols-3 gap-4">
+                      <div className="p-4 bg-surface rounded-xl border border-outline-variant/30 text-center">
+                        <p className="text-2xl font-bold text-stitch-primary">{parsedData?.experience?.length || 0}</p>
+                        <p className="text-xs text-on-surface-variant uppercase tracking-wider font-semibold mt-1">Experience</p>
+                      </div>
+                      <div className="p-4 bg-surface rounded-xl border border-outline-variant/30 text-center">
+                        <p className="text-2xl font-bold text-stitch-primary">{parsedData?.education?.length || 0}</p>
+                        <p className="text-xs text-on-surface-variant uppercase tracking-wider font-semibold mt-1">Education</p>
+                      </div>
+                      <div className="p-4 bg-surface rounded-xl border border-outline-variant/30 text-center">
+                        <p className="text-2xl font-bold text-stitch-primary">{parsedData?.skills?.length || 0}</p>
+                        <p className="text-xs text-on-surface-variant uppercase tracking-wider font-semibold mt-1">Skills</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div className="flex justify-end gap-3 mt-6">
+                  <Button onClick={() => setStep('input')} variant="ghost" className="rounded-full text-on-surface-variant hover:bg-surface-variant">Retry with edits</Button>
+                  <Button 
+                    disabled={loading}
+                    onClick={handleConfirmAndCreate}
+                    className="relative bg-stitch-primary hover:bg-stitch-primary/90 text-white rounded-full flex items-center gap-2 px-8 h-10 shadow-md transition-all active:scale-95"
+                  >
+                    {loading ? <Loader2 className='animate-spin' /> : 'Confirm & Create'}
+                  </Button>
+                </div>
+              </>
+            )}
           </div>
         </DialogContent>
       </Dialog>

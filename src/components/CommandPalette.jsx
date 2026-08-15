@@ -2,11 +2,23 @@ import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Search, FileText, Settings, Palette, Zap } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { toast } from 'sonner';
 
 export function CommandPalette() {
   const [isOpen, setIsOpen] = useState(false);
   const [search, setSearch] = useState('');
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const hasSeen = localStorage.getItem('hasSeenCommandPalette');
+    if (!hasSeen) {
+      const timer = setTimeout(() => {
+        toast("💡 Pro tip: Press Ctrl+K to open the quick command palette");
+        localStorage.setItem('hasSeenCommandPalette', 'true');
+      }, 3000);
+      return () => clearTimeout(timer);
+    }
+  }, []);
 
   useEffect(() => {
     const down = (e) => {
