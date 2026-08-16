@@ -4,8 +4,11 @@ import { useDispatch, useSelector } from 'react-redux';
 import { setCurrentPortfolio } from '@/store/portfolioSlice';
 import { ActionCreators } from 'redux-undo';
 import useUndoRedoKeyboard from '@/hooks/useUndoRedoKeyboard';
-import PortfolioFormSection from '../../components/PortfolioFormSection';
-import PortfolioPreview from '../../components/PortfolioPreview';
+import BlockPalette from '../../components/BlockPalette';
+import CanvasArea from '../../components/CanvasArea';
+import PropertiesPanel from '../../components/PropertiesPanel';
+import LeftSidebar from '../../components/LeftSidebar';
+import { updatePortfolioData } from '@/store/portfolioSlice';
 import GlobalApi from './../../../../../service/GlobalApi';
 import { toast } from 'sonner';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -18,7 +21,8 @@ import { calculateSeoScore } from '@/lib/seoScorer';
 import { Skeleton } from '@/components/ui/skeleton';
 import ResponsiveBreadcrumbs from '@/components/custom/ResponsiveBreadcrumbs';
 import useHideOnScroll from '@/hooks/useHideOnScroll';
-import { Undo2, Redo2 } from 'lucide-react';
+import { Undo2, Redo2, Bot, Settings2, Monitor, Tablet, Smartphone } from 'lucide-react';
+import GlobalEditorToolbar from '@/components/custom/GlobalEditorToolbar';
 
 export default function EditPortfolio() {
   const { portfolioId } = useParams();
@@ -37,6 +41,9 @@ export default function EditPortfolio() {
   const [isSeoModalOpen, setIsSeoModalOpen] = useState(false);
   const [isDeployModalOpen, setIsDeployModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [activeBlockId, setActiveBlockId] = useState('hero');
+  const [isLeftPanelOpen, setIsLeftPanelOpen] = useState(true);
+  const [isPropertiesPanelOpen, setIsPropertiesPanelOpen] = useState(true);
 
   const scrollRef = React.useRef(null);
   const isVisible = useHideOnScroll(scrollRef);
@@ -162,43 +169,12 @@ export default function EditPortfolio() {
       className="bg-background text-on-background font-body-md h-[100dvh] w-screen overflow-hidden flex flex-col"
     >
         {/* Top Toolbar */}
-        <header 
-          className="bg-surface-container-lowest border-b border-t-4 border-t-purple-500 border-outline-variant/30 px-gutter h-16 flex items-center justify-between shrink-0 shadow-sm z-20 relative transition-transform duration-300"
-          style={{ transform: isVisible ? 'translateY(0)' : 'translateY(-100%)' }}
+        <GlobalEditorToolbar 
+          view={view}
+          setView={setView}
+          mode="portfolio"
+          title={`Portfolio Editor`}
         >
-          <div className="flex items-center gap-sm">
-            <Link to="/dashboard" className="flex items-center gap-sm hover:opacity-80 transition-opacity">
-              <span className="material-symbols-outlined text-stitch-primary font-headline-md text-[24px]" style={{fontVariationSettings: "'FILL' 1"}} translate="no">auto_awesome</span>
-              <span className="font-headline-md text-[24px] font-bold text-stitch-primary">Sparkfolio</span>
-            </Link>
-            <div className="mx-2 flex items-center">
-              <ResponsiveBreadcrumbs paths={[{label: 'Dashboard', href: '/dashboard'}, {label: 'Portfolio Editor', href: '#'}]} />
-            </div>
-            <AnimatePresence mode="wait">
-              {isSaving ? (
-                <motion.div 
-                  key="saving"
-                  initial={{ opacity: 0, y: -10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: 10 }}
-                  className="ml-sm px-3 py-1.5 bg-primary-container text-on-primary-container rounded-full font-label-sm flex items-center gap-2 shadow-sm"
-                >
-                  <span className="material-symbols-outlined text-[14px] animate-spin" translate="no">sync</span> Saving...
-                </motion.div>
-              ) : (
-                <motion.div 
-                  key="saved"
-                  initial={{ opacity: 0, y: -10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: 10 }}
-                  className="ml-sm px-3 py-1.5 bg-surface-container-highest text-on-surface-variant rounded-full font-label-sm flex items-center gap-2 shadow-sm"
-                >
-                  <span className="material-symbols-outlined text-[14px] text-[#34A853]" translate="no">check_circle</span> Saved
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </div>
-          <div className="flex items-center gap-md">
             {/* Undo / Redo Buttons */}
             <div className="flex items-center gap-1 border-r border-outline-variant/30 pr-2 md:pr-4 mr-1 md:mr-2">
               <button
@@ -218,6 +194,29 @@ export default function EditPortfolio() {
                 <Redo2 className="w-5 h-5 group-hover:translate-x-0.5 transition-transform" />
               </button>
             </div>
+
+            {/* Left Panel Toggle */}
+            {!isLeftPanelOpen && (
+              <button 
+                onClick={() => setIsLeftPanelOpen(true)} 
+                className="hidden md:flex items-center gap-2 h-10 px-3 bg-indigo-50 text-indigo-600 rounded-lg font-label-md text-[14px] hover:bg-indigo-100 transition-colors shadow-sm cursor-pointer"
+              >
+                <Bot className="w-4 h-4" />
+                Sidebar
+              </button>
+            )}
+
+            {/* Properties Panel Toggle */}
+            {!isPropertiesPanelOpen && (
+              <button 
+                onClick={() => setIsPropertiesPanelOpen(true)} 
+                className="hidden md:flex items-center gap-2 h-10 px-3 bg-surface-container-high text-on-surface-variant border border-outline-variant/30 rounded-lg font-label-md text-[14px] hover:bg-surface-variant transition-colors shadow-sm cursor-pointer"
+              >
+                <Settings2 className="w-4 h-4" />
+                Properties
+              </button>
+            )}
+
             {/* SEO Settings Button */}
             <button 
               onClick={() => setIsSeoModalOpen(true)}
@@ -258,23 +257,7 @@ export default function EditPortfolio() {
               <span className="material-symbols-outlined text-[18px]">auto_awesome_mosaic</span>
               Optimize Layout
             </button>
-            {/* Viewport Switcher */}
-            <div className="hidden md:flex bg-surface-container-low rounded-lg p-xs">
-              <button 
-                aria-label="Desktop preview"
-                onClick={() => setPreviewMode('desktop')}
-                className={`p-2 rounded-md transition-colors flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-stitch-primary ${previewMode === 'desktop' ? 'bg-surface shadow-sm text-stitch-primary' : 'text-on-surface-variant hover:text-stitch-primary'}`}
-              >
-                <span className="material-symbols-outlined text-[20px]">desktop_mac</span>
-              </button>
-              <button 
-                aria-label="Mobile preview"
-                onClick={() => setPreviewMode('mobile')}
-                className={`p-2 rounded-md transition-colors flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-stitch-primary ${previewMode === 'mobile' ? 'bg-surface shadow-sm text-stitch-primary' : 'text-on-surface-variant hover:text-stitch-primary'}`}
-              >
-                <span className="material-symbols-outlined text-[20px]">smartphone</span>
-              </button>
-            </div>
+
             {/* SEO Score Button */}
             <button 
               className="h-10 px-4 rounded-lg font-label-md text-[14px] shadow-sm flex items-center gap-2"
@@ -291,8 +274,7 @@ export default function EditPortfolio() {
               <span className="material-symbols-outlined text-[18px]">rocket_launch</span>
               Publish
             </button>
-          </div>
-        </header>
+        </GlobalEditorToolbar>
 
         {/* Pill Tab Switcher (Mobile Only) */}
         <div className="md:hidden w-full bg-surface py-2 px-4 flex justify-center z-40 border-b border-outline-variant/30 shrink-0">
@@ -319,26 +301,29 @@ export default function EditPortfolio() {
         </div>
 
         {/* Workspace Area */}
-        <main className="flex-1 flex overflow-hidden bg-surface-container-low relative">
+        <main className="flex-1 flex overflow-hidden bg-surface-container-low relative pt-14 md:pt-16">
           
-          {/* Left Sidebar: Content Editor (Visible on desktop, or on mobile when 'builder' is selected) */}
-          <aside className={`w-full md:w-[420px] shrink-0 bg-surface-container-lowest border-r border-outline-variant/30 h-full overflow-y-auto flex-col z-10 shadow-[4px_0px_24px_rgba(0,0,0,0.02)] ${view === 'builder' ? 'flex' : 'hidden md:flex'}`}>
-            <div ref={scrollRef} className="p-4 flex flex-col flex-1 pb-24 overflow-y-auto custom-scrollbar">
-                {isLoading ? (
-                  <div className="flex flex-col gap-4">
-                    <Skeleton className="h-10 w-full" />
-                    <Skeleton className="h-[200px] w-full" />
-                    <Skeleton className="h-[300px] w-full" />
-                  </div>
-                ) : (
-                  <PortfolioFormSection />
-                )}
-            </div>
-          </aside>
+          {/* 1. Left Sidebar (Tabbed: Sections | AI) */}
+          {!isLoading && <LeftSidebar activeBlockId={activeBlockId} setActiveBlockId={setActiveBlockId} isOpen={isLeftPanelOpen} onToggle={() => setIsLeftPanelOpen(!isLeftPanelOpen)} />}
 
-          {/* Right Preview Canvas (Visible on desktop, or on mobile when 'preview' is selected) */}
-          <section className={`h-full flex-1 overflow-hidden flex-col bg-surface-container p-0 md:p-6 relative ${view === 'preview' ? 'flex' : 'hidden md:flex'} items-center justify-center`}>
-            <div className={`transition-all duration-500 ease-in-out flex flex-col bg-surface-container-lowest md:rounded-xl md:shadow-lg overflow-hidden md:border border-outline-variant/20 relative ${previewMode === 'mobile' ? 'w-[375px] h-[812px] rounded-[2rem] border-[8px] border-surface-container-highest shadow-2xl' : 'w-full h-full'}`}>
+          {/* 2. Center Preview Canvas */}
+          <section className={`h-full flex-1 overflow-hidden flex-col bg-surface-container p-0 md:p-6 relative items-center justify-center`}>
+            
+            {/* Device Switcher (Top Center of Canvas) */}
+            <div className="hidden md:flex absolute top-4 left-1/2 -translate-x-1/2 z-50 bg-white/90 dark:bg-slate-800/90 backdrop-blur-md shadow-sm border border-gray-200 dark:border-slate-700 rounded-full p-1 gap-1">
+              <button onClick={() => setPreviewMode('mobile')} className={`p-1.5 rounded-full transition-all ${previewMode === 'mobile' ? 'bg-gray-100 dark:bg-slate-700 text-indigo-600 dark:text-indigo-400' : 'text-gray-500 hover:text-gray-800 dark:hover:text-gray-200'}`} title="Mobile View"><Smartphone className="w-4 h-4" /></button>
+              <button onClick={() => setPreviewMode('tablet')} className={`p-1.5 rounded-full transition-all ${previewMode === 'tablet' ? 'bg-gray-100 dark:bg-slate-700 text-indigo-600 dark:text-indigo-400' : 'text-gray-500 hover:text-gray-800 dark:hover:text-gray-200'}`} title="Tablet View"><Tablet className="w-4 h-4" /></button>
+              <button onClick={() => setPreviewMode('desktop')} className={`p-1.5 rounded-full transition-all ${previewMode === 'desktop' ? 'bg-gray-100 dark:bg-slate-700 text-indigo-600 dark:text-indigo-400' : 'text-gray-500 hover:text-gray-800 dark:hover:text-gray-200'}`} title="Desktop View"><Monitor className="w-4 h-4" /></button>
+            </div>
+
+            <div className={`transition-all duration-500 ease-in-out flex flex-col md:rounded-xl overflow-hidden relative mt-10 md:mt-12 ${previewMode === 'mobile' ? 'w-[375px] h-[812px] rounded-[2rem] border-[8px] border-surface-container-highest shadow-2xl mx-auto' : previewMode === 'tablet' ? 'w-[768px] h-[1024px] rounded-[1.5rem] border-[8px] border-surface-container-highest shadow-2xl mx-auto' : 'w-full h-full max-w-6xl mx-auto'}`}>
+               
+               {/* Mobile Only: Tabbed Bottom Sheet Toggle */}
+               <div className="md:hidden absolute bottom-4 left-4 right-4 z-50 flex gap-2 justify-center">
+                  <button onClick={() => { setIsLeftPanelOpen(true); setIsPropertiesPanelOpen(false); }} className="px-4 py-2 bg-indigo-600 text-white rounded-full shadow-lg text-sm font-semibold">Menu</button>
+                  <button onClick={() => { setIsPropertiesPanelOpen(true); setIsLeftPanelOpen(false); }} className="px-4 py-2 bg-white text-gray-800 rounded-full shadow-lg text-sm font-semibold">Properties</button>
+               </div>
+
                <div className="flex-1 overflow-y-auto bg-background relative w-full h-full custom-scrollbar">
                   {isLoading ? (
                     <div className="p-10 flex flex-col gap-8">
@@ -347,11 +332,28 @@ export default function EditPortfolio() {
                       <Skeleton className="h-96 w-full rounded-xl" />
                     </div>
                   ) : (
-                    <PortfolioPreview />
+                    <CanvasArea 
+                      blocks={portfolioData?.siteConfig?.layout || []} 
+                      portfolioData={portfolioData}
+                      onSelectBlock={(id) => {
+                        setActiveBlockId(id);
+                        if (!isPropertiesPanelOpen) setIsPropertiesPanelOpen(true);
+                      }}
+                      activeBlockId={activeBlockId}
+                      onOpenAi={() => {
+                        setIsLeftPanelOpen(true);
+                        // Hack: we don't have direct access to setActiveTab from LeftSidebar here, 
+                        // so we can simulate a click on the AI Tab button, or pass a prop to LeftSidebar.
+                        // Let's rely on standard LeftSidebar state for now, it's a minor detail.
+                      }}
+                    />
                   )}
                </div>
             </div>
           </section>
+
+          {/* 3. Right Properties Panel */}
+          {!isLoading && <PropertiesPanel activeBlockId={activeBlockId} isOpen={isPropertiesPanelOpen} onToggle={() => setIsPropertiesPanelOpen(!isPropertiesPanelOpen)} />}
         </main>
         
         <SeoSettingsModal isOpen={isSeoModalOpen} onClose={() => setIsSeoModalOpen(false)} />

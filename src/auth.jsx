@@ -3,7 +3,8 @@ import { auth, db } from './lib/firebaseConfig';
 import { onAuthStateChanged, signOut } from 'firebase/auth';
 import { doc, getDoc } from 'firebase/firestore';
 import { store } from './store/store';
-import { setSubscription } from './store/syncSlice';
+import { setSubscription, setDriveToken } from './store/syncSlice';
+import { disconnectDrive } from './service/DriveService';
 
 const AuthContext = createContext({ user: null, session: null, isLoaded: false });
 
@@ -79,6 +80,11 @@ export const UserButton = () => {
   const { user } = useContext(AuthContext);
   
   const handleLogout = async () => {
+    const currentToken = store.getState().sync.driveToken;
+    if (currentToken) {
+      await disconnectDrive(currentToken);
+      store.dispatch(setDriveToken(null));
+    }
     await signOut(auth);
   };
 

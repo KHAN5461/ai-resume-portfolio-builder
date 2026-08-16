@@ -6,7 +6,8 @@ import ResumeCardItem from './components/ResumeCardItem';
 import AddPortfolio from './components/AddPortfolio';
 import MagicImportModal from './components/MagicImportModal';
 import { WelcomeModal } from './components/WelcomeModal';
-import { Loader2, Plus, LayoutGrid, FileText, ChevronDown, Check, MoreVertical, Trash, Share, Copy, Edit2, Download, Search, Filter, RefreshCcw, LayoutTemplate, Briefcase, Sparkles, Folder, FolderPlus, FolderOpen, Bell, Activity } from 'lucide-react'
+import GitHubSyncModal from '@/components/custom/GitHubSyncModal';
+import { Github, Loader2, Plus, LayoutGrid, FileText, ChevronDown, Check, MoreVertical, Trash, Share, Copy, Edit2, Download, Search, Filter, RefreshCcw, LayoutTemplate, Briefcase, Sparkles, Folder, FolderPlus, FolderOpen, Bell, Activity } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { AnalyticsDashboard } from './components/AnalyticsDashboard';
 import { useSelector } from 'react-redux';
@@ -394,6 +395,12 @@ function Dashboard() {
                         <button onClick={onClick} className="bg-stitch-primary text-white px-6 py-3.5 rounded-xl font-label-md text-[14px] hover:shadow-[0_8px_20px_rgba(var(--stitch-primary),0.25)] hover:-translate-y-0.5 transition-all duration-200 active:scale-95 flex items-center gap-2">
                           <span className="material-symbols-outlined" style={{fontVariationSettings: "'FILL' 1"}}>description</span>
                           Create from Template
+                        </button>
+                      )} />
+                      <GitHubSyncModal renderTrigger={(onClick) => (
+                        <button onClick={onClick} className="bg-surface text-on-surface border border-outline-variant/50 px-6 py-3.5 rounded-xl font-label-md text-[14px] hover:bg-surface-variant hover:border-outline-variant transition-all duration-200 active:scale-95 flex items-center gap-2">
+                          <Github className="w-5 h-5 text-stitch-primary" />
+                          Import from GitHub
                         </button>
                       )} />
                       <MagicImportModal renderTrigger={(onClick) => (

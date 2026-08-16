@@ -1,24 +1,4 @@
-import { GoogleGenerativeAI } from "@google/generative-ai";
-
-const apiKey = import.meta.env.VITE_GOOGLE_AI_API_KEY;
-
-if (!apiKey) {
-    console.warn("VITE_GOOGLE_AI_API_KEY is not defined in the environment variables.");
-}
-
-const genAI = new GoogleGenerativeAI(apiKey || "DUMMY_KEY");
-
-const model = genAI.getGenerativeModel({
-  model: "gemini-1.5-flash",
-});
-
-const generationConfig = {
-  temperature: 1,
-  topP: 0.95,
-  topK: 64,
-  maxOutputTokens: 8192,
-  responseMimeType: "text/plain",
-};
+import { auth } from '../lib/firebaseConfig';
 
 // Caching implementation to manage AI tokens and costs
 const aiCache = new Map();
@@ -34,11 +14,6 @@ const hashPrompt = (str) => {
   return hash.toString();
 };
 
-const _AIChatSession = model.startChat({
-  generationConfig,
-  history: [],
-});
-
 export const AIChatSession = {
   sendMessage: async (prompt) => {
     const hash = hashPrompt(prompt);
@@ -46,14 +21,31 @@ export const AIChatSession = {
       console.log("Serving AI response from cache");
       return { response: { text: () => aiCache.get(hash) } };
     }
-    const result = await _AIChatSession.sendMessage(prompt);
-    const text = result.response.text();
+
+    const userId = auth.currentUser?.uid;
+    if (!userId) {
+      throw new Error("User must be logged in to generate content.");
+    }
+
+    const response = await fetch('/api/generate', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ prompt, userId })
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.error || 'Failed to generate content');
+    }
+
+    const text = data.result;
     aiCache.set(hash, text);
-    return result;
+    return { response: { text: () => text } };
   },
   sendMessageStream: async (prompt) => {
-    // For streaming, we could cache the final result, but streaming is complex to mock.
-    // So we just pass it through, or return a fake stream if cached.
     const hash = hashPrompt(prompt);
     if (aiCache.has(hash)) {
       console.log("Serving AI stream response from cache");
@@ -65,14 +57,36 @@ export const AIChatSession = {
       };
     }
     
-    const result = await _AIChatSession.sendMessageStream(prompt);
-    
-    // We can't easily intercept the stream here without breaking it, 
-    // so we'll let the caller handle it and maybe cache it if needed.
-    // For simplicity, we just return the real stream.
-    return result;
+    // We lost true streaming by moving to the Vercel serverless function, 
+    // so we mock a fast stream that just yields the full text at once.
+    const userId = auth.currentUser?.uid;
+    if (!userId) {
+      throw new Error("User must be logged in to generate content.");
+    }
+
+    const response = await fetch('/api/generate', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ prompt, userId })
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.error || 'Failed to generate content');
+    }
+
+    const text = data.result;
+    aiCache.set(hash, text);
+
+    return {
+      stream: (async function* () {
+        yield { text: () => text };
+      })()
+    };
   },
-  // Provide a method to manually cache a streamed result once complete
   cacheResult: (prompt, finalResult) => {
     const hash = hashPrompt(prompt);
     aiCache.set(hash, finalResult);

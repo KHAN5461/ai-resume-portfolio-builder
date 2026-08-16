@@ -1,6 +1,5 @@
 import Stripe from 'stripe';
-import { initializeApp } from 'firebase/app';
-import { getFirestore, doc, updateDoc, collection, query, where, getDocs } from 'firebase/firestore';
+import * as admin from 'firebase-admin';
 
 export const config = {
   api: {
@@ -10,12 +9,24 @@ export const config = {
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
-const firebaseApp = initializeApp({
-  apiKey: process.env.VITE_FIREBASE_API_KEY,
-  authDomain: process.env.VITE_FIREBASE_AUTH_DOMAIN,
-  projectId: process.env.VITE_FIREBASE_PROJECT_ID,
-});
-const db = getFirestore(firebaseApp);
+// Initialize Firebase Admin
+if (!admin.apps.length) {
+  let credential;
+  if (process.env.FIREBASE_SERVICE_ACCOUNT_KEY) {
+    try {
+      const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT_KEY);
+      credential = admin.credential.cert(serviceAccount);
+    } catch (e) {
+      console.warn("Failed to parse FIREBASE_SERVICE_ACCOUNT_KEY as JSON. Falling back to default application credentials.");
+    }
+  }
+  
+  admin.initializeApp({
+    credential: credential || admin.credential.applicationDefault(),
+    projectId: process.env.VITE_FIREBASE_PROJECT_ID
+  });
+}
+const db = admin.firestore();
 
 async function buffer(readable) {
   const chunks = [];
@@ -44,6 +55,14 @@ export default async function handler(req, res) {
     return res.status(400).send(`Webhook Error: ${err.message}`);
   }
 
+  // Idempotency Check
+  const eventRef = db.collection('stripe_events').doc(event.id);
+  const eventDoc = await eventRef.get();
+  if (eventDoc.exists) {
+    console.log(`Event ${event.id} already processed. Skipping.`);
+    return res.status(200).json({ received: true, skipped: true });
+  }
+
   try {
     switch (event.type) {
       case 'checkout.session.completed': {
@@ -52,8 +71,8 @@ export default async function handler(req, res) {
         const plan = session.metadata?.plan || 'pro';
         
         if (userId) {
-          const userRef = doc(db, 'users', userId);
-          await updateDoc(userRef, {
+          const userRef = db.collection('users').doc(userId);
+          await userRef.update({
             isPremium: true,
             plan: plan,
             stripeCustomerId: session.customer,
@@ -70,14 +89,12 @@ export default async function handler(req, res) {
       }
       case 'customer.subscription.deleted': {
         const subscription = event.data.object;
-        const usersRef = collection(db, 'users');
-        const q = query(usersRef, where('stripeSubscriptionId', '==', subscription.id));
-        const querySnapshot = await getDocs(q);
+        const usersRef = db.collection('users');
+        const snapshot = await usersRef.where('stripeSubscriptionId', '==', subscription.id).get();
 
-        if (!querySnapshot.empty) {
-          // A user might only have one document
-          const promises = querySnapshot.docs.map((userDoc) => 
-            updateDoc(doc(db, 'users', userDoc.id), {
+        if (!snapshot.empty) {
+          const promises = snapshot.docs.map((userDoc) => 
+            userDoc.ref.update({
               isPremium: false,
               plan: 'free'
             })
@@ -89,6 +106,9 @@ export default async function handler(req, res) {
       default:
         console.log(`Unhandled event type ${event.type}`);
     }
+
+    // Mark event as processed
+    await eventRef.set({ processedAt: new Date().toISOString(), type: event.type });
 
     res.status(200).json({ received: true });
   } catch (error) {

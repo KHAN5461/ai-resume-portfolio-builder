@@ -12,7 +12,7 @@ import {
 import useHideOnScroll from '../../hooks/useHideOnScroll'
 import { connectDrive } from '../../service/DriveService';
 import { useSelector, useDispatch } from 'react-redux';
-import { setDriveStatus } from '../../store/syncSlice';
+import { setDriveStatus, setDriveToken } from '../../store/syncSlice';
 
 function Header() {
     const { user, isSignedIn } = useUser();
@@ -23,7 +23,8 @@ function Header() {
     const handleConnectDrive = async () => {
         dispatch(setDriveStatus('connecting'));
         try {
-            await connectDrive();
+            const token = await connectDrive();
+            dispatch(setDriveToken(token));
             dispatch(setDriveStatus('connected'));
         } catch (e) {
             console.error("Drive connection failed", e);

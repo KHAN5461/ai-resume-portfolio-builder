@@ -6,6 +6,7 @@ const initialState = {
   pendingQueueLength: 0,
   lastServerTimestamp: null,
   driveStatus: 'disconnected', // 'disconnected', 'connecting', 'connected'
+  driveToken: null, // Strictly in-memory token
   // Subscription state (from Firebase)
   subscription: {
     plan: 'free', // 'free', 'pro', 'enterprise'
@@ -25,6 +26,9 @@ export const syncSlice = createSlice({
     setDriveStatus: (state, action) => {
       state.driveStatus = action.payload;
     },
+    setDriveToken: (state, action) => {
+      state.driveToken = action.payload;
+    },
     setSubscription: (state, action) => {
       state.subscription = { ...state.subscription, ...action.payload };
     },
@@ -40,6 +44,6 @@ export const syncSlice = createSlice({
   },
 });
 
-export const { setSyncStatus, setDriveStatus, setSubscription, setLastSavedAt, setPendingQueueLength, setLastServerTimestamp } = syncSlice.actions;
+export const { setSyncStatus, setDriveStatus, setDriveToken, setSubscription, setLastSavedAt, setPendingQueueLength, setLastServerTimestamp } = syncSlice.actions;
 
 export default syncSlice.reducer;

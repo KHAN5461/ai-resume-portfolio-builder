@@ -4,26 +4,40 @@
 const DRIVE_UPLOAD_URL = 'https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart';
 const FOLDER_NAME = 'AI_Resume_Portfolio_App';
 
+// Cache ETags to prevent data-races
+const etagCache = new Map();
+
 /**
  * Mocks the GIS Auth flow to return a dummy token since we don't have a real Client ID yet.
  * In a real environment, this would call google.accounts.oauth2.initTokenClient
+ * The scope MUST be strictly: https://www.googleapis.com/auth/drive.file
  */
 export const connectDrive = async () => {
     return new Promise((resolve) => {
         setTimeout(() => {
             const dummyToken = 'dummy_google_drive_access_token_' + Date.now();
-            sessionStorage.setItem('gdrive_token', dummyToken);
             resolve(dummyToken);
         }, 1000);
     });
 };
 
 export const getDriveToken = () => {
-    return sessionStorage.getItem('gdrive_token');
+    // Deprecated: Token is now held in memory via Redux syncSlice.driveToken
+    return null;
 };
 
-export const disconnectDrive = () => {
-    sessionStorage.removeItem('gdrive_token');
+export const disconnectDrive = async (accessToken) => {
+    if (accessToken && !accessToken.startsWith('dummy_')) {
+        try {
+            await fetch(`https://oauth2.googleapis.com/revoke?token=${accessToken}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
+            });
+            console.log('Successfully revoked Google Drive token.');
+        } catch (error) {
+            console.error('Failed to revoke Google Drive token:', error);
+        }
+    }
 };
 
 /**
@@ -62,9 +76,14 @@ export const saveToDrive = async (accessToken, data, fileName, fileId = null) =>
         ? `https://www.googleapis.com/upload/drive/v3/files/${fileId}?uploadType=multipart`
         : DRIVE_UPLOAD_URL;
 
+    const headers = { Authorization: `Bearer ${accessToken}` };
+    if (fileId && etagCache.has(fileId)) {
+        headers['If-Match'] = etagCache.get(fileId);
+    }
+
     const response = await fetch(url, {
         method: fileId ? 'PATCH' : 'POST',
-        headers: { Authorization: `Bearer ${accessToken}` },
+        headers: headers,
         body: form
     });
 
@@ -72,10 +91,17 @@ export const saveToDrive = async (accessToken, data, fileName, fileId = null) =>
         if (response.status === 401) {
             throw new Error('Unauthorized');
         }
+        if (response.status === 412) {
+            throw new Error('DATA_RACE: This file has been updated elsewhere.');
+        }
         throw new Error('Failed to save to Google Drive');
     }
 
-    return response.json();
+    const json = await response.json();
+    if (response.headers.get('ETag')) {
+        etagCache.set(fileId || json.id, response.headers.get('ETag'));
+    }
+    return json;
 };
 
 export const loadFromDrive = async (accessToken, fileId) => {
@@ -98,6 +124,10 @@ export const loadFromDrive = async (accessToken, fileId) => {
 
     if (!response.ok) {
         throw new Error('Failed to load from Google Drive');
+    }
+
+    if (response.headers.get('ETag')) {
+        etagCache.set(fileId, response.headers.get('ETag'));
     }
 
     return response.json();

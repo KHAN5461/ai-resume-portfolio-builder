@@ -8,6 +8,7 @@ import ResumePreview from '../dashboard/resume/components/ResumePreview';
 import { useDispatch } from 'react-redux';
 import { setResumeData } from '@/store/resumeSlice';
 import { useUser } from '../auth.jsx';
+import MagicImportModal from '../dashboard/components/MagicImportModal';
 
 function Home() {
   const [checkoutOpen, setCheckoutOpen] = useState(false);
@@ -116,10 +117,12 @@ function Home() {
             Stop guessing why you're getting rejected. Our AI analyzes, optimizes, and formats your resume to beat Applicant Tracking Systems and land you interviews.
         </p>
         <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto mt-4">
-            <Link to="/playground" className="bg-primary text-on-primary font-label-md text-label-md px-8 py-4 rounded-full shadow-[0_0_20px_rgba(159,91,255,0.4)] hover:-translate-y-1 hover:shadow-[0_0_30px_rgba(159,91,255,0.6)] hover:bg-primary/90 transition-all duration-300 flex items-center justify-center gap-2 min-h-[48px]">
-                Try the Builder
-                <span className="material-symbols-outlined group-hover:translate-x-1 transition-transform" data-icon="arrow_forward">arrow_forward</span>
-            </Link>
+            <MagicImportModal renderTrigger={(onClick) => (
+                <button onClick={onClick} className="bg-primary text-on-primary font-label-md text-label-md px-8 py-4 rounded-full shadow-[0_0_20px_rgba(159,91,255,0.4)] hover:-translate-y-1 hover:shadow-[0_0_30px_rgba(159,91,255,0.6)] hover:bg-primary/90 transition-all duration-300 flex items-center justify-center gap-2 min-h-[48px] cursor-pointer">
+                    <span className="material-symbols-outlined text-[20px]">auto_awesome</span>
+                    Import LinkedIn / PDF
+                </button>
+            )} />
             <button className="bg-white/50 backdrop-blur-md text-primary border border-white/40 font-label-md text-label-md px-8 py-4 rounded-full hover:bg-white/80 hover:shadow-lg transition-all duration-300 flex items-center justify-center gap-2 min-h-[48px] hover:-translate-y-1">
                 <span className="material-symbols-outlined" data-icon="play_circle">play_circle</span>
                 Watch Demo

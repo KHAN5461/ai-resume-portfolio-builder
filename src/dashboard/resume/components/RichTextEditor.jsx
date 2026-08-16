@@ -5,6 +5,7 @@ import React, { useContext, useState } from 'react'
 import { BtnBold, BtnBulletList, BtnClearFormatting, BtnItalic, BtnLink, BtnNumberedList, BtnStrikeThrough, BtnStyles, BtnUnderline, Editor, EditorProvider, HtmlButton, Separator, Toolbar } from 'react-simple-wysiwyg'
 import { AIChatSession } from './../../../service/AIModal';
 import { toast } from 'sonner';
+import DOMPurify from 'dompurify';
 import { calculateLocalAtsScore } from '../../../lib/atsCalculator';
 
 const GENERATE_PROMPT = `Based on the position title "{positionTitle}" at "{companyName}", give me 5-7 professional bullet points for a resume. Focus on achievements and technical skills. Do not include experience level. Return ONLY valid HTML ul and li tags, without markdown wrappers.`;
@@ -149,8 +150,7 @@ function RichTextEditor({onRichTextEditorChange,index,defaultValue}) {
                     <Button size="sm" className="h-8 text-xs bg-stitch-primary hover:bg-stitch-primary/90 text-white" onClick={acceptDraft}>Accept & Merge</Button>
                 </div>
             </div>
-            
-            <div className="bg-surface rounded-lg p-3 border border-outline-variant/30 text-sm mb-4" dangerouslySetInnerHTML={{ __html: draftValue }}></div>
+            <div className="bg-surface rounded-lg p-3 border border-outline-variant/30 text-sm mb-4" dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(draftValue) }}></div>
 
             <div className="flex flex-wrap gap-2 items-center">
                 <span className="text-xs text-on-surface-variant">Refine:</span>

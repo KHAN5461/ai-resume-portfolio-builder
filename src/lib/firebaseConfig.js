@@ -1,5 +1,5 @@
 import { initializeApp } from "firebase/app";
-import { getAuth, GoogleAuthProvider } from "firebase/auth";
+import { getAuth, GoogleAuthProvider, setPersistence, browserSessionPersistence } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
 
 const firebaseConfig = {
@@ -13,5 +13,15 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 export const auth = getAuth(app);
+
+// Set persistence to session storage so sessions die when tab is closed
+setPersistence(auth, browserSessionPersistence)
+  .then(() => {
+    console.log("Firebase Auth persistence set to browserSessionPersistence");
+  })
+  .catch((error) => {
+    console.error("Error setting persistence:", error);
+  });
+
 export const db = getFirestore(app);
 export const googleProvider = new GoogleAuthProvider();

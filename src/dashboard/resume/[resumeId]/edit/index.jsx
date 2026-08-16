@@ -22,6 +22,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import useScrollIntoViewOnFocus from '@/hooks/useScrollIntoViewOnFocus';
 import ResponsiveBreadcrumbs from '@/components/custom/ResponsiveBreadcrumbs';
 import useHideOnScroll from '@/hooks/useHideOnScroll';
+import GlobalEditorToolbar from '@/components/custom/GlobalEditorToolbar';
 
 function EditResume() {
     const {resumeId}=useParams();
@@ -92,208 +93,20 @@ function EditResume() {
         className="bg-background text-on-background font-body-md h-[100dvh] w-screen overflow-hidden flex flex-col"
       >
         {/* Top Toolbar */}
-        <header 
-          className="bg-surface/70 backdrop-blur-md border-b border-t-4 border-t-stitch-primary border-white/20 dark:border-white/10 px-gutter h-16 flex items-center justify-between shrink-0 shadow-sm z-20 relative transition-transform duration-300"
-          style={{ transform: isVisible ? 'translateY(0)' : 'translateY(-100%)' }}
+        <GlobalEditorToolbar 
+          view={view}
+          setView={setView}
+          onSave={() => {}} // Resume saves automatically via Redux middleware
+          onExport={() => {
+            if (!resumeId) {
+              window.location.href = '/auth/sign-in';
+            } else {
+              setIsExportOpen(true);
+            }
+          }}
+          mode="resume"
+          title={`Draft - ${resumeInfo?.title || 'Loading...'}`}
         >
-          <div className="flex items-center gap-sm">
-            <Link to="/dashboard" className="flex items-center gap-sm hover:opacity-80 transition-opacity">
-              <span className="material-symbols-outlined text-stitch-primary font-headline-md text-[24px]" style={{fontVariationSettings: "'FILL' 1"}}>auto_awesome</span>
-              <span className="font-headline-md text-[24px] font-bold text-stitch-primary">Sparkfolio</span>
-            </Link>
-            <div className="mx-2 flex items-center">
-              <ResponsiveBreadcrumbs paths={[{label: 'Dashboard', href: '/dashboard'}, {label: !resumeId ? 'Playground' : 'Resume Editor', href: '#'}]} />
-            </div>
-            
-            <div className="hidden md:flex items-center gap-4 ml-8">
-              <span className="px-2 py-1 bg-surface-container-highest rounded-md font-label-sm text-[12px] text-on-surface-variant flex items-center gap-xs">
-                {!resumeId ? 'Playground Mode' : `Draft - ${resumeInfo?.title || 'Loading...'}`}
-              </span>
-              
-            </div>
-          </div>
-          <div className="flex items-center gap-md">
-            
-            {/* Save Status Indicator */}
-            <div className="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-full bg-surface-variant/30 border border-outline-variant/20 mr-2">
-              {syncStatus === 'saved' && (
-                <>
-                  <span className="material-symbols-outlined text-[16px] text-green-500">cloud_done</span>
-                  <span className="font-label-sm text-[12px] text-on-surface-variant">Saved to Cloud</span>
-                </>
-              )}
-              {syncStatus === 'saving' && (
-                <>
-                  <span className="material-symbols-outlined text-[16px] text-stitch-primary animate-pulse">cloud_sync</span>
-                  <span className="font-label-sm text-[12px] text-on-surface-variant">Saving...</span>
-                </>
-              )}
-              {syncStatus === 'unsaved' && (
-                <>
-                  <span className="material-symbols-outlined text-[16px] text-yellow-500">edit_note</span>
-                  <span className="font-label-sm text-[12px] text-on-surface-variant">Unsaved changes</span>
-                </>
-              )}
-              {syncStatus === 'error' && (
-                <>
-                  <span className="material-symbols-outlined text-[16px] text-red-500">cloud_off</span>
-                  <span className="font-label-sm text-[12px] text-on-surface-variant">Save Failed</span>
-                </>
-              )}
-              {syncStatus === 'offline-queued' && (
-                <>
-                  <span className="material-symbols-outlined text-[16px] text-orange-500">wifi_off</span>
-                  <span className="font-label-sm text-[12px] text-on-surface-variant">Queued offline</span>
-                </>
-              )}
-            </div>
-
-            </div>
-            {/* Undo / Redo Buttons */}
-            <div className="flex items-center gap-1 border-r border-outline-variant/30 pr-2 md:pr-4 mr-1 md:mr-2">
-              <button
-                onClick={() => dispatch(ActionCreators.undo())}
-                disabled={pastStates.length === 0}
-                className="w-10 h-10 hover:bg-surface-variant transition-colors cursor-pointer text-on-surface-variant hover:text-stitch-primary rounded-full flex items-center justify-center disabled:opacity-30 disabled:cursor-not-allowed group"
-                title="Undo (Ctrl+Z)"
-              >
-                <Undo2 className="w-5 h-5 group-hover:-translate-x-0.5 transition-transform" />
-              </button>
-              <button
-                onClick={() => dispatch(ActionCreators.redo())}
-                disabled={futureStates.length === 0}
-                className="w-10 h-10 hover:bg-surface-variant transition-colors cursor-pointer text-on-surface-variant hover:text-stitch-primary rounded-full flex items-center justify-center disabled:opacity-30 disabled:cursor-not-allowed group"
-                title="Redo (Ctrl+Y)"
-              >
-                <Redo2 className="w-5 h-5 group-hover:translate-x-0.5 transition-transform" />
-              </button>
-            </div>
-            {/* Action Buttons */}
-            <div className="flex items-center gap-1 md:gap-2">
-              <GitHubSyncModal renderTrigger={(onClick) => (
-                <button 
-                  onClick={onClick}
-                  className="w-10 h-10 hover:bg-surface-variant transition-colors cursor-pointer text-on-surface-variant hover:text-stitch-primary rounded-full flex items-center justify-center group"
-                  title="GitHub Sync"
-                >
-                  <Github className="w-5 h-5 group-hover:scale-110 transition-transform" />
-                </button>
-              )} />
-
-              <MagicImportModal renderTrigger={(onClick) => (
-                <button 
-                  onClick={onClick}
-                  className="w-10 h-10 hover:bg-surface-variant transition-colors cursor-pointer text-on-surface-variant hover:text-stitch-primary rounded-full flex items-center justify-center group"
-                  title="Magic Import"
-                >
-                  <span className="material-symbols-outlined text-[20px] group-hover:scale-110 transition-transform" style={{fontVariationSettings: "'FILL' 0"}}>auto_fix_high</span>
-                </button>
-              )} />
-
-              <button 
-                onClick={() => setIsAtsPanelOpen(true)}
-                className="w-10 h-10 hover:bg-red-50 transition-colors cursor-pointer text-on-surface-variant hover:text-red-500 rounded-full flex items-center justify-center group"
-                title="Roast Resume"
-              >
-                <Flame className="w-5 h-5 group-hover:scale-110 transition-transform" />
-              </button>
-              <Link 
-                to={!resumeId ? '/auth/sign-in' : `/interview/${resumeId}`}
-                className="w-10 h-10 hover:bg-blue-50 transition-colors cursor-pointer text-on-surface-variant hover:text-blue-500 rounded-full flex items-center justify-center group mr-2 md:mr-4"
-                title="Interview Coach"
-              >
-                <MessageSquare className="w-5 h-5 group-hover:scale-110 transition-transform" />
-              </Link>
-              <button 
-                onClick={() => {
-                  if (!resumeId) {
-                    window.location.href = '/auth/sign-in';
-                  } else {
-                    setIsExportOpen(true);
-                  }
-                }}
-                className="h-10 px-6 bg-stitch-primary text-white rounded-full font-label-md text-[14px] hover:bg-stitch-primary/90 transition-all shadow-md hover:shadow-lg flex items-center gap-2 cursor-pointer active:scale-95"
-              >
-                Export
-                <span className="material-symbols-outlined text-[16px]">download</span>
-              </button>
-            </div>
-        </header>
-
-        <ExportModal 
-          isOpen={isExportOpen} 
-          onOpenChange={setIsExportOpen} 
-          resumeInfo={resumeInfo} 
-        />
-
-        <AtsRoastPanel 
-          isOpen={isAtsPanelOpen}
-          onClose={() => setIsAtsPanelOpen(false)}
-        />
-
-        {/* Pill Tab Switcher (Mobile Only) */}
-        <div className="md:hidden w-full bg-surface py-2 px-4 flex justify-center z-40 border-b border-outline-variant/30 shrink-0">
-          <div className="flex bg-surface-variant/30 rounded-full p-1 border border-outline-variant/20 relative w-full max-w-sm">
-            {['builder', 'preview'].map((tab) => (
-              <button
-                key={tab}
-                onClick={() => setView(tab)}
-                className={`flex-1 py-2 rounded-full font-label-md capitalize relative z-10 transition-colors ${
-                  view === tab ? 'text-on-primary-container font-bold' : 'text-on-surface-variant'
-                }`}
-              >
-                {view === tab && (
-                  <motion.div
-                    layoutId="resume-active-pill"
-                    className="absolute inset-0 bg-primary-container rounded-full -z-10 shadow-sm"
-                    transition={{ type: "spring", stiffness: 300, damping: 30 }}
-                  />
-                )}
-                {tab}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* Workspace Area */}
-        <main className="flex-1 flex overflow-hidden bg-surface-container-low">
-          {/* Left Sidebar: Content Editor */}
-          {!isZenMode && (
-            <aside className={`w-full md:w-[420px] shrink-0 bg-surface-container-lowest border-r border-outline-variant/30 h-full overflow-y-auto flex-col z-10 shadow-[4px_0px_24px_rgba(0,0,0,0.02)] transition-all duration-300 ${isSidebarOpen ? 'ml-0' : '-ml-[420px]'} ${view === 'builder' ? 'flex' : 'hidden md:flex'}`}>
-              
-              {/* Header area of sidebar with toggle */}
-              <div className="flex items-center justify-between p-4 border-b border-outline-variant/30 sticky top-0 bg-surface-container-lowest z-10">
-                 {/* Segmented Control Tabs */}
-                 <div className="flex bg-surface-container-low rounded-lg p-1 w-full gap-1 border border-outline-variant/20">
-                    <button onClick={() => setActiveTab('Content')} className={`flex-1 py-1.5 rounded-md text-center font-label-md text-[13px] transition-all ${activeTab === 'Content' ? 'bg-white shadow-sm text-stitch-primary font-bold' : 'text-on-surface-variant hover:text-on-surface'}`}>Content</button>
-                    <button onClick={() => setActiveTab('Theme')} className={`flex-1 py-1.5 rounded-md text-center font-label-md text-[13px] transition-all ${activeTab === 'Theme' ? 'bg-white shadow-sm text-stitch-primary font-bold' : 'text-on-surface-variant hover:text-on-surface'}`}>Theme</button>
-                    <button onClick={() => setActiveTab('Settings')} className={`flex-1 py-1.5 rounded-md text-center font-label-md text-[13px] transition-all ${activeTab === 'Settings' ? 'bg-white shadow-sm text-stitch-primary font-bold' : 'text-on-surface-variant hover:text-on-surface'}`}>Settings</button>
-                 </div>
-              </div>
-              
-              <div ref={scrollRef} className="p-4 flex flex-col flex-1 pb-24 overflow-y-auto custom-scrollbar">
-                {isLoading ? (
-                  <div className="flex flex-col gap-4">
-                    <Skeleton className="h-10 w-full" />
-                    <Skeleton className="h-[200px] w-full" />
-                    <Skeleton className="h-[300px] w-full" />
-                  </div>
-                ) : (
-                  <>
-                    {activeTab === 'Content' && <FormSection />}
-                    {activeTab === 'Theme' && <ThemeBuilder />}
-                    {activeTab === 'Settings' && <div className="flex-1 mt-4"><RawJsonEditor /></div>}
-                  </>
-                )}
-              </div>
-            </aside>
-          )}
-
-          {/* Right Preview Canvas */}
-          <section className={`h-full flex-1 overflow-hidden flex-col bg-surface-container p-0 md:p-6 relative ${view === 'preview' ? 'flex' : 'hidden md:flex'}`}>
-            {/* Canvas Controls Overlay */}
-            <div className="absolute top-6 left-1/2 -translate-x-1/2 z-20 bg-surface/90 backdrop-blur-xl px-5 py-2.5 rounded-full shadow-lg flex items-center gap-3 border border-white/60 dark:border-white/10 transition-all hover:shadow-xl hover:-translate-y-0.5">
-              
               {/* Sidebar Toggle (Only if not zen mode) */}
               {!isZenMode && (
                 <button 
@@ -356,11 +169,82 @@ function EditResume() {
               <Link aria-label="Open in new tab" to={'/my-resume/'+resumeId+"/view"} target="_blank" className="w-7 h-7 rounded-full flex items-center justify-center text-on-surface-variant hover:text-stitch-primary hover:bg-surface-variant focus:outline-none focus:ring-2 focus:ring-stitch-primary transition-colors" title="Open in new tab">
                 <span className="material-symbols-outlined text-[18px]">open_in_new</span>
               </Link>
-            </div>
+        </GlobalEditorToolbar>
 
+        <ExportModal 
+          isOpen={isExportOpen} 
+          onOpenChange={setIsExportOpen} 
+          resumeInfo={resumeInfo} 
+        />
+
+        <AtsRoastPanel 
+          isOpen={isAtsPanelOpen}
+          onClose={() => setIsAtsPanelOpen(false)}
+        />
+
+        {/* Pill Tab Switcher (Mobile Only) */}
+        <div className="md:hidden w-full bg-surface py-2 px-4 flex justify-center z-40 border-b border-outline-variant/30 shrink-0">
+          <div className="flex bg-surface-variant/30 rounded-full p-1 border border-outline-variant/20 relative w-full max-w-sm">
+            {['builder', 'preview'].map((tab) => (
+              <button
+                key={tab}
+                onClick={() => setView(tab)}
+                className={`flex-1 py-2 rounded-full font-label-md capitalize relative z-10 transition-colors ${
+                  view === tab ? 'text-on-primary-container font-bold' : 'text-on-surface-variant'
+                }`}
+              >
+                {view === tab && (
+                  <motion.div
+                    layoutId="resume-active-pill"
+                    className="absolute inset-0 bg-primary-container rounded-full -z-10 shadow-sm"
+                    transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                  />
+                )}
+                {tab}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Workspace Area */}
+        <main className="flex-1 flex overflow-hidden bg-surface-container-low pt-14">
+          {/* Left Sidebar: Content Editor */}
+          {!isZenMode && (
+            <aside className={`w-full md:w-[420px] shrink-0 bg-surface-container-lowest border-r border-outline-variant/30 h-full overflow-y-auto flex-col z-10 shadow-[4px_0px_24px_rgba(0,0,0,0.02)] transition-all duration-300 ${isSidebarOpen ? 'ml-0' : '-ml-[420px]'} ${view === 'builder' ? 'flex' : 'hidden md:flex'}`}>
+              
+              {/* Header area of sidebar with toggle */}
+              <div className="flex items-center justify-between p-4 border-b border-outline-variant/30 sticky top-0 bg-surface-container-lowest z-10">
+                 {/* Segmented Control Tabs */}
+                 <div className="flex bg-surface-container-low rounded-lg p-1 w-full gap-1 border border-outline-variant/20">
+                    <button onClick={() => setActiveTab('Content')} className={`flex-1 py-1.5 rounded-md text-center font-label-md text-[13px] transition-all ${activeTab === 'Content' ? 'bg-white shadow-sm text-stitch-primary font-bold' : 'text-on-surface-variant hover:text-on-surface'}`}>Content</button>
+                    <button onClick={() => setActiveTab('Theme')} className={`flex-1 py-1.5 rounded-md text-center font-label-md text-[13px] transition-all ${activeTab === 'Theme' ? 'bg-white shadow-sm text-stitch-primary font-bold' : 'text-on-surface-variant hover:text-on-surface'}`}>Theme</button>
+                    <button onClick={() => setActiveTab('Settings')} className={`flex-1 py-1.5 rounded-md text-center font-label-md text-[13px] transition-all ${activeTab === 'Settings' ? 'bg-white shadow-sm text-stitch-primary font-bold' : 'text-on-surface-variant hover:text-on-surface'}`}>Settings</button>
+                 </div>
+              </div>
+              
+              <div ref={scrollRef} className="p-4 flex flex-col flex-1 pb-24 overflow-y-auto custom-scrollbar">
+                {isLoading ? (
+                  <div className="flex flex-col gap-4">
+                    <Skeleton className="h-10 w-full" />
+                    <Skeleton className="h-[200px] w-full" />
+                    <Skeleton className="h-[300px] w-full" />
+                  </div>
+                ) : (
+                  <>
+                    {activeTab === 'Content' && <FormSection />}
+                    {activeTab === 'Theme' && <ThemeBuilder />}
+                    {activeTab === 'Settings' && <div className="flex-1 mt-4"><RawJsonEditor /></div>}
+                  </>
+                )}
+              </div>
+            </aside>
+          )}
+
+          {/* Right Preview Canvas */}
+          <section className={`h-full flex-1 overflow-hidden flex-col bg-surface-container p-0 md:p-6 relative ${view === 'preview' ? 'flex' : 'hidden md:flex'}`}>
             {/* Clean A4 Canvas */}
             <div 
-              className="w-full h-full flex flex-col bg-surface-container overflow-hidden pt-16 pb-10"
+              className="w-full h-full flex flex-col bg-surface-container/50 overflow-hidden py-8"
               onContextMenu={(e) => {
                   e.preventDefault();
                   setContextMenu({ show: true, x: e.pageX, y: e.pageY });

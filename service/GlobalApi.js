@@ -123,6 +123,21 @@ const DeletePortfolioById = (id) => {
     });
 };
 
+const IncrementPortfolioViews = (id) => {
+    return new Promise((resolve) => {
+        const portfolios = getPortfoliosFromStorage();
+        const index = portfolios.findIndex(p => p.documentId === id);
+        if (index !== -1) {
+            const currentViews = portfolios[index].views || 0;
+            portfolios[index].views = currentViews + 1;
+            savePortfoliosToStorage(portfolios);
+            resolve({ data: { success: true, views: currentViews + 1 } });
+        } else {
+            resolve({ data: { success: false } });
+        }
+    });
+};
+
 export default {
     CreateNewResume,
     GetUserResumes,
@@ -133,5 +148,6 @@ export default {
     GetUserPortfolios,
     UpdatePortfolioDetail,
     GetPortfolioById,
-    DeletePortfolioById
+    DeletePortfolioById,
+    IncrementPortfolioViews
 };

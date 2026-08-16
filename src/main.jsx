@@ -2,14 +2,14 @@ import React, { Suspense, lazy } from 'react'
 import ReactDOM from 'react-dom/client'
 import App from './App.jsx'
 import './index.css'
-import { RouterProvider, createBrowserRouter } from 'react-router-dom'
+import { RouterProvider, createBrowserRouter, Navigate } from 'react-router-dom'
 import { ClerkProvider } from './auth.jsx'
 import { Provider } from 'react-redux'
 import { store } from './store/store.js'
 import ErrorBoundary from './components/ErrorBoundary.jsx'
 
 // Code splitting / Lazy Loading for optimization
-const Home = lazy(() => import('./home/index.jsx'))
+const RootLayout = lazy(() => import('./components/RootLayout.jsx'))
 const Dashboard = lazy(() => import('./dashboard/index.jsx'))
 const SignInPage = lazy(() => import('./auth/sign-in/index.jsx'))
 const EditResume = lazy(() => import('./dashboard/resume/[resumeId]/edit/index.jsx'))
@@ -34,15 +34,15 @@ const PublicPortfolio = () => {
 
 const router=createBrowserRouter([
   {
-    path:'/',
-    element: <Suspense fallback={<LoadingFallback />}><Home/></Suspense>
-  },
-  {
     element:<App/>,
     children:[
       {
+        path:'/',
+        element: <Suspense fallback={<LoadingFallback />}><RootLayout/></Suspense>
+      },
+      {
         path:'/dashboard',
-        element: <Suspense fallback={<LoadingFallback />}><Dashboard/></Suspense>
+        element: <Navigate to="/" replace />
       },
       {
         path:'/dashboard/resume/:resumeId/edit',

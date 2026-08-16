@@ -19,11 +19,11 @@ const defaultPortfolioData = {
       ogImage: ""
     },
     layout: [
-      { id: 'hero', visible: true, name: 'Hero' },
-      { id: 'about', visible: true, name: 'About' },
-      { id: 'projects', visible: true, name: 'Projects' },
-      { id: 'skills', visible: true, name: 'Skills' },
-      { id: 'contact', visible: true, name: 'Contact' }
+      { id: 'hero', type: 'hero', visible: true, name: 'Hero' },
+      { id: 'about', type: 'about', visible: true, name: 'About' },
+      { id: 'projects', type: 'projects', visible: true, name: 'Projects' },
+      { id: 'skills', type: 'skills', visible: true, name: 'Skills' },
+      { id: 'contact', type: 'contact', visible: true, name: 'Contact' }
     ]
   },
   heroSection: {
@@ -81,7 +81,6 @@ export const portfolioSlice = createSlice({
         state.portfolios[id].aboutSection = { ...state.portfolios[id].aboutSection, ...data };
       }
     },
-    // We can add more specific reducers later, or a generic one:
     updatePortfolioData: (state, action) => {
       const { id, data } = action.payload;
       const current = state.portfolios[id] || { ...defaultPortfolioData };
@@ -121,9 +120,59 @@ export const portfolioSlice = createSlice({
           layout[index + 1] = temp;
         }
       }
+    },
+    addBlock: (state, action) => {
+      const { portfolioId, blockType, blockName } = action.payload;
+      const portfolio = state.portfolios[portfolioId];
+      if (portfolio && portfolio.siteConfig && portfolio.siteConfig.layout) {
+        const newBlock = {
+          id: `${blockType}_${Date.now()}`,
+          type: blockType,
+          name: blockName || (blockType.charAt(0).toUpperCase() + blockType.slice(1)),
+          visible: true
+        };
+        portfolio.siteConfig.layout.push(newBlock);
+      }
+    },
+    removeBlock: (state, action) => {
+      const { portfolioId, blockId } = action.payload;
+      const portfolio = state.portfolios[portfolioId];
+      if (portfolio && portfolio.siteConfig && portfolio.siteConfig.layout) {
+        if (blockId !== 'hero' && !blockId.startsWith('hero_')) { // Protect hero
+           portfolio.siteConfig.layout = portfolio.siteConfig.layout.filter(b => b.id !== blockId);
+        }
+      }
+    },
+    duplicateBlock: (state, action) => {
+      const { portfolioId, blockId } = action.payload;
+      const portfolio = state.portfolios[portfolioId];
+      if (portfolio && portfolio.siteConfig && portfolio.siteConfig.layout) {
+        const layout = portfolio.siteConfig.layout;
+        const index = layout.findIndex(b => b.id === blockId);
+        if (index >= 0) {
+          const original = layout[index];
+          const newBlock = {
+            ...original,
+            id: `${original.type}_${Date.now()}`,
+            name: `${original.name} (Copy)`
+          };
+          layout.splice(index + 1, 0, newBlock);
+        }
+      }
     }
   },
 });
 
-export const { createPortfolio, setCurrentPortfolio, updateHeroSection, updateAboutSection, updatePortfolioData, moveBlockUp, moveBlockDown } = portfolioSlice.actions;
+export const { 
+  createPortfolio, 
+  setCurrentPortfolio, 
+  updateHeroSection, 
+  updateAboutSection, 
+  updatePortfolioData, 
+  moveBlockUp, 
+  moveBlockDown,
+  addBlock,
+  removeBlock,
+  duplicateBlock
+} = portfolioSlice.actions;
 export default portfolioSlice.reducer;

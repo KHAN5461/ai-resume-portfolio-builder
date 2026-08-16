@@ -1,7 +1,8 @@
-import { getDriveToken, saveToDrive, loadFromDrive, deleteFromDrive } from './DriveService';
+import { saveToDrive, loadFromDrive, deleteFromDrive } from './DriveService';
+import { store } from '../store/store';
 
 // Helper to get token safely
-const getToken = () => getDriveToken() || 'dummy_token_for_local_fallback';
+const getToken = () => store.getState().sync.driveToken || 'dummy_token_for_local_fallback';
 
 const CURRENT_SCHEMA_VERSION = 1.1;
 

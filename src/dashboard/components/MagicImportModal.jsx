@@ -96,7 +96,24 @@ function MagicImportModal({ renderTrigger }) {
     }
   };
 
+  React.useEffect(() => {
+    const pending = sessionStorage.getItem('pendingMagicImport');
+    if (pending && user) {
+      setParsedData(JSON.parse(pending));
+      setStep('preview');
+      setOpenDialog(true);
+      sessionStorage.removeItem('pendingMagicImport');
+    }
+  }, [user]);
+
   const handleConfirmAndCreate = async () => {
+    if (!user) {
+      sessionStorage.setItem('pendingMagicImport', JSON.stringify(parsedData));
+      setOpenDialog(false);
+      navigation('/auth/sign-in');
+      return;
+    }
+
     setLoading(true);
     try {
       // 2. Create in Strapi DB
