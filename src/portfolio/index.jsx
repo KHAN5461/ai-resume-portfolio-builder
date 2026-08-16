@@ -6,6 +6,8 @@ import AboutSection from './components/AboutSection';
 import ProjectsSection from './components/ProjectsSection';
 import SkillsSection from './components/SkillsSection';
 import ContactSection from './components/ContactSection';
+import PortfolioNav from './components/PortfolioNav';
+import PortfolioFooter from './components/PortfolioFooter';
 import GlobalApi from './../../service/GlobalApi';
 
 import ModernTemplate from './templates/ModernTemplate';
@@ -85,6 +87,9 @@ export default function Portfolio({ isPublic = false }) {
   return (
     <div className={`min-h-screen relative ${themeMode === 'dark' ? 'dark bg-slate-950 text-white' : ''}`} style={style}>
       
+      {/* Navigation */}
+      <PortfolioNav data={portfolioData} blocks={portfolioData.siteConfig?.layout || []} />
+
       {/* Dynamic Template Engine */}
       <div className={themeMode === 'dark' ? 'dark' : ''}>
         {themePreset === 'bento' && <BentoTemplate portfolioData={portfolioData} />}
@@ -92,6 +97,9 @@ export default function Portfolio({ isPublic = false }) {
         {themePreset === 'creative' && <CreativeTemplate portfolioData={portfolioData} />}
         {(themePreset === 'modern' || themePreset === 'default') && <ModernTemplate portfolioData={portfolioData} />}
       </div>
+
+      {/* Footer */}
+      <PortfolioFooter data={portfolioData} />
 
       {/* Floating Theme Switcher UI */}
       {!isPublic && (

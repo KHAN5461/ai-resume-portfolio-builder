@@ -21,6 +21,7 @@ const TemplatesPage = lazy(() => import('./pages/TemplateGallery.jsx'))
 const NotFound = lazy(() => import('./pages/NotFound.jsx'))
 const CoverLetters = lazy(() => import('./dashboard/cover-letters/index.jsx'))
 const InterviewCoach = lazy(() => import('./interview/index.jsx'))
+const AIPromptStudio = lazy(() => import('./dashboard/portfolio/components/AIPromptStudio.jsx'));
 
 const LoadingFallback = () => (
   <div className="h-screen w-screen flex items-center justify-center bg-surface-container-lowest">
@@ -51,6 +52,10 @@ const router=createBrowserRouter([
       {
         path:'/dashboard/portfolio/:portfolioId/edit',
         element: <Suspense fallback={<LoadingFallback />}><EditPortfolio/></Suspense>
+      },
+      {
+        path:'/dashboard/portfolio/new/ai',
+        element: <Suspense fallback={<LoadingFallback />}><AIPromptStudio/></Suspense>
       },
       {
         path:'/templates',

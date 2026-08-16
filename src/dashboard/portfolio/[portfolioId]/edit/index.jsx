@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useSearchParams, useLocation } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { setCurrentPortfolio } from '@/store/portfolioSlice';
 import { ActionCreators } from 'redux-undo';
@@ -8,6 +8,7 @@ import BlockPalette from '../../components/BlockPalette';
 import CanvasArea from '../../components/CanvasArea';
 import PropertiesPanel from '../../components/PropertiesPanel';
 import LeftSidebar from '../../components/LeftSidebar';
+import GenerativeCanvasLoader from '../../components/GenerativeCanvasLoader';
 import { updatePortfolioData } from '@/store/portfolioSlice';
 import GlobalApi from './../../../../../service/GlobalApi';
 import { toast } from 'sonner';
@@ -45,6 +46,13 @@ export default function EditPortfolio() {
   const [isLeftPanelOpen, setIsLeftPanelOpen] = useState(true);
   const [isPropertiesPanelOpen, setIsPropertiesPanelOpen] = useState(true);
 
+  // AI Generation Focus Mode
+  const [searchParams, setSearchParams] = useSearchParams();
+  const location = useLocation();
+  const isGeneratingParam = searchParams.get('generating') === 'true';
+  const [isGenerating, setIsGenerating] = useState(isGeneratingParam);
+  const aiPrompt = location.state?.prompt || '';
+
   const scrollRef = React.useRef(null);
   const isVisible = useHideOnScroll(scrollRef);
 
@@ -81,6 +89,81 @@ export default function EditPortfolio() {
        return () => clearTimeout(delayDebounceFn);
     }
   }, [portfolioData, portfolioId]);
+
+  // AI Generation Workflow
+  useEffect(() => {
+    if (!isGenerating || !portfolioId || isLoading) return;
+
+    const runGeneration = async () => {
+      try {
+        const prompt = `
+          You are an expert portfolio architect. Based on this creative brief, generate a complete portfolio data payload.
+          
+          Creative Brief: "${aiPrompt}"
+          
+          Return ONLY valid JSON matching this exact structure:
+          {
+            "heroSection": {
+              "greeting": "Hi, I'm [Name]",
+              "headline": "A punchy 3-5 word professional title",
+              "subheadline": "A compelling 1-2 sentence value proposition"
+            },
+            "aboutSection": {
+              "bioTitle": "About Me",
+              "bioDescription": "A conversational 2-3 paragraph biography."
+            },
+            "skillsSection": {
+              "categories": [
+                { "categoryName": "Category", "skills": ["Skill1", "Skill2"] }
+              ]
+            },
+            "contactSection": {
+              "heading": "Get In Touch",
+              "subheading": "A friendly invitation message.",
+              "email": "hello@example.com"
+            }
+          }
+        `;
+
+        const result = await AIChatSession.sendMessage(prompt);
+        const rawText = result.response.text();
+        const cleanedJSON = JSON.parse(rawText.replace(/\`\`\`json/g, '').replace(/\`\`\`/g, '').trim());
+
+        dispatch({
+          type: 'portfolio/updatePortfolioData',
+          payload: {
+            id: portfolioId,
+            data: cleanedJSON
+          }
+        });
+
+        // Exit generation mode
+        setIsGenerating(false);
+        setIsPropertiesPanelOpen(true);
+        setSearchParams({}, { replace: true });
+
+        toast('✨ AI generated your portfolio.', {
+          action: {
+            label: 'Undo',
+            onClick: () => {
+              dispatch(ActionCreators.undo());
+              toast.info('Reverted AI generation.');
+            },
+          },
+        });
+      } catch (error) {
+        console.error('AI Generation failed:', error);
+        toast.error('Failed to synthesize portfolio. Please try again.');
+        setIsGenerating(false);
+        setIsPropertiesPanelOpen(true);
+        setSearchParams({}, { replace: true });
+      }
+    };
+
+    // Hide right panel during generation
+    setIsPropertiesPanelOpen(false);
+    runGeneration();
+  }, [isGenerating, portfolioId, isLoading]);
 
   const handleAutoFill = async () => {
     if (!user) {
@@ -174,6 +257,7 @@ export default function EditPortfolio() {
           setView={setView}
           mode="portfolio"
           title={`Portfolio Editor`}
+          onSave={() => setIsDeployModalOpen(true)}
         >
             {/* Undo / Redo Buttons */}
             <div className="flex items-center gap-1 border-r border-outline-variant/30 pr-2 md:pr-4 mr-1 md:mr-2">
@@ -194,86 +278,6 @@ export default function EditPortfolio() {
                 <Redo2 className="w-5 h-5 group-hover:translate-x-0.5 transition-transform" />
               </button>
             </div>
-
-            {/* Left Panel Toggle */}
-            {!isLeftPanelOpen && (
-              <button 
-                onClick={() => setIsLeftPanelOpen(true)} 
-                className="hidden md:flex items-center gap-2 h-10 px-3 bg-indigo-50 text-indigo-600 rounded-lg font-label-md text-[14px] hover:bg-indigo-100 transition-colors shadow-sm cursor-pointer"
-              >
-                <Bot className="w-4 h-4" />
-                Sidebar
-              </button>
-            )}
-
-            {/* Properties Panel Toggle */}
-            {!isPropertiesPanelOpen && (
-              <button 
-                onClick={() => setIsPropertiesPanelOpen(true)} 
-                className="hidden md:flex items-center gap-2 h-10 px-3 bg-surface-container-high text-on-surface-variant border border-outline-variant/30 rounded-lg font-label-md text-[14px] hover:bg-surface-variant transition-colors shadow-sm cursor-pointer"
-              >
-                <Settings2 className="w-4 h-4" />
-                Properties
-              </button>
-            )}
-
-            {/* SEO Settings Button */}
-            <button 
-              onClick={() => setIsSeoModalOpen(true)}
-              className="hidden md:flex h-10 px-4 bg-surface-container text-on-surface-variant border border-outline-variant/30 rounded-lg font-label-md text-[14px] hover:bg-surface-variant transition-all shadow-sm items-center gap-2 cursor-pointer"
-            >
-              <span className="material-symbols-outlined text-[18px]">search</span>
-              SEO Settings
-            </button>
-            {/* AI Sync Button */}
-            <button 
-              onClick={handleAutoFill}
-              disabled={isSyncing}
-              className={`hidden md:flex h-10 px-4 bg-primary-container text-on-primary-container rounded-lg font-label-md text-[14px] hover:bg-primary-container/90 transition-all shadow-sm items-center gap-2 cursor-pointer ${isSyncing ? 'opacity-50 cursor-not-allowed' : ''}`}
-            >
-              <span className={`material-symbols-outlined text-[18px] ${isSyncing ? 'animate-spin' : ''}`}>magic_button</span>
-              {isSyncing ? 'Crafting...' : 'Auto-Fill'}
-            </button>
-            {/* Magic Layout Optimizer Button */}
-            <button 
-              onClick={() => {
-                  import('@/lib/magicLayoutOptimizer').then(({ optimizeLayout }) => {
-                      const optimizedBlocks = optimizeLayout(portfolioData);
-                      dispatch({
-                          type: 'portfolio/updatePortfolioData',
-                          payload: {
-                              id: portfolioId,
-                              data: {
-                                  ...portfolioData,
-                                  blocks: optimizedBlocks
-                              }
-                          }
-                      });
-                      toast.success("Magic Layout Applied!");
-                  });
-              }}
-              className="hidden lg:flex h-10 px-4 bg-purple-100 text-purple-700 border border-purple-200 rounded-lg font-label-md text-[14px] hover:bg-purple-200 transition-all shadow-sm items-center gap-2 cursor-pointer"
-            >
-              <span className="material-symbols-outlined text-[18px]">auto_awesome_mosaic</span>
-              Optimize Layout
-            </button>
-
-            {/* SEO Score Button */}
-            <button 
-              className="h-10 px-4 rounded-lg font-label-md text-[14px] shadow-sm flex items-center gap-2"
-              style={{ backgroundColor: seoData.color, color: '#fff' }}
-              title={seoData.warnings && seoData.warnings.length > 0 ? seoData.warnings.join('\n') : 'SEO Score Good'}
-            >
-              SEO Score: {seoData.score}
-            </button>
-            {/* Publish Button */}
-            <button 
-              onClick={() => setIsDeployModalOpen(true)}
-              className="h-10 px-4 bg-stitch-secondary text-white rounded-lg font-label-md text-[14px] hover:bg-stitch-secondary/90 transition-all shadow-sm flex items-center gap-2 cursor-pointer active:scale-95"
-            >
-              <span className="material-symbols-outlined text-[18px]">rocket_launch</span>
-              Publish
-            </button>
         </GlobalEditorToolbar>
 
         {/* Pill Tab Switcher (Mobile Only) */}
@@ -307,16 +311,16 @@ export default function EditPortfolio() {
           {!isLoading && <LeftSidebar activeBlockId={activeBlockId} setActiveBlockId={setActiveBlockId} isOpen={isLeftPanelOpen} onToggle={() => setIsLeftPanelOpen(!isLeftPanelOpen)} />}
 
           {/* 2. Center Preview Canvas */}
-          <section className={`h-full flex-1 overflow-hidden flex-col bg-surface-container p-0 md:p-6 relative items-center justify-center`}>
+          <section className={`h-full flex-1 overflow-hidden flex-col bg-surface-container p-0 relative`}>
             
             {/* Device Switcher (Top Center of Canvas) */}
-            <div className="hidden md:flex absolute top-4 left-1/2 -translate-x-1/2 z-50 bg-white/90 dark:bg-slate-800/90 backdrop-blur-md shadow-sm border border-gray-200 dark:border-slate-700 rounded-full p-1 gap-1">
+            <div className="hidden md:flex absolute top-2 left-1/2 -translate-x-1/2 z-50 bg-white/90 dark:bg-slate-800/90 backdrop-blur-md shadow-sm border border-gray-200 dark:border-slate-700 rounded-full p-1 gap-1">
               <button onClick={() => setPreviewMode('mobile')} className={`p-1.5 rounded-full transition-all ${previewMode === 'mobile' ? 'bg-gray-100 dark:bg-slate-700 text-indigo-600 dark:text-indigo-400' : 'text-gray-500 hover:text-gray-800 dark:hover:text-gray-200'}`} title="Mobile View"><Smartphone className="w-4 h-4" /></button>
               <button onClick={() => setPreviewMode('tablet')} className={`p-1.5 rounded-full transition-all ${previewMode === 'tablet' ? 'bg-gray-100 dark:bg-slate-700 text-indigo-600 dark:text-indigo-400' : 'text-gray-500 hover:text-gray-800 dark:hover:text-gray-200'}`} title="Tablet View"><Tablet className="w-4 h-4" /></button>
               <button onClick={() => setPreviewMode('desktop')} className={`p-1.5 rounded-full transition-all ${previewMode === 'desktop' ? 'bg-gray-100 dark:bg-slate-700 text-indigo-600 dark:text-indigo-400' : 'text-gray-500 hover:text-gray-800 dark:hover:text-gray-200'}`} title="Desktop View"><Monitor className="w-4 h-4" /></button>
             </div>
 
-            <div className={`transition-all duration-500 ease-in-out flex flex-col md:rounded-xl overflow-hidden relative mt-10 md:mt-12 ${previewMode === 'mobile' ? 'w-[375px] h-[812px] rounded-[2rem] border-[8px] border-surface-container-highest shadow-2xl mx-auto' : previewMode === 'tablet' ? 'w-[768px] h-[1024px] rounded-[1.5rem] border-[8px] border-surface-container-highest shadow-2xl mx-auto' : 'w-full h-full max-w-6xl mx-auto'}`}>
+            <div className={`transition-all duration-500 ease-in-out flex flex-col overflow-hidden relative ${previewMode === 'mobile' ? 'mt-10 w-[375px] h-[812px] rounded-[2rem] border-[8px] border-surface-container-highest shadow-2xl mx-auto' : previewMode === 'tablet' ? 'mt-10 w-[768px] h-[1024px] rounded-[1.5rem] border-[8px] border-surface-container-highest shadow-2xl mx-auto' : 'w-full h-full'}`}>
                
                {/* Mobile Only: Tabbed Bottom Sheet Toggle */}
                <div className="md:hidden absolute bottom-4 left-4 right-4 z-50 flex gap-2 justify-center">
@@ -325,6 +329,7 @@ export default function EditPortfolio() {
                </div>
 
                <div className="flex-1 overflow-y-auto bg-background relative w-full h-full custom-scrollbar">
+                  {isGenerating && <GenerativeCanvasLoader />}
                   {isLoading ? (
                     <div className="p-10 flex flex-col gap-8">
                       <Skeleton className="h-64 w-full rounded-xl" />
@@ -353,7 +358,7 @@ export default function EditPortfolio() {
           </section>
 
           {/* 3. Right Properties Panel */}
-          {!isLoading && <PropertiesPanel activeBlockId={activeBlockId} isOpen={isPropertiesPanelOpen} onToggle={() => setIsPropertiesPanelOpen(!isPropertiesPanelOpen)} />}
+          {!isLoading && !isGenerating && <PropertiesPanel activeBlockId={activeBlockId} setActiveBlockId={setActiveBlockId} isOpen={isPropertiesPanelOpen} onToggle={() => setIsPropertiesPanelOpen(!isPropertiesPanelOpen)} />}
         </main>
         
         <SeoSettingsModal isOpen={isSeoModalOpen} onClose={() => setIsSeoModalOpen(false)} />

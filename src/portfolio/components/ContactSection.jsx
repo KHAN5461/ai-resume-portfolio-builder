@@ -1,42 +1,57 @@
 import React from 'react';
+import { motion } from 'framer-motion';
 
 export default function ContactSection({ data }) {
   if (!data) return null;
 
   return (
-    <section className="py-24 px-8 text-center max-w-2xl mx-auto">
-      <h2 className="text-[clamp(2rem,4vw,3.5rem)] font-bold mb-6 text-[#2c3e50] font-['Space_Grotesk',sans-serif]">
-        {data.heading || "Get In Touch"}
-      </h2>
-      
-      <p className="text-[#555] text-lg mb-10 leading-relaxed font-['Inter',sans-serif]">
-        {data.subheading || "I'm currently looking for new opportunities. Whether you have a question or just want to say hi, I'll try my best to get back to you!"}
-      </p>
-      
-      {data.email && (
-        <a 
-          href={`mailto:${data.email}`}
-          className="inline-block px-8 py-4 bg-[#3366BB] text-white font-bold rounded-full hover:bg-[#5A8DEE] hover:-translate-y-1 hover:shadow-[0_4px_15px_rgba(0,0,0,0.2)] transition-all duration-300"
-        >
-          Say Hello
-        </a>
-      )}
-      
-      {data.socialLinks && data.socialLinks.length > 0 && (
-        <div className="mt-16 flex justify-center gap-6">
-          {data.socialLinks.map((link, idx) => (
+    <section id="contact" className="w-full max-w-6xl mx-auto px-6 md:px-8 py-32 bg-white dark:bg-slate-950">
+      <motion.div 
+        initial={{ opacity: 0, y: 20 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, margin: "-100px" }}
+        transition={{ duration: 0.6 }}
+        className="max-w-3xl mx-auto text-center flex flex-col items-center gap-8"
+      >
+        <span className="text-xs font-mono font-semibold text-indigo-600 dark:text-indigo-400 uppercase tracking-widest">
+          {data.heading || "Get In Touch"}
+        </span>
+        
+        <h2 className="text-5xl md:text-6xl font-bold text-slate-900 dark:text-white tracking-tight">
+          Let's build something together.
+        </h2>
+        
+        <p className="text-xl text-slate-600 dark:text-slate-400 leading-relaxed">
+          {data.subheading || "I'm currently looking for new opportunities. Whether you have a question or just want to say hi, I'll try my best to get back to you!"}
+        </p>
+        
+        <div className="pt-8">
+          {data.email && (
             <a 
-              key={idx} 
-              href={link.url}
-              target="_blank"
-              rel="noreferrer"
-              className="text-gray-500 hover:text-[#3366BB] transition-colors capitalize font-semibold"
+              href={`mailto:${data.email}`}
+              className="inline-flex items-center justify-center px-10 py-5 bg-indigo-600 text-white font-semibold text-lg rounded-full hover:bg-indigo-700 hover:scale-95 hover:shadow-lg transition-all duration-200 ease-out"
             >
-              {link.platform}
+              Say Hello
             </a>
-          ))}
+          )}
         </div>
-      )}
+        
+        {data.socialLinks && data.socialLinks.length > 0 && (
+          <div className="mt-16 flex flex-wrap justify-center gap-8">
+            {data.socialLinks.map((link, idx) => (
+              <a 
+                key={idx} 
+                href={link.url}
+                target="_blank"
+                rel="noreferrer"
+                className="text-slate-500 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors font-mono text-sm uppercase tracking-wider font-semibold"
+              >
+                {link.platform}
+              </a>
+            ))}
+          </div>
+        )}
+      </motion.div>
     </section>
   );
 }

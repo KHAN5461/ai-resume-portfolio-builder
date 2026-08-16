@@ -83,109 +83,108 @@ const ProjectsForm = () => {
   };
 
   return (
-    <div className='p-5 shadow-lg rounded-lg border-t-indigo-500 border-t-4 mt-10 bg-white'>
-      <div className="flex justify-between items-center mb-2">
-        <h2 className='font-bold text-lg'>Projects Section</h2>
-        <Dialog open={isGithubModalOpen} onOpenChange={setIsGithubModalOpen}>
-          <DialogTrigger asChild>
-            <Button 
-              variant="outline" 
-              size="sm" 
-              disabled={isFetchingGithub}
-              className="flex items-center gap-2 border-slate-200 text-slate-700 hover:bg-slate-50"
-            >
-              <Github className="w-4 h-4" />
-              Import from GitHub
-            </Button>
-          </DialogTrigger>
-          <DialogContent className="sm:max-w-[425px]">
-            <DialogHeader>
-              <DialogTitle>Import from GitHub</DialogTitle>
-              <DialogDescription>
-                Enter your GitHub username to import your most recently updated public repositories.
-              </DialogDescription>
-            </DialogHeader>
-            <div className="grid gap-4 py-4">
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Input
-                  id="username"
-                  value={githubUsername}
-                  onChange={(e) => setGithubUsername(e.target.value)}
-                  placeholder="e.g. torvalds"
-                  className="col-span-4"
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter') {
-                      handleGithubImport();
-                    }
-                  }}
-                />
+    <div className='space-y-6'>
+      <div className="space-y-1">
+        <div className="flex justify-between items-center">
+          <h4 className="text-xs font-bold text-gray-500 uppercase tracking-wider">Selected Works</h4>
+          <Dialog open={isGithubModalOpen} onOpenChange={setIsGithubModalOpen}>
+            <DialogTrigger asChild>
+              <button 
+                disabled={isFetchingGithub}
+                className="text-[11px] font-bold text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 uppercase tracking-wider transition-colors bg-indigo-50 dark:bg-indigo-900/20 px-2 py-1 rounded-md flex items-center gap-1.5"
+              >
+                <Github className="w-3.5 h-3.5" />
+                Import from GitHub
+              </button>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-[425px]">
+              <DialogHeader>
+                <DialogTitle>Import from GitHub</DialogTitle>
+                <DialogDescription>
+                  Enter your GitHub username to import your most recently updated public repositories.
+                </DialogDescription>
+              </DialogHeader>
+              <div className="grid gap-4 py-4">
+                <div className="grid grid-cols-4 items-center gap-4">
+                  <Input
+                    id="username"
+                    value={githubUsername}
+                    onChange={(e) => setGithubUsername(e.target.value)}
+                    placeholder="e.g. torvalds"
+                    className="col-span-4"
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') {
+                        handleGithubImport();
+                      }
+                    }}
+                  />
+                </div>
               </div>
-            </div>
-            <DialogFooter>
-              <Button disabled={isFetchingGithub || !githubUsername} onClick={handleGithubImport}>
-                {isFetchingGithub ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
-                {isFetchingGithub ? "Importing..." : "Import Repositories"}
-              </Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
+              <DialogFooter>
+                <Button disabled={isFetchingGithub || !githubUsername} onClick={handleGithubImport}>
+                  {isFetchingGithub ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
+                  {isFetchingGithub ? "Importing..." : "Import Repositories"}
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
+        </div>
       </div>
-      <p className="text-sm text-slate-500 mb-4">Add your selected works</p>
 
       {projects.length === 0 ? (
-        <div className="text-center py-8 bg-zinc-50 rounded-lg mt-4 border border-dashed border-zinc-300">
-           <span className="material-symbols-outlined text-4xl text-zinc-400 mb-2">work_off</span>
-           <h3 className="font-semibold text-zinc-700">No Projects Yet</h3>
-           <p className="text-sm text-zinc-500 max-w-xs mx-auto mb-4">Showcase your best work by adding your first project.</p>
+        <div className="text-center py-6 bg-gray-50 dark:bg-slate-800/30 rounded-xl border border-dashed border-gray-200 dark:border-slate-700/50">
+           <span className="material-symbols-outlined text-[32px] text-gray-300 dark:text-gray-600 mb-1 block">work_off</span>
+           <h3 className="font-semibold text-sm text-gray-600 dark:text-gray-300">No Projects</h3>
+           <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">Showcase your best work.</p>
         </div>
       ) : (
-        <div className="mt-4 flex flex-col gap-4">
+        <div className="space-y-4">
           <AnimatePresence initial={false}>
             {projects.map((project, index) => (
               <motion.div 
                 key={index}
-                initial={{ opacity: 0, y: 20 }}
+                initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, height: 0, overflow: 'hidden' }}
-                transition={{ duration: 0.3, delay: index * 0.1 }}
+                transition={{ duration: 0.2 }}
               >
-                <div className='border rounded p-4 bg-zinc-50 relative'>
-                  <button 
-                    onClick={() => removeProject(index)}
-                    className='absolute top-2 right-2 text-red-500 text-sm hover:underline flex items-center gap-1'
-                  >
-                    <span className="material-symbols-outlined text-[16px]">delete</span>
-                    Remove
-                  </button>
+                <div className='p-4 bg-gray-50 dark:bg-slate-800/50 rounded-xl border border-gray-100 dark:border-slate-700/50 relative group'>
+                  <div className="flex justify-between items-center mb-4 border-b border-gray-200 dark:border-slate-700 pb-2">
+                     <h5 className="text-[11px] font-bold text-gray-500 uppercase">Project {index + 1}</h5>
+                     <button 
+                       onClick={() => removeProject(index)}
+                       className='p-1 text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-md transition-colors opacity-0 group-hover:opacity-100'
+                     >
+                       <span className="material-symbols-outlined text-[16px] block">delete</span>
+                     </button>
+                  </div>
                   
-                  <div className='grid grid-cols-1 md:grid-cols-2 gap-4 mt-2'>
-                    <div>
-                      <label className='text-sm font-semibold'>Project Title</label>
-                      <Input value={project.title || ""} onChange={(e) => handleProjectChange(index, 'title', e.target.value)} placeholder="e.g. E-Commerce App" />
+                  <div className='space-y-3'>
+                    <div className="space-y-1.5">
+                      <label className='text-xs font-medium text-gray-600 dark:text-gray-400'>Project Title</label>
+                      <Input value={project.title || ""} onChange={(e) => handleProjectChange(index, 'title', e.target.value)} placeholder="e.g. E-Commerce App" className="h-8 text-xs bg-white dark:bg-slate-900" />
                     </div>
-                    <div>
-                      <label className='text-sm font-semibold'>Tagline</label>
-                      <Input value={project.tagline || ""} onChange={(e) => handleProjectChange(index, 'tagline', e.target.value)} placeholder="e.g. Built with React & Node" />
+                    <div className="space-y-1.5">
+                      <label className='text-xs font-medium text-gray-600 dark:text-gray-400'>Tagline</label>
+                      <Input value={project.tagline || ""} onChange={(e) => handleProjectChange(index, 'tagline', e.target.value)} placeholder="e.g. Built with React & Node" className="h-8 text-xs bg-white dark:bg-slate-900" />
                     </div>
-                    <div className='md:col-span-2'>
-                      <label className='text-sm font-semibold'>Description</label>
-                      <Textarea value={project.description || ""} onChange={(e) => handleProjectChange(index, 'description', e.target.value)} placeholder="What did you build?" />
+                    <div className="space-y-1.5">
+                      <label className='text-xs font-medium text-gray-600 dark:text-gray-400'>Description</label>
+                      <Textarea value={project.description || ""} onChange={(e) => handleProjectChange(index, 'description', e.target.value)} placeholder="What did you build?" className="text-xs resize-none h-20 custom-scrollbar bg-white dark:bg-slate-900" />
                     </div>
-                    <div className='md:col-span-2'>
-                      <label className='text-sm font-semibold'>Thumbnail URL</label>
-                      <Input value={project.thumbnailUrl || ""} onChange={(e) => handleProjectChange(index, 'thumbnailUrl', e.target.value)} placeholder="https://..." />
+                    
+                    <div className="space-y-1.5 pt-2">
+                      <label className='text-[10px] font-bold text-gray-400 uppercase tracking-wider'>Media & Links</label>
+                      <div className="grid grid-cols-2 gap-2">
+                        <Input value={project.thumbnailUrl || ""} onChange={(e) => handleProjectChange(index, 'thumbnailUrl', e.target.value)} placeholder="Thumbnail URL" className="h-8 text-xs bg-white dark:bg-slate-900 col-span-2" />
+                        <Input value={project.githubUrl || ""} onChange={(e) => handleProjectChange(index, 'githubUrl', e.target.value)} placeholder="GitHub URL" className="h-8 text-xs bg-white dark:bg-slate-900" />
+                        <Input value={project.liveUrl || ""} onChange={(e) => handleProjectChange(index, 'liveUrl', e.target.value)} placeholder="Live URL" className="h-8 text-xs bg-white dark:bg-slate-900" />
+                      </div>
                     </div>
-                    <div>
-                      <label className='text-sm font-semibold'>GitHub URL</label>
-                      <Input value={project.githubUrl || ""} onChange={(e) => handleProjectChange(index, 'githubUrl', e.target.value)} placeholder="https://github.com/..." />
-                    </div>
-                    <div>
-                      <label className='text-sm font-semibold'>Live URL</label>
-                      <Input value={project.liveUrl || ""} onChange={(e) => handleProjectChange(index, 'liveUrl', e.target.value)} placeholder="https://..." />
-                    </div>
-                    <div className='md:col-span-2'>
-                      <label className='text-sm font-semibold'>Tags (comma separated)</label>
-                      <Input value={project.tags?.join(', ') || ""} onChange={(e) => handleTagsChange(index, e.target.value)} placeholder="React, Node.js, MongoDB" />
+                    
+                    <div className="space-y-1.5 pt-2">
+                      <label className='text-xs font-medium text-gray-600 dark:text-gray-400'>Tags (comma separated)</label>
+                      <Input value={project.tags?.join(', ') || ""} onChange={(e) => handleTagsChange(index, e.target.value)} placeholder="React, Node.js, MongoDB" className="h-8 text-xs bg-white dark:bg-slate-900" />
                     </div>
                   </div>
                 </div>
@@ -195,9 +194,9 @@ const ProjectsForm = () => {
         </div>
       )}
       
-      <Button onClick={addProject} variant="outline" className="w-full mt-4 text-indigo-600 border-indigo-600">
+      <button onClick={addProject} className="w-full py-2 bg-white dark:bg-slate-800 border border-dashed border-gray-300 dark:border-slate-600 rounded-xl text-sm font-semibold text-gray-600 dark:text-gray-300 hover:border-indigo-500 hover:text-indigo-600 transition-all flex items-center justify-center gap-2">
         + Add New Project
-      </Button>
+      </button>
     </div>
   );
 }

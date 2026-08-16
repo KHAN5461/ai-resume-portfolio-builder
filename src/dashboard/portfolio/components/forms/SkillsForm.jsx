@@ -38,18 +38,19 @@ const SkillsForm = () => {
   };
 
   return (
-    <div className='p-5 shadow-lg rounded-lg border-t-indigo-500 border-t-4 mt-10 bg-white'>
-      <h2 className='font-bold text-lg'>Skills Section</h2>
-      <p>Categorize your technical skills</p>
+    <div className='space-y-6'>
+      <div className="flex justify-between items-center">
+         <h4 className="text-xs font-bold text-gray-500 uppercase tracking-wider">Skill Categories</h4>
+      </div>
 
       {categories.length === 0 ? (
-        <div className="text-center py-8 bg-zinc-50 rounded-lg mt-4 border border-dashed border-zinc-300">
-           <span className="material-symbols-outlined text-4xl text-zinc-400 mb-2">construction</span>
-           <h3 className="font-semibold text-zinc-700">No Skills Added</h3>
-           <p className="text-sm text-zinc-500 max-w-xs mx-auto mb-4">Add categories like "Frontend" or "Backend" and list your skills.</p>
+        <div className="text-center py-6 bg-gray-50 dark:bg-slate-800/30 rounded-xl border border-dashed border-gray-200 dark:border-slate-700/50">
+           <span className="material-symbols-outlined text-[32px] text-gray-300 dark:text-gray-600 mb-1 block">construction</span>
+           <h3 className="font-semibold text-sm text-gray-600 dark:text-gray-300">No Skills Added</h3>
+           <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">Add categories like "Frontend" or "Backend".</p>
         </div>
       ) : (
-        <div className="mt-4 flex flex-col gap-4">
+        <div className="space-y-4">
           <AnimatePresence initial={false}>
             {categories.map((cat, index) => (
               <motion.div 
@@ -57,25 +58,27 @@ const SkillsForm = () => {
                 initial={{ opacity: 0, height: 0 }}
                 animate={{ opacity: 1, height: 'auto' }}
                 exit={{ opacity: 0, height: 0, overflow: 'hidden' }}
-                transition={{ duration: 0.3 }}
+                transition={{ duration: 0.2 }}
               >
-                <div className='border rounded p-4 bg-zinc-50 relative'>
-                  <button 
-                    onClick={() => removeCategory(index)}
-                    className='absolute top-2 right-2 text-red-500 text-sm hover:underline flex items-center gap-1'
-                  >
-                    <span className="material-symbols-outlined text-[16px]">delete</span>
-                    Remove
-                  </button>
+                <div className='p-4 bg-gray-50 dark:bg-slate-800/50 rounded-xl border border-gray-100 dark:border-slate-700/50 relative group'>
+                  <div className="flex justify-between items-center mb-3 border-b border-gray-200 dark:border-slate-700 pb-2">
+                     <h5 className="text-[11px] font-bold text-gray-500 uppercase">Category {index + 1}</h5>
+                     <button 
+                       onClick={() => removeCategory(index)}
+                       className='p-1 text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-md transition-colors opacity-0 group-hover:opacity-100'
+                     >
+                       <span className="material-symbols-outlined text-[16px] block">delete</span>
+                     </button>
+                  </div>
                   
-                  <div className='grid grid-cols-1 md:grid-cols-2 gap-4 mt-2'>
-                    <div>
-                      <label className='text-sm font-semibold'>Category Title</label>
-                      <Input value={cat.title || ""} onChange={(e) => handleCategoryChange(index, e.target.value)} placeholder="e.g. Frontend Development" />
+                  <div className='space-y-3'>
+                    <div className="space-y-1.5">
+                      <label className='text-xs font-medium text-gray-600 dark:text-gray-400'>Category Title</label>
+                      <Input value={cat.title || ""} onChange={(e) => handleCategoryChange(index, e.target.value)} placeholder="e.g. Frontend Development" className="h-8 text-xs bg-white dark:bg-slate-900" />
                     </div>
-                    <div>
-                      <label className='text-sm font-semibold'>Skills (comma separated)</label>
-                      <Input value={cat.items?.join(', ') || ""} onChange={(e) => handleSkillsChange(index, e.target.value)} placeholder="React, Vue, HTML, CSS" />
+                    <div className="space-y-1.5">
+                      <label className='text-xs font-medium text-gray-600 dark:text-gray-400'>Skills (comma separated)</label>
+                      <Input value={cat.items?.join(', ') || ""} onChange={(e) => handleSkillsChange(index, e.target.value)} placeholder="React, Vue, HTML, CSS" className="h-8 text-xs bg-white dark:bg-slate-900" />
                     </div>
                   </div>
                 </div>
@@ -85,9 +88,9 @@ const SkillsForm = () => {
         </div>
       )}
       
-      <Button onClick={addCategory} variant="outline" className="w-full mt-4 text-indigo-600 border-indigo-600">
+      <button onClick={addCategory} className="w-full py-2 bg-white dark:bg-slate-800 border border-dashed border-gray-300 dark:border-slate-600 rounded-xl text-sm font-semibold text-gray-600 dark:text-gray-300 hover:border-indigo-500 hover:text-indigo-600 transition-all flex items-center justify-center gap-2">
         + Add New Category
-      </Button>
+      </button>
     </div>
   );
 }

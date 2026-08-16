@@ -1,35 +1,53 @@
 import React from 'react';
+import { motion } from 'framer-motion';
 
 export default function SkillsSection({ data }) {
   if (!data || !data.categories || data.categories.length === 0) return null;
 
   return (
-    <section className="py-24 px-8 max-w-6xl mx-auto">
-      <h2 className="text-3xl font-bold mb-12 flex items-center gap-4">
-        <span className="text-[#3366BB] font-['Space_Grotesk',sans-serif] text-xl">03.</span>
-        <span className="text-[#2c3e50] font-['Space_Grotesk',sans-serif]">Technical Arsenal</span>
-        <div className="flex-grow h-px bg-gray-300 ml-4" />
-      </h2>
+    <section id="skills" className="w-full max-w-6xl mx-auto px-6 md:px-8 py-24 bg-white dark:bg-slate-950">
+      
+      <motion.div 
+        initial={{ opacity: 0, y: 20 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, margin: "-100px" }}
+        transition={{ duration: 0.6 }}
+        className="mb-12 flex flex-col gap-4"
+      >
+        <span className="text-xs font-mono font-semibold text-indigo-600 dark:text-indigo-400 uppercase tracking-widest">
+          {data.heading || "Technical Arsenal"}
+        </span>
+        <h2 className="text-3xl md:text-4xl font-bold text-slate-900 dark:text-white tracking-tight">
+          Tools & Technologies
+        </h2>
+      </motion.div>
       
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
         {data.categories.map((category, idx) => (
-          <div key={idx} className="bg-white p-6 rounded-xl border border-gray-200 shadow-[0_4px_15px_rgba(0,0,0,0.05)]">
-            <h3 className="font-semibold text-[#2c3e50] mb-6 flex items-center gap-3 font-['Space_Grotesk',sans-serif]">
-              <div className="w-2 h-2 rounded-full bg-[#3366BB]" />
+          <motion.div 
+            key={idx} 
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-100px" }}
+            transition={{ duration: 0.5, delay: idx * 0.1 }}
+            className="p-6 rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50 flex flex-col gap-6"
+          >
+            <h3 className="text-xl font-semibold text-slate-900 dark:text-white flex items-center gap-3">
+              <div className="w-1.5 h-1.5 rounded-full bg-indigo-600 dark:bg-indigo-400" />
               {category.categoryName}
             </h3>
             
-            <div className="flex flex-wrap gap-3">
+            <div className="flex flex-wrap gap-2">
               {category.skills?.map((skill, sIdx) => (
                 <span 
                   key={sIdx} 
-                  className="px-3 py-1.5 bg-gray-50 text-gray-700 rounded-lg text-sm border border-gray-200 hover:border-[#3366BB] hover:text-[#3366BB] transition-colors cursor-default"
+                  className="px-3 py-1.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 text-sm font-medium rounded-lg hover:border-indigo-300 dark:hover:border-indigo-700 hover:text-indigo-700 dark:hover:text-indigo-400 transition-colors cursor-default shadow-sm"
                 >
                   {skill}
                 </span>
               ))}
             </div>
-          </div>
+          </motion.div>
         ))}
       </div>
     </section>

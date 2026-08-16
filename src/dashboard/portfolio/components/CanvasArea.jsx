@@ -8,7 +8,9 @@ import AboutSection from '../../../portfolio/components/AboutSection';
 import ProjectsSection from '../../../portfolio/components/ProjectsSection';
 import SkillsSection from '../../../portfolio/components/SkillsSection';
 import ContactSection from '../../../portfolio/components/ContactSection';
-import MagicImportModal from '../../components/MagicImportModal';
+import PortfolioNav from '../../../portfolio/components/PortfolioNav';
+import PortfolioFooter from '../../../portfolio/components/PortfolioFooter';
+import GeneratePortfolioModal from './GeneratePortfolioModal';
 
 // This is our BlockRenderer
 const BlockRenderer = ({ block, portfolioData }) => {
@@ -25,6 +27,7 @@ const BlockRenderer = ({ block, portfolioData }) => {
 };
 
 export default function CanvasArea({ blocks, portfolioData, onSelectBlock, activeBlockId, onOpenAi }) {
+  const [isGenerateModalOpen, setIsGenerateModalOpen] = React.useState(false);
   const dispatch = useDispatch();
   const { portfolioId } = useParams();
 
@@ -73,10 +76,16 @@ export default function CanvasArea({ blocks, portfolioData, onSelectBlock, activ
           </div>
           <div>
              <h2 className="text-2xl font-bold text-slate-800 mb-2">Blank Canvas</h2>
-             <p className="text-slate-500 mb-6">Let AI craft a beautiful portfolio from your resume data, or start building manually from the left panel.</p>
+             <p className="text-slate-500 mb-6">Let AI scaffold a beautiful portfolio from your resume data, or start building manually from the left panel.</p>
           </div>
-          <MagicImportModal />
+          <button 
+            onClick={() => setIsGenerateModalOpen(true)}
+            className="w-full py-3 px-4 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-semibold shadow-md transition-colors"
+          >
+            Generate Portfolio
+          </button>
         </div>
+        <GeneratePortfolioModal isOpen={isGenerateModalOpen} onClose={() => setIsGenerateModalOpen(false)} />
       </div>
     );
   }
@@ -89,8 +98,10 @@ export default function CanvasArea({ blocks, portfolioData, onSelectBlock, activ
   const themeMode = portfolioData.siteConfig?.themeMode || 'light';
 
   return (
-    <div className={`min-h-full w-full p-4 md:p-8 transition-colors bg-gradient-to-br from-gray-50 to-gray-200 dark:from-slate-900 dark:to-slate-950`} style={style}>
-      <div className={`max-w-4xl mx-auto space-y-0 bg-white dark:bg-slate-900 shadow-2xl rounded-xl min-h-[90vh] overflow-hidden transition-all duration-500`}>
+    <div className={`h-full w-full bg-white dark:bg-slate-950 overflow-y-auto custom-scrollbar`} style={style}>
+        {/* Navigation */}
+        <PortfolioNav data={portfolioData} blocks={blocks} />
+
         {blocks.map((block) => {
           const isActive = activeBlockId === block.id;
           const quality = getSemanticQuality(block);
@@ -138,12 +149,14 @@ export default function CanvasArea({ blocks, portfolioData, onSelectBlock, activ
                </div>
             )}
 
-            <div className={`pointer-events-none transition-all p-8 md:p-12 ${!block.visible ? 'opacity-40 grayscale' : ''}`}>
+            <div className={`pointer-events-none transition-all ${!block.visible ? 'opacity-40 grayscale' : ''}`}>
                <BlockRenderer block={block} portfolioData={portfolioData} />
             </div>
-          </div>
-        )})}
-      </div>
+           </div>
+         )})}
+
+        {/* Footer */}
+        <PortfolioFooter data={portfolioData} />
     </div>
   );
 }

@@ -159,6 +159,14 @@ export const portfolioSlice = createSlice({
           layout.splice(index + 1, 0, newBlock);
         }
       }
+    },
+    setPortfolioData: (state, action) => {
+      const { id, data } = action.payload;
+      // Atomic overwrite of portfolio data
+      state.portfolios[id] = {
+        ...data,
+        title: state.portfolios[id]?.title || data.title || "Untitled Portfolio"
+      };
     }
   },
 });
@@ -173,6 +181,7 @@ export const {
   moveBlockDown,
   addBlock,
   removeBlock,
-  duplicateBlock
+  duplicateBlock,
+  setPortfolioData
 } = portfolioSlice.actions;
 export default portfolioSlice.reducer;

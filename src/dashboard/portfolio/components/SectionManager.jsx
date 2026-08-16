@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { updatePortfolioData, moveBlockUp, moveBlockDown, addBlock } from '@/store/portfolioSlice';
-import { ArrowUp, ArrowDown, Eye, EyeOff, LayoutList, Plus, FolderGit2, Briefcase, User, Mail, GraduationCap } from 'lucide-react';
+import { updatePortfolioData, addBlock } from '@/store/portfolioSlice';
+import { Eye, EyeOff, LayoutList, Plus, FolderGit2, Briefcase, User, Mail, GraduationCap } from 'lucide-react';
 import { useParams } from 'react-router-dom';
+import { motion, AnimatePresence, Reorder } from 'framer-motion';
 
 const defaultLayout = [
   { id: 'hero', visible: true, name: 'Hero' },
@@ -28,10 +29,16 @@ export default function SectionManager({ activeBlockId, setActiveBlockId }) {
     }
   };
 
-  const handleMove = (e, blockId, direction) => {
-    e.stopPropagation();
-    if (direction === 'up') dispatch(moveBlockUp({ portfolioId, blockId }));
-    else dispatch(moveBlockDown({ portfolioId, blockId }));
+  const handleReorder = (newLayout) => {
+    dispatch(updatePortfolioData({
+      id: portfolioId,
+      data: {
+        siteConfig: {
+          ...portfolioData?.siteConfig,
+          layout: newLayout
+        }
+      }
+    }));
   };
 
   const toggleVisibility = (e, id) => {
@@ -64,43 +71,39 @@ export default function SectionManager({ activeBlockId, setActiveBlockId }) {
       </div>
 
       <div className="flex-1 overflow-y-auto p-4 flex flex-col gap-2 custom-scrollbar">
-        {layout.map((item, index) => (
-          <div 
-            key={item.id}
-            onClick={() => handleSectionClick(item.id)}
-            className={`flex items-center justify-between p-3 rounded-xl border transition-all cursor-pointer group ${activeBlockId === item.id ? 'border-indigo-500 bg-indigo-50 dark:bg-indigo-500/10 shadow-sm' : 'border-gray-100 dark:border-slate-800 hover:border-indigo-300 dark:hover:border-indigo-700 bg-white dark:bg-slate-800/50 hover:shadow-sm'}`}
-          >
-            <div className="flex items-center gap-3">
-              <div className="flex flex-col opacity-30 group-hover:opacity-100 transition-opacity">
-                <button 
-                  onClick={(e) => handleMove(e, item.id, 'up')}
-                  disabled={index === 0}
-                  className="hover:text-indigo-600 disabled:opacity-20 transition-colors"
-                >
-                  <ArrowUp className="w-3 h-3" />
-                </button>
-                <button 
-                  onClick={(e) => handleMove(e, item.id, 'down')}
-                  disabled={index === layout.length - 1}
-                  className="hover:text-indigo-600 disabled:opacity-20 transition-colors"
-                >
-                  <ArrowDown className="w-3 h-3" />
-                </button>
+        <Reorder.Group axis="y" values={layout} onReorder={handleReorder} className="flex flex-col gap-2">
+          <AnimatePresence>
+            {layout.map((item, index) => (
+              <Reorder.Item 
+                key={item.id}
+                value={item}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.95 }}
+                transition={{ duration: 0.2 }}
+                onClick={() => handleSectionClick(item.id)}
+                className={`flex items-center justify-between p-3 rounded-xl border transition-all cursor-grab active:cursor-grabbing group ${activeBlockId === item.id ? 'border-indigo-500 bg-indigo-50 dark:bg-indigo-500/10 shadow-sm' : 'border-gray-100 dark:border-slate-800 hover:border-indigo-300 dark:hover:border-indigo-700 bg-white dark:bg-slate-800/50 hover:shadow-sm'}`}
+              >
+              <div className="flex items-center gap-3">
+                <div className="flex flex-col opacity-30 group-hover:opacity-100 transition-opacity text-gray-400 cursor-grab active:cursor-grabbing">
+                   <span className="material-symbols-outlined text-[16px]">drag_indicator</span>
+                </div>
+                <span className={`text-sm font-medium ${!item.visible ? 'text-gray-400 line-through' : (activeBlockId === item.id ? 'text-indigo-700 dark:text-indigo-300' : 'text-gray-700 dark:text-gray-200')}`}>
+                  {item.name}
+                </span>
               </div>
-              <span className={`text-sm font-medium ${!item.visible ? 'text-gray-400 line-through' : (activeBlockId === item.id ? 'text-indigo-700 dark:text-indigo-300' : 'text-gray-700 dark:text-gray-200')}`}>
-                {item.name}
-              </span>
-            </div>
-            
-            <button 
-              onClick={(e) => toggleVisibility(e, item.id)}
-              className={`p-1.5 rounded-md transition-colors ${item.visible ? 'text-gray-400 hover:bg-gray-100 hover:text-red-500' : 'text-red-500 bg-red-50 dark:bg-red-500/10 hover:bg-red-100'}`}
-              title={item.visible ? "Hide section" : "Show section"}
-            >
-              {item.visible ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
-            </button>
-          </div>
-        ))}
+              
+              <button 
+                onClick={(e) => toggleVisibility(e, item.id)}
+                className={`p-1.5 rounded-md transition-colors ${item.visible ? 'text-gray-400 hover:bg-gray-100 hover:text-red-500 dark:hover:bg-slate-700' : 'text-red-500 bg-red-50 dark:bg-red-500/10 hover:bg-red-100'}`}
+                title={item.visible ? "Hide section" : "Show section"}
+              >
+                {item.visible ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
+              </button>
+            </Reorder.Item>
+          ))}
+          </AnimatePresence>
+        </Reorder.Group>
       </div>
 
       {/* Add Section Button Area */}

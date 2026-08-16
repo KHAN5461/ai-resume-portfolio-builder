@@ -1,4 +1,4 @@
-import { Loader2, PlusSquare } from 'lucide-react';
+import { Loader2, PlusSquare, Sparkles } from 'lucide-react';
 import React, { useState } from 'react';
 import {
     Dialog,
@@ -78,6 +78,14 @@ function AddPortfolio({ renderTrigger }) {
                                 <Loader2 className='animate-spin' /> : 'Create'   
                                 }
                             </Button>
+                        </div>
+                        <div className="pt-3 mt-3 border-t border-[var(--color-chalk)]">
+                          <button
+                            onClick={() => { setOpenDialog(false); navigation('/dashboard/portfolio/new/ai'); }}
+                            className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white px-4 py-2.5 rounded-[36px] text-sm font-semibold shadow-lg shadow-indigo-600/20 transition-all cursor-pointer"
+                          >
+                            <Sparkles size={16} /> Generate with AI instead
+                          </button>
                         </div>
                     </DialogHeader>
                 </DialogContent>
