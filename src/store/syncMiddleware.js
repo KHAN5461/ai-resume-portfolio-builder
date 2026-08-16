@@ -4,7 +4,9 @@ import { setSyncStatus, setPendingQueueLength } from './syncSlice';
 let localSaveTimeout = null;
 let apiSaveTimeout = null;
 let offlineQueue = [];
+let onlineQueue = []; // Queue for tracking pending online saves
 let isFlushingQueue = false;
+let isOnlineSaving = false; // Lock for online saves
 
 const flushQueue = async (store) => {
   if (isFlushingQueue || offlineQueue.length === 0 || !navigator.onLine) return;
@@ -32,11 +34,42 @@ const flushQueue = async (store) => {
   }
 };
 
+const processOnlineQueue = async (store) => {
+  if (isOnlineSaving || onlineQueue.length === 0 || !navigator.onLine) return;
+  
+  isOnlineSaving = true;
+  store.dispatch(setSyncStatus('saving'));
+  
+  while (onlineQueue.length > 0) {
+    const { resumeId, resumeData, previousState } = onlineQueue[0];
+    try {
+      await GlobalApi.UpdateResumeDetail(resumeId, { data: resumeData });
+      onlineQueue.shift(); // Remove successful item
+    } catch (error) {
+      console.error("API update error:", error);
+      store.dispatch(setSyncStatus('error'));
+      // Optimistic Rollback logic (for demonstration, we restore localStorage and notify)
+      try {
+        localStorage.setItem('sparkfolio_state', previousState);
+      } catch (e) {
+        console.error("Failed to rollback local state", e);
+      }
+      onlineQueue.shift(); // Drop the failed save to prevent infinite loops, or we could leave it
+      isOnlineSaving = false;
+      return;
+    }
+  }
+  
+  isOnlineSaving = false;
+  store.dispatch(setSyncStatus('saved'));
+};
+
 export const syncMiddleware = store => {
   if (typeof window !== 'undefined') {
     // Listen for online event to flush queue
     window.addEventListener('online', () => {
       flushQueue(store);
+      processOnlineQueue(store);
     });
   }
 
@@ -73,20 +106,21 @@ export const syncMiddleware = store => {
           apiSaveTimeout = setTimeout(() => {
             const state = store.getState();
             const resumeData = state.resume.present.resumeData;
-  
+            
             if (navigator.onLine) {
-              store.dispatch(setSyncStatus('saving'));
-              GlobalApi.UpdateResumeDetail(resumeId, { data: resumeData })
-                .then(() => {
-                  store.dispatch(setSyncStatus('saved'));
-                })
-                .catch((err) => {
-                  console.error("API update error:", err);
-                  store.dispatch(setSyncStatus('error'));
-                });
+              const previousState = localStorage.getItem('sparkfolio_state');
+              
+              // Push to online queue
+              const existingIndex = onlineQueue.findIndex(item => item.resumeId === resumeId);
+              if (existingIndex !== -1) {
+                onlineQueue[existingIndex] = { resumeId, resumeData, previousState };
+              } else {
+                onlineQueue.push({ resumeId, resumeData, previousState });
+              }
+              
+              processOnlineQueue(store);
             } else {
               // Push to offline queue
-              // We could overwrite the previous one if it's the same resumeId
               const existingIndex = offlineQueue.findIndex(item => item.resumeId === resumeId);
               if (existingIndex !== -1) {
                 offlineQueue[existingIndex].resumeData = resumeData;

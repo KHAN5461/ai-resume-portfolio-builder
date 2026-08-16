@@ -3,16 +3,52 @@ import { getDriveToken, saveToDrive, loadFromDrive, deleteFromDrive } from './Dr
 // Helper to get token safely
 const getToken = () => getDriveToken() || 'dummy_token_for_local_fallback';
 
+const CURRENT_SCHEMA_VERSION = 1.1;
+
+// Schema Migration Layer
+const migrateResumeData = (data) => {
+    let migrated = { ...data };
+    const version = migrated.schemaVersion || 1.0;
+    
+    // 1.0 to 1.1: Ensure themeConfig and layout arrays exist
+    if (version < 1.1) {
+        if (!migrated.themeConfig) {
+            migrated.themeConfig = { accentColor: '#000000', fontFamily: 'Inter' };
+        }
+        if (!Array.isArray(migrated.layout)) {
+            migrated.layout = ['summary', 'experience', 'education', 'skills'];
+        }
+        migrated.schemaVersion = CURRENT_SCHEMA_VERSION;
+    }
+    
+    return migrated;
+};
+
+const migratePortfolioData = (data) => {
+    let migrated = { ...data };
+    const version = migrated.schemaVersion || 1.0;
+    
+    // 1.0 to 1.1: Ensure siteConfig exists
+    if (version < 1.1) {
+        if (!migrated.siteConfig) {
+            migrated.siteConfig = { themeMode: 'system', accentColor: '#3b82f6' };
+        }
+        migrated.schemaVersion = CURRENT_SCHEMA_VERSION;
+    }
+    
+    return migrated;
+};
+
 const GetUserResumes = async (userEmail) => {
     // For BYOS, the index is kept locally or in an index.json on Drive.
     // We will use local storage to simulate the index for now.
     const local = JSON.parse(localStorage.getItem('local_resumes') || '[]');
-    return { data: { data: local.filter(r => r.userEmail === userEmail) } };
+    return { data: { data: local.filter(r => r.userEmail === userEmail).map(migrateResumeData) } };
 };
 
 const GetUserPortfolios = async (userEmail) => {
     const local = JSON.parse(localStorage.getItem('local_portfolios') || '[]');
-    return { data: { data: local.filter(p => p.userEmail === userEmail) } };
+    return { data: { data: local.filter(p => p.userEmail === userEmail).map(migratePortfolioData) } };
 };
 
 const CreateNewResume = async (payload) => {
@@ -54,12 +90,12 @@ const GetResumeById = async (id) => {
     const token = getToken();
     try {
         const driveData = await loadFromDrive(token, id);
-        return { data: { data: driveData } };
+        return { data: { data: migrateResumeData(driveData) } };
     } catch (error) {
         console.warn("Drive Load Failed, falling back to local index:", error);
         const local = JSON.parse(localStorage.getItem('local_resumes') || '[]');
         const found = local.find(r => r.documentId === id);
-        if (found) return { data: { data: found } };
+        if (found) return { data: { data: migrateResumeData(found) } };
         throw new Error("No such document!");
     }
 };
@@ -68,12 +104,12 @@ const GetPortfolioById = async (id) => {
     const token = getToken();
     try {
         const driveData = await loadFromDrive(token, id);
-        return { data: { data: driveData } };
+        return { data: { data: migratePortfolioData(driveData) } };
     } catch (error) {
         console.warn("Drive Load Failed, falling back to local index:", error);
         const local = JSON.parse(localStorage.getItem('local_portfolios') || '[]');
         const found = local.find(p => p.documentId === id);
-        if (found) return { data: { data: found } };
+        if (found) return { data: { data: migratePortfolioData(found) } };
         throw new Error("No such document!");
     }
 };

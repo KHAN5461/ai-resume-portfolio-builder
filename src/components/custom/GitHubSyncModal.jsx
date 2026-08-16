@@ -16,36 +16,36 @@ export default function GitHubSyncModal({ renderTrigger }) {
     const handleSync = async () => {
         if (!username.trim()) return;
         setIsLoading(true);
+        
         try {
-            const response = await fetch(`https://api.github.com/users/${username.trim()}/repos?sort=updated&per_page=100`);
-            if (!response.ok) {
-                throw new Error('Failed to fetch repositories. Please check the username.');
-            }
-            const repos = await response.json();
+            // Use Web Worker to prevent UI blocking during large JSON parse and sort
+            const worker = new Worker(new URL('../../workers/githubWorker.js', import.meta.url), { type: 'module' });
             
-            // Filter out forks, sort by stargazers_count (descending), take top 6
-            const topRepos = repos
-                .filter(repo => !repo.fork)
-                .sort((a, b) => b.stargazers_count - a.stargazers_count)
-                .slice(0, 6);
+            worker.onmessage = (e) => {
+                const { success, repos, error } = e.data;
+                if (success) {
+                    dispatch(updateProfileData({ projects: repos }));
+                    toast('Successfully synced GitHub repositories!');
+                    setOpen(false);
+                    setUsername('');
+                } else {
+                    toast(error || 'Failed to sync GitHub. Please try again.');
+                }
+                setIsLoading(false);
+                worker.terminate();
+            };
 
-            const parsedRepos = topRepos.map(repo => ({
-                name: repo.name,
-                role: "Creator",
-                startDate: "",
-                endDate: "",
-                highlights: [repo.description || ""],
-                technologies: repo.language ? [repo.language] : []
-            }));
+            worker.onerror = (error) => {
+                toast('Failed to sync GitHub due to a worker error.');
+                console.error('Worker error:', error);
+                setIsLoading(false);
+                worker.terminate();
+            };
 
-            dispatch(updateProfileData({ projects: parsedRepos }));
-            
-            toast('Successfully synced GitHub repositories!');
-            setOpen(false);
-            setUsername('');
+            worker.postMessage({ username: username.trim() });
         } catch (error) {
-            toast(error.message || 'Failed to sync GitHub. Please try again.');
-        } finally {
+            toast('Failed to initialize Web Worker.');
+            console.error(error);
             setIsLoading(false);
         }
     };
