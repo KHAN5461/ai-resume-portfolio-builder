@@ -9,6 +9,7 @@ import CanvasArea from '../../components/CanvasArea';
 import PropertiesPanel from '../../components/PropertiesPanel';
 import LeftSidebar from '../../components/LeftSidebar';
 import GenerativeCanvasLoader from '../../components/GenerativeCanvasLoader';
+import PreviewWindow from './components/PreviewWindow';
 import { updatePortfolioData } from '@/store/portfolioSlice';
 import GlobalApi from './../../../../../service/GlobalApi';
 import { toast } from 'sonner';
@@ -36,7 +37,6 @@ export default function EditPortfolio() {
   const seoData = calculateSeoScore(portfolioData, portfolioData?.blocks || []);
 
   const [view, setView] = useState('builder'); // 'builder' or 'preview'
-  const [previewMode, setPreviewMode] = useState('desktop'); // 'desktop' | 'mobile'
   const [isSaving, setIsSaving] = useState(false);
   const [isSyncing, setIsSyncing] = useState(false);
   const [isSeoModalOpen, setIsSeoModalOpen] = useState(false);
@@ -311,17 +311,8 @@ export default function EditPortfolio() {
           {!isLoading && <LeftSidebar activeBlockId={activeBlockId} setActiveBlockId={setActiveBlockId} isOpen={isLeftPanelOpen} onToggle={() => setIsLeftPanelOpen(!isLeftPanelOpen)} />}
 
           {/* 2. Center Preview Canvas */}
-          <section className={`h-full flex-1 overflow-hidden flex-col bg-surface-container p-0 relative`}>
-            
-            {/* Device Switcher (Top Center of Canvas) */}
-            <div className="hidden md:flex absolute top-2 left-1/2 -translate-x-1/2 z-50 bg-white/90 dark:bg-slate-800/90 backdrop-blur-md shadow-sm border border-gray-200 dark:border-slate-700 rounded-full p-1 gap-1">
-              <button onClick={() => setPreviewMode('mobile')} className={`p-1.5 rounded-full transition-all ${previewMode === 'mobile' ? 'bg-gray-100 dark:bg-slate-700 text-indigo-600 dark:text-indigo-400' : 'text-gray-500 hover:text-gray-800 dark:hover:text-gray-200'}`} title="Mobile View"><Smartphone className="w-4 h-4" /></button>
-              <button onClick={() => setPreviewMode('tablet')} className={`p-1.5 rounded-full transition-all ${previewMode === 'tablet' ? 'bg-gray-100 dark:bg-slate-700 text-indigo-600 dark:text-indigo-400' : 'text-gray-500 hover:text-gray-800 dark:hover:text-gray-200'}`} title="Tablet View"><Tablet className="w-4 h-4" /></button>
-              <button onClick={() => setPreviewMode('desktop')} className={`p-1.5 rounded-full transition-all ${previewMode === 'desktop' ? 'bg-gray-100 dark:bg-slate-700 text-indigo-600 dark:text-indigo-400' : 'text-gray-500 hover:text-gray-800 dark:hover:text-gray-200'}`} title="Desktop View"><Monitor className="w-4 h-4" /></button>
-            </div>
-
-            <div className={`transition-all duration-500 ease-in-out flex flex-col overflow-hidden relative ${previewMode === 'mobile' ? 'mt-10 w-[375px] h-[812px] rounded-[2rem] border-[8px] border-surface-container-highest shadow-2xl mx-auto' : previewMode === 'tablet' ? 'mt-10 w-[768px] h-[1024px] rounded-[1.5rem] border-[8px] border-surface-container-highest shadow-2xl mx-auto' : 'w-full h-full'}`}>
-               
+          <main className="flex-1 relative flex flex-col overflow-hidden bg-slate-950 p-4 md:p-6">
+            <PreviewWindow rawCode={JSON.stringify(portfolioData, null, 2)}>
                {/* Mobile Only: Tabbed Bottom Sheet Toggle */}
                <div className="md:hidden absolute bottom-4 left-4 right-4 z-50 flex gap-2 justify-center">
                   <button onClick={() => { setIsLeftPanelOpen(true); setIsPropertiesPanelOpen(false); }} className="px-4 py-2 bg-indigo-600 text-white rounded-full shadow-lg text-sm font-semibold">Menu</button>
@@ -347,15 +338,12 @@ export default function EditPortfolio() {
                       activeBlockId={activeBlockId}
                       onOpenAi={() => {
                         setIsLeftPanelOpen(true);
-                        // Hack: we don't have direct access to setActiveTab from LeftSidebar here, 
-                        // so we can simulate a click on the AI Tab button, or pass a prop to LeftSidebar.
-                        // Let's rely on standard LeftSidebar state for now, it's a minor detail.
                       }}
                     />
                   )}
                </div>
-            </div>
-          </section>
+            </PreviewWindow>
+          </main>
 
           {/* 3. Right Properties Panel */}
           {!isLoading && !isGenerating && <PropertiesPanel activeBlockId={activeBlockId} setActiveBlockId={setActiveBlockId} isOpen={isPropertiesPanelOpen} onToggle={() => setIsPropertiesPanelOpen(!isPropertiesPanelOpen)} />}
