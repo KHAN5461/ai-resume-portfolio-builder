@@ -7,12 +7,12 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuTrigger,
+  DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu"
 import useHideOnScroll from '../../hooks/useHideOnScroll'
-import { connectDrive } from '../../service/DriveService';
 import { useSelector, useDispatch } from 'react-redux';
 import { setDriveStatus, setDriveToken } from '../../store/syncSlice';
+import { useGoogleLogin } from '@react-oauth/google';
 
 function Header() {
     const { user, isSignedIn } = useUser();
@@ -20,16 +20,24 @@ function Header() {
     const dispatch = useDispatch();
     const driveStatus = useSelector(state => state.sync.driveStatus); // 'disconnected', 'connecting', 'connected'
 
-    const handleConnectDrive = async () => {
-        dispatch(setDriveStatus('connecting'));
-        try {
-            const token = await connectDrive();
-            dispatch(setDriveToken(token));
+    const handleConnectDrive = useGoogleLogin({
+        onSuccess: (tokenResponse) => {
+            dispatch(setDriveToken(tokenResponse.access_token));
             dispatch(setDriveStatus('connected'));
-        } catch (e) {
-            console.error("Drive connection failed", e);
+        },
+        onError: (error) => {
+            console.error("Drive connection failed", error);
             dispatch(setDriveStatus('disconnected'));
-        }
+        },
+        onNonOAuthError: () => {
+            dispatch(setDriveStatus('disconnected'));
+        },
+        scope: 'https://www.googleapis.com/auth/drive.file',
+    });
+
+    const triggerDriveConnect = () => {
+        dispatch(setDriveStatus('connecting'));
+        handleConnectDrive();
     };
 
     return (
@@ -65,8 +73,8 @@ function Header() {
                     {/* Drive Sync Status Indicator */}
                     <div className="hidden md:flex items-center" title={driveStatus === 'connected' ? 'Drive Connected (Synced)' : 'Drive Disconnected'}>
                         {driveStatus === 'disconnected' && (
-                            <Button variant="ghost" size="sm" onClick={handleConnectDrive} className="text-red-500 hover:text-red-600 hover:bg-red-50 flex gap-2">
-                                <CloudOff className="w-4 h-4" />
+                            <Button variant="ghost" size="sm" onClick={triggerDriveConnect} className="text-red-500 hover:text-red-600 hover:bg-red-50 flex gap-2">
+                                <HardDrive className="w-4 h-4" />
                                 <span className="text-xs">Connect Drive</span>
                             </Button>
                         )}

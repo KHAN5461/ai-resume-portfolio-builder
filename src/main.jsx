@@ -7,6 +7,10 @@ import { ClerkProvider } from './auth.jsx'
 import { Provider } from 'react-redux'
 import { store } from './store/store.js'
 import ErrorBoundary from './components/ErrorBoundary.jsx'
+import { GoogleOAuthProvider } from '@react-oauth/google'
+
+// Replace with User's Client ID
+const GOOGLE_CLIENT_ID = "52155307628-382fqve1dsbmg44j3ohsc98j13ec1as0.apps.googleusercontent.com";
 
 // Code splitting / Lazy Loading for optimization
 const RootLayout = lazy(() => import('./components/RootLayout.jsx'))
@@ -103,12 +107,14 @@ const router=createBrowserRouter([
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
-     <Provider store={store}>
-      <ClerkProvider>
-        <ErrorBoundary>
-          <RouterProvider router={router} />
-        </ErrorBoundary>
-      </ClerkProvider>
-    </Provider>
+    <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>
+      <Provider store={store}>
+        <ClerkProvider>
+          <ErrorBoundary>
+            <RouterProvider router={router} />
+          </ErrorBoundary>
+        </ClerkProvider>
+      </Provider>
+    </GoogleOAuthProvider>
   </React.StrictMode>,
 )

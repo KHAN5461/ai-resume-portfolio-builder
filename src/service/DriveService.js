@@ -7,27 +7,13 @@ const FOLDER_NAME = 'AI_Resume_Portfolio_App';
 // Cache ETags to prevent data-races
 const etagCache = new Map();
 
-/**
- * Mocks the GIS Auth flow to return a dummy token since we don't have a real Client ID yet.
- * In a real environment, this would call google.accounts.oauth2.initTokenClient
- * The scope MUST be strictly: https://www.googleapis.com/auth/drive.file
- */
-export const connectDrive = async () => {
-    return new Promise((resolve) => {
-        setTimeout(() => {
-            const dummyToken = 'dummy_google_drive_access_token_' + Date.now();
-            resolve(dummyToken);
-        }, 1000);
-    });
-};
-
 export const getDriveToken = () => {
     // Deprecated: Token is now held in memory via Redux syncSlice.driveToken
     return null;
 };
 
 export const disconnectDrive = async (accessToken) => {
-    if (accessToken && !accessToken.startsWith('dummy_')) {
+    if (accessToken) {
         try {
             await fetch(`https://oauth2.googleapis.com/revoke?token=${accessToken}`, {
                 method: 'POST',
@@ -48,24 +34,6 @@ export const disconnectDrive = async (accessToken) => {
  * @param {string} fileId Optional. If provided, updates existing file via PATCH.
  */
 export const saveToDrive = async (accessToken, data, fileName, fileId = null) => {
-    // For local mocking/testing without real credentials, we will just use localStorage
-    if (accessToken.startsWith('dummy_')) {
-        console.log(`[Drive Mock] Saving ${fileName} to Drive...`);
-        return new Promise((resolve) => {
-            setTimeout(() => {
-                const docId = fileId || crypto.randomUUID();
-                const localFiles = JSON.parse(localStorage.getItem('mock_gdrive_files') || '{}');
-                localFiles[docId] = {
-                    name: fileName,
-                    content: data,
-                    updatedAt: new Date().toISOString()
-                };
-                localStorage.setItem('mock_gdrive_files', JSON.stringify(localFiles));
-                resolve({ id: docId });
-            }, 500);
-        });
-    }
-
     // Real Google Drive API logic
     const metadata = { name: fileName, mimeType: 'application/json' };
     const form = new FormData();
@@ -105,18 +73,6 @@ export const saveToDrive = async (accessToken, data, fileName, fileId = null) =>
 };
 
 export const loadFromDrive = async (accessToken, fileId) => {
-    if (accessToken.startsWith('dummy_')) {
-        return new Promise((resolve, reject) => {
-            setTimeout(() => {
-                const localFiles = JSON.parse(localStorage.getItem('mock_gdrive_files') || '{}');
-                if (localFiles[fileId]) {
-                    resolve(localFiles[fileId].content);
-                } else {
-                    reject(new Error('File not found'));
-                }
-            }, 500);
-        });
-    }
 
     const response = await fetch(`https://www.googleapis.com/drive/v3/files/${fileId}?alt=media`, {
         headers: { Authorization: `Bearer ${accessToken}` }
@@ -134,16 +90,6 @@ export const loadFromDrive = async (accessToken, fileId) => {
 };
 
 export const deleteFromDrive = async (accessToken, fileId) => {
-    if (accessToken.startsWith('dummy_')) {
-        return new Promise((resolve) => {
-            setTimeout(() => {
-                const localFiles = JSON.parse(localStorage.getItem('mock_gdrive_files') || '{}');
-                delete localFiles[fileId];
-                localStorage.setItem('mock_gdrive_files', JSON.stringify(localFiles));
-                resolve(true);
-            }, 500);
-        });
-    }
 
     const response = await fetch(`https://www.googleapis.com/drive/v3/files/${fileId}`, {
         method: 'DELETE',
