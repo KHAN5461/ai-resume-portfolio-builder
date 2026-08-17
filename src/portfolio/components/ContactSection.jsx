@@ -5,7 +5,8 @@ export default function ContactSection({ data }) {
   if (!data) return null;
 
   return (
-    <section id="contact" className="w-full max-w-6xl mx-auto px-6 md:px-8 py-32 bg-white dark:bg-slate-950">
+    <section id="contact" className="w-full py-16 md:py-32 bg-white dark:bg-slate-950 transition-colors">
+      <div className="w-full max-w-6xl mx-auto px-6 md:px-8">
       <motion.div 
         initial={{ opacity: 0, y: 20 }}
         whileInView={{ opacity: 1, y: 0 }}
@@ -52,6 +53,7 @@ export default function ContactSection({ data }) {
           </div>
         )}
       </motion.div>
+      </div>
     </section>
   );
 }

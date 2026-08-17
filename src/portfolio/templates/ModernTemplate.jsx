@@ -9,7 +9,7 @@ export default function ModernTemplate({ portfolioData }) {
   if (!portfolioData) return null;
 
   return (
-    <div className="max-w-5xl mx-auto px-6 py-12 md:py-20 space-y-32">
+    <div className="w-full">
       <HeroSection data={portfolioData.heroSection} />
       <AboutSection data={portfolioData.aboutSection} />
       <ProjectsSection data={portfolioData.projectsSection} />

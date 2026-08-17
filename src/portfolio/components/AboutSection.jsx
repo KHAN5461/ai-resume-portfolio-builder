@@ -5,7 +5,8 @@ export default function AboutSection({ data }) {
   if (!data) return null;
 
   return (
-    <section id="about" className="w-full max-w-6xl mx-auto px-6 md:px-8 py-24 bg-white dark:bg-slate-950">
+    <section id="about" className="w-full py-16 md:py-24 bg-slate-50/50 dark:bg-slate-900/20 border-y border-slate-100 dark:border-slate-800/50 transition-colors">
+      <div className="w-full max-w-6xl mx-auto px-6 md:px-8">
       <div className="grid grid-cols-1 md:grid-cols-12 gap-10 md:gap-12 items-start">
         
         {/* Left Column: Typography & Narrative */}
@@ -90,6 +91,7 @@ export default function AboutSection({ data }) {
           )}
         </motion.div>
 
+      </div>
       </div>
     </section>
   );

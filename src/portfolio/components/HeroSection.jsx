@@ -5,7 +5,8 @@ export default function HeroSection({ data }) {
   if (!data) return null;
 
   return (
-    <section id="hero" className="w-full max-w-6xl mx-auto px-6 md:px-8 py-24 flex flex-col items-start justify-center text-left gap-8 bg-white dark:bg-slate-950">
+    <section id="hero" className="w-full py-16 md:py-24 bg-white dark:bg-slate-950 transition-colors">
+      <div className="w-full max-w-6xl mx-auto px-6 md:px-8 flex flex-col items-start justify-center text-left gap-8">
       <motion.div 
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -58,6 +59,7 @@ export default function HeroSection({ data }) {
             Available for freelance opportunities
         </span>
       </motion.div>
+      </div>
     </section>
   );
 }

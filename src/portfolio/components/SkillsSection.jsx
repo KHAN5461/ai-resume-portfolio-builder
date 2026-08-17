@@ -5,7 +5,8 @@ export default function SkillsSection({ data }) {
   if (!data || !data.categories || data.categories.length === 0) return null;
 
   return (
-    <section id="skills" className="w-full max-w-6xl mx-auto px-6 md:px-8 py-24 bg-white dark:bg-slate-950">
+    <section id="skills" className="w-full py-16 md:py-24 bg-slate-50/50 dark:bg-slate-900/20 border-y border-slate-100 dark:border-slate-800/50 transition-colors">
+      <div className="w-full max-w-6xl mx-auto px-6 md:px-8">
       
       <motion.div 
         initial={{ opacity: 0, y: 20 }}
@@ -49,6 +50,7 @@ export default function SkillsSection({ data }) {
             </div>
           </motion.div>
         ))}
+      </div>
       </div>
     </section>
   );

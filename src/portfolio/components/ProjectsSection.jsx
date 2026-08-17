@@ -5,7 +5,8 @@ export default function ProjectsSection({ data }) {
   if (!data || data.length === 0) return null;
 
   return (
-    <section id="projects" className="w-full max-w-6xl mx-auto px-6 md:px-8 py-24 bg-white dark:bg-slate-950">
+    <section id="projects" className="w-full py-16 md:py-24 bg-white dark:bg-slate-950 transition-colors">
+      <div className="w-full max-w-6xl mx-auto px-6 md:px-8">
       
       {/* Section Header */}
       <motion.div 
@@ -85,6 +86,7 @@ export default function ProjectsSection({ data }) {
             </div>
           </motion.article>
         ))}
+      </div>
       </div>
     </section>
   );

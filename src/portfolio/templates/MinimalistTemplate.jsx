@@ -5,7 +5,7 @@ export default function MinimalistTemplate({ portfolioData }) {
   const { heroSection, aboutSection, projectsSection, skillsSection, contactSection } = portfolioData;
 
   return (
-    <div className="max-w-4xl mx-auto px-8 py-20 space-y-32 font-sans tracking-tight text-slate-900 selection:bg-slate-900 selection:text-white">
+    <div className="w-full mx-auto px-8 py-20 font-sans tracking-tight text-slate-900 selection:bg-slate-900 selection:text-white">
       {/* Hero Section */}
       <section className="space-y-6 pt-20">
         <h2 className="text-xl font-medium text-slate-500">{heroSection?.greeting}</h2>
