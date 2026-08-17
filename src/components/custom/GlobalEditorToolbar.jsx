@@ -1,10 +1,11 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, Save, Download, Eye, Edit, CloudCog, ChevronDown, Code2 } from 'lucide-react';
+import { ArrowLeft, Save, Download, Eye, Edit, CloudCog, ChevronDown, Code2, FileArchive } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useSelector } from 'react-redux';
-import { useState } from 'react';
 import ExportModal from '@/dashboard/portfolio/components/ExportModal';
+import { downloadPortfolioZip } from '@/lib/codeExporter';
+import { toast } from 'sonner';
 
 export default function GlobalEditorToolbar({ 
   view, 
@@ -75,6 +76,20 @@ export default function GlobalEditorToolbar({
                    className="w-full text-left px-4 py-2 text-xs font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-slate-800 transition-colors flex items-center gap-2"
                  >
                    <Code2 size={13} /> Export React Code
+                 </button>
+                 <button 
+                   onClick={async () => {
+                     try {
+                       toast.loading("Generating ZIP file...", { id: "zip" });
+                       await downloadPortfolioZip(portfolioData);
+                       toast.success("Download started!", { id: "zip" });
+                     } catch (e) {
+                       toast.error("Failed to generate ZIP.", { id: "zip" });
+                     }
+                   }} 
+                   className="w-full text-left px-4 py-2 text-xs font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-slate-800 transition-colors flex items-center gap-2 border-t border-gray-100 dark:border-slate-700 mt-1 pt-2"
+                 >
+                   <FileArchive size={13} className="text-indigo-500" /> Download ZIP
                  </button>
               </>
             ) : (

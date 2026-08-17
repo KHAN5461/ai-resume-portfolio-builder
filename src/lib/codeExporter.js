@@ -1,3 +1,5 @@
+import JSZip from 'jszip';
+
 export function generatePortfolioReactCode(portfolioData) {
   const { siteConfig, heroSection, aboutSection, projectsSection, skillsSection } = portfolioData || {};
 
@@ -55,4 +57,113 @@ export default function Portfolio() {
     </div>
   );
 }`;
+}
+
+export async function downloadPortfolioZip(portfolioData) {
+  const zip = new JSZip();
+
+  // 1. package.json
+  zip.file("package.json", JSON.stringify({
+    "name": "portfolio-source",
+    "private": true,
+    "version": "0.0.0",
+    "type": "module",
+    "scripts": {
+      "dev": "vite",
+      "build": "vite build",
+      "preview": "vite preview"
+    },
+    "dependencies": {
+      "react": "^18.2.0",
+      "react-dom": "^18.2.0",
+      "lucide-react": "^0.300.0"
+    },
+    "devDependencies": {
+      "@types/react": "^18.2.43",
+      "@types/react-dom": "^18.2.17",
+      "@vitejs/plugin-react": "^4.2.1",
+      "autoprefixer": "^10.4.16",
+      "postcss": "^8.4.32",
+      "tailwindcss": "^3.4.0",
+      "vite": "^5.0.8"
+    }
+  }, null, 2));
+
+  // 2. index.html
+  zip.file("index.html", `<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>My Portfolio</title>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>`);
+
+  // 3. vite.config.js
+  zip.file("vite.config.js", `import { defineConfig } from 'vite'
+import react from '@vitejs/plugin-react'
+
+// https://vitejs.dev/config/
+export default defineConfig({
+  plugins: [react()],
+})`);
+
+  // 4. tailwind.config.js
+  zip.file("tailwind.config.js", `/** @type {import('tailwindcss').Config} */
+export default {
+  content: [
+    "./index.html",
+    "./src/**/*.{js,ts,jsx,tsx}",
+  ],
+  theme: {
+    extend: {},
+  },
+  plugins: [],
+}`);
+
+  // 5. postcss.config.js
+  zip.file("postcss.config.js", `export default {
+  plugins: {
+    tailwindcss: {},
+    autoprefixer: {},
+  },
+}`);
+
+  // 6. src/main.jsx
+  zip.file("src/main.jsx", `import React from 'react'
+import ReactDOM from 'react-dom/client'
+import App from './App.jsx'
+import './index.css'
+
+ReactDOM.createRoot(document.getElementById('root')).render(
+  <React.StrictMode>
+    <App />
+  </React.StrictMode>,
+)`);
+
+  // 7. src/index.css
+  zip.file("src/index.css", `@tailwind base;
+@tailwind components;
+@tailwind utilities;`);
+
+  // 8. src/App.jsx (Using the existing generator for simplicity and robustness)
+  zip.file("src/App.jsx", generatePortfolioReactCode(portfolioData));
+
+  // Generate ZIP and trigger download
+  const content = await zip.generateAsync({ type: "blob" });
+  
+  // Create a temporary anchor element to trigger the download
+  const url = window.URL.createObjectURL(content);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = 'portfolio-source.zip';
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  window.URL.revokeObjectURL(url);
 }
