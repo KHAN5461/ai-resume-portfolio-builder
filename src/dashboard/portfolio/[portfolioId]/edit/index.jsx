@@ -311,7 +311,7 @@ export default function EditPortfolio() {
           {!isLoading && <LeftSidebar activeBlockId={activeBlockId} setActiveBlockId={setActiveBlockId} isOpen={isLeftPanelOpen} onToggle={() => setIsLeftPanelOpen(!isLeftPanelOpen)} />}
 
           {/* 2. Center Preview Canvas */}
-          <main className="flex-1 relative flex flex-col overflow-hidden bg-slate-950 p-4 md:p-6">
+          <main className="flex-1 relative flex flex-col overflow-hidden bg-slate-100 dark:bg-slate-950 p-4 md:p-6">
             <PreviewWindow rawCode={JSON.stringify(portfolioData, null, 2)}>
                {/* Mobile Only: Tabbed Bottom Sheet Toggle */}
                <div className="md:hidden absolute bottom-4 left-4 right-4 z-50 flex gap-2 justify-center">
