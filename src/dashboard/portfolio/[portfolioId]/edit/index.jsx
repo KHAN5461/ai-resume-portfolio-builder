@@ -257,6 +257,7 @@ export default function EditPortfolio() {
           setView={setView}
           mode="portfolio"
           title={`Portfolio Editor`}
+          portfolioData={portfolioData}
           onSave={() => setIsDeployModalOpen(true)}
         >
             {/* Undo / Redo Buttons */}

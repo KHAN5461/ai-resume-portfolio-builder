@@ -1,161 +1,58 @@
-import JSZip from 'jszip';
-import { saveAs } from 'file-saver';
+export function generatePortfolioReactCode(portfolioData) {
+  const { siteConfig, heroSection, aboutSection, projectsSection, skillsSection } = portfolioData || {};
 
-/**
- * Generates a Next.js App Router boilerplate and triggers a ZIP download.
- */
-export async function exportNextJsPortfolio(portfolioData) {
-    const zip = new JSZip();
+  return `import React from 'react';
 
-    // 1. package.json
-    const packageJson = {
-        "name": "my-portfolio",
-        "version": "0.1.0",
-        "private": true,
-        "scripts": {
-            "dev": "next dev",
-            "build": "next build",
-            "start": "next start",
-            "lint": "next lint"
-        },
-        "dependencies": {
-            "react": "^18",
-            "react-dom": "^18",
-            "next": "14.2.3",
-            "lucide-react": "^0.394.0"
-        },
-        "devDependencies": {
-            "postcss": "^8",
-            "tailwindcss": "^3.4.1",
-            "eslint": "^8",
-            "eslint-config-next": "14.2.3"
-        }
-    };
-    zip.file("package.json", JSON.stringify(packageJson, null, 2));
-
-    // 2. tailwind.config.js
-    const themeMode = portfolioData?.siteConfig?.themeMode || 'light';
-    const primaryHex = portfolioData?.siteConfig?.accentColor || '#6366f1';
-    // Just a simple setup, letting CSS variables handle it mostly
-    const tailwindConfig = `
-/** @type {import('tailwindcss').Config} */
-module.exports = {
-  content: [
-    "./src/pages/**/*.{js,ts,jsx,tsx,mdx}",
-    "./src/components/**/*.{js,ts,jsx,tsx,mdx}",
-    "./src/app/**/*.{js,ts,jsx,tsx,mdx}",
-  ],
-  theme: {
-    extend: {
-      colors: {
-        background: "var(--background)",
-        foreground: "var(--foreground)",
-        primary: {
-          DEFAULT: "var(--primary)",
-          foreground: "var(--primary-foreground)",
-        },
-      },
-    },
-  },
-  plugins: [],
-};
-`;
-    zip.file("tailwind.config.js", tailwindConfig);
-
-    // 3. postcss.config.js
-    const postcssConfig = `module.exports = { plugins: { tailwindcss: {}, autoprefixer: {}, }, };`;
-    zip.file("postcss.config.js", postcssConfig);
-
-    // 4. src/app/globals.css
-    // Calculate raw CSS variables
-    const bgColor = themeMode === 'dark' ? '#0f172a' : '#ffffff';
-    const fgColor = themeMode === 'dark' ? '#f8fafc' : '#0f172a';
-    const globalsCss = `
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-
-:root {
-  --background: ${bgColor};
-  --foreground: ${fgColor};
-  --primary: ${primaryHex};
-  --primary-foreground: ${themeMode === 'dark' ? '#000000' : '#ffffff'};
-}
-
-body {
-  color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
-}
-`;
-    zip.file("src/app/globals.css", globalsCss);
-
-    // 5. src/app/layout.js
-    const layoutJs = `
-import "./globals.css";
-export const metadata = {
-  title: "${portfolioData?.seo?.title || 'My Portfolio'}",
-  description: "${portfolioData?.seo?.description || 'Portfolio generated with Sparkfolio'}",
-};
-export default function RootLayout({ children }) {
+export default function Portfolio() {
   return (
-    <html lang="en">
-      <body>{children}</body>
-    </html>
-  );
-}
-`;
-    zip.file("src/app/layout.js", layoutJs);
-
-    // 6. src/app/page.js
-    // Extract data
-    const hero = portfolioData?.heroSection || {};
-    const about = portfolioData?.aboutSection || {};
-    const projects = portfolioData?.projectsSection || [];
-
-    const pageJs = `
-import React from 'react';
-
-export default function Home() {
-  return (
-    <main className="min-h-screen p-8 md:p-24 max-w-5xl mx-auto space-y-16">
+    <div className="min-h-screen bg-slate-950 text-slate-100 font-sans selection:bg-indigo-500 selection:text-white">
       
       {/* Hero Section */}
-      <section className="space-y-4">
-        <h1 className="text-5xl font-bold text-primary">{ \`${hero.greeting || ''} ${hero.headline || ''}\` }</h1>
-        <p className="text-xl text-foreground/80">{ \`${hero.subheadline || ''}\` }</p>
+      <section className="min-h-screen flex flex-col items-center justify-center text-center px-6 relative">
+        <h2 className="text-sm uppercase tracking-widest text-indigo-400 font-semibold mb-3">
+          {${JSON.stringify(heroSection?.greeting || 'Hello World')}}
+        </h2>
+        <h1 className="text-4xl md:text-6xl font-extrabold max-w-3xl tracking-tight mb-6">
+          {${JSON.stringify(heroSection?.headline || 'I build exceptional digital experiences.')}}
+        </h1>
+        <p className="text-slate-400 max-w-xl text-base md:text-lg mb-8 leading-relaxed">
+          {${JSON.stringify(heroSection?.subheadline || 'Full-stack developer focused on scalable applications.')}}
+        </p>
+        <div className="flex gap-4">
+          <a href="#projects" className="bg-indigo-600 hover:bg-indigo-500 text-white px-6 py-3 rounded-xl font-semibold transition-all shadow-lg shadow-indigo-600/20">
+            View Work
+          </a>
+        </div>
       </section>
 
       {/* About Section */}
-      <section className="space-y-4">
-        <h2 className="text-3xl font-semibold border-b pb-2">About Me</h2>
-        <p className="text-lg leading-relaxed">{ \`${about.bioDescription || ''}\` }</p>
+      <section id="about" className="py-24 px-6 max-w-4xl mx-auto border-t border-slate-800/80">
+        <h3 className="text-xs uppercase tracking-widest text-indigo-400 font-semibold mb-2">01. Biography</h3>
+        <h2 className="text-2xl md:text-3xl font-bold mb-6">About Me</h2>
+        <p className="text-slate-300 leading-relaxed text-lg">
+          {${JSON.stringify(aboutSection?.bioDescription || 'Add your bio description here...')}}
+        </p>
       </section>
 
       {/* Projects Section */}
-      <section className="space-y-6">
-        <h2 className="text-3xl font-semibold border-b pb-2">Projects</h2>
+      <section id="projects" className="py-24 px-6 max-w-5xl mx-auto border-t border-slate-800/80">
+        <h3 className="text-xs uppercase tracking-widest text-indigo-400 font-semibold mb-2">02. Portfolio</h3>
+        <h2 className="text-2xl md:text-3xl font-bold mb-10">Featured Projects</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          ${projects.map(p => `
-            <div className="border border-foreground/10 rounded-xl p-6 shadow-sm hover:shadow-md transition-shadow">
-              <h3 className="text-xl font-bold mb-2">${p.name || ''}</h3>
-              <p className="text-sm mb-4">${p.description || ''}</p>
-              ${p.url ? `<a href="${p.url}" target="_blank" className="text-primary hover:underline">View Project &rarr;</a>` : ''}
+          {/* Map Projects */}
+          {/* Example static card output */}
+          <div className="bg-slate-900/50 border border-slate-800 p-6 rounded-2xl hover:border-indigo-500/50 transition-all">
+            <h4 className="text-lg font-bold text-white mb-2">Project Showcase</h4>
+            <p className="text-slate-400 text-sm mb-4">High performance full-stack application built with React and Tailwind CSS.</p>
+            <div className="flex gap-2">
+              <span className="text-[10px] bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 px-2.5 py-1 rounded-full font-mono">React</span>
+              <span className="text-[10px] bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 px-2.5 py-1 rounded-full font-mono">Tailwind</span>
             </div>
-          `).join('\n')}
+          </div>
         </div>
       </section>
-      
-    </main>
+
+    </div>
   );
-}
-`;
-    zip.file("src/app/page.js", pageJs);
-
-    // 7. raw-data.json
-    zip.file("raw-data.json", JSON.stringify(portfolioData, null, 2));
-
-    // Generate ZIP
-    const content = await zip.generateAsync({ type: "blob" });
-    saveAs(content, "sparkfolio-nextjs-export.zip");
+}`;
 }

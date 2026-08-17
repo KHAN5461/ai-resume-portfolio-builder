@@ -1,8 +1,10 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, Save, Download, Eye, Edit, CloudCog, ChevronDown } from 'lucide-react';
+import { ArrowLeft, Save, Download, Eye, Edit, CloudCog, ChevronDown, Code2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useSelector } from 'react-redux';
+import { useState } from 'react';
+import ExportModal from '@/dashboard/portfolio/components/ExportModal';
 
 export default function GlobalEditorToolbar({ 
   view, 
@@ -11,9 +13,11 @@ export default function GlobalEditorToolbar({
   onExport, 
   mode = "resume", 
   title = "Editor",
+  portfolioData,
   children
 }) {
   const isSaving = useSelector((state) => state.sync.isSaving);
+  const [isExportModalOpen, setIsExportModalOpen] = useState(false);
 
   return (
     <header className="fixed top-0 left-0 w-full h-16 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-b border-gray-200 dark:border-slate-800 z-50 flex items-center justify-between px-4 md:px-6">
@@ -60,12 +64,18 @@ export default function GlobalEditorToolbar({
             Export <ChevronDown className="w-4 h-4" />
           </button>
           
-          {/* Dropdown Menu */}
+        {/* Dropdown Menu */}
           <div className="absolute right-0 mt-2 w-40 bg-white dark:bg-slate-900 shadow-xl rounded-xl border border-gray-100 dark:border-slate-800 py-1 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all">
             {mode === 'portfolio' ? (
               <>
                  <button onClick={onSave} className="w-full text-left px-4 py-2 text-xs font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-slate-800 transition-colors">Publish</button>
                  <button onClick={onSave} className="w-full text-left px-4 py-2 text-xs font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-slate-800 transition-colors">Deploy Source</button>
+                 <button 
+                   onClick={() => setIsExportModalOpen(true)} 
+                   className="w-full text-left px-4 py-2 text-xs font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-slate-800 transition-colors flex items-center gap-2"
+                 >
+                   <Code2 size={13} /> Export React Code
+                 </button>
               </>
             ) : (
                <button onClick={onExport} className="w-full text-left px-4 py-2 text-xs font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-slate-800 transition-colors flex items-center gap-2">
@@ -75,6 +85,15 @@ export default function GlobalEditorToolbar({
           </div>
         </div>
       </div>
+      
+      {/* Render Modal */}
+      {mode === 'portfolio' && (
+        <ExportModal 
+          isOpen={isExportModalOpen} 
+          onClose={() => setIsExportModalOpen(false)} 
+          portfolioData={portfolioData} 
+        />
+      )}
     </header>
   );
 }
