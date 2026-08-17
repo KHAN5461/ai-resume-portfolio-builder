@@ -37,7 +37,7 @@ export default function BentoTemplate({ portfolioData }) {
         className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-4 lg:grid-cols-4 gap-4 md:gap-6 auto-rows-[minmax(180px,auto)]"
       >
         {/* Intro Box (Large) */}
-        <motion.div variants={itemVariants} className="md:col-span-2 lg:col-span-2 bg-white dark:bg-slate-900 rounded-[2rem] p-8 shadow-sm flex flex-col justify-center border border-slate-100 dark:border-slate-800 hover:shadow-md transition-shadow relative overflow-hidden group">
+        <motion.div id="hero" variants={itemVariants} className="md:col-span-2 lg:col-span-2 bg-white dark:bg-slate-900 rounded-[2rem] p-8 shadow-sm flex flex-col justify-center border border-slate-100 dark:border-slate-800 hover:shadow-md transition-shadow relative overflow-hidden group">
           <div className="absolute top-0 right-0 w-64 h-64 bg-[var(--accent)]/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/3"></div>
           <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight mb-4 relative z-10 text-slate-900 dark:text-white">
             {heroSection.greeting || "Hi there 👋"}
@@ -64,7 +64,7 @@ export default function BentoTemplate({ portfolioData }) {
         </motion.div>
 
         {/* Contact/Social Box */}
-        <motion.div variants={itemVariants} className="md:col-span-1 lg:col-span-1 bg-[var(--accent)] rounded-[2rem] p-6 shadow-md text-white flex flex-col justify-between hover:scale-[1.02] transition-transform">
+        <motion.div id="contact" variants={itemVariants} className="md:col-span-1 lg:col-span-1 bg-[var(--accent)] rounded-[2rem] p-6 shadow-md text-white flex flex-col justify-between hover:scale-[1.02] transition-transform">
           <div>
             <h3 className="text-xl font-bold mb-4">{contactSection.heading || "Let's Connect"}</h3>
             <div className="flex flex-col gap-3">
@@ -90,7 +90,7 @@ export default function BentoTemplate({ portfolioData }) {
 
         {/* Featured Project */}
         {projectsSection.length > 0 && (
-          <motion.div variants={itemVariants} className="md:col-span-2 lg:col-span-2 bg-slate-900 rounded-[2rem] p-8 shadow-sm text-white flex flex-col justify-between hover:shadow-xl transition-shadow group relative overflow-hidden border border-slate-800">
+          <motion.div id="projects" variants={itemVariants} className="md:col-span-2 lg:col-span-2 bg-slate-900 rounded-[2rem] p-8 shadow-sm text-white flex flex-col justify-between hover:shadow-xl transition-shadow group relative overflow-hidden border border-slate-800">
             <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-slate-900/40 z-10"></div>
             {projectsSection[0].thumbnailUrl && <img src={projectsSection[0].thumbnailUrl} alt={projectsSection[0].title} className="absolute inset-0 w-full h-full object-cover opacity-50 group-hover:scale-105 transition-transform duration-700" />}
             
@@ -110,7 +110,7 @@ export default function BentoTemplate({ portfolioData }) {
         )}
 
         {/* About Box (Replaced Experience) */}
-        <motion.div variants={itemVariants} className="md:col-span-2 lg:col-span-2 bg-white dark:bg-slate-900 rounded-[2rem] p-8 shadow-sm border border-slate-100 dark:border-slate-800 hover:shadow-md transition-shadow flex flex-col">
+        <motion.div id="about" variants={itemVariants} className="md:col-span-2 lg:col-span-2 bg-white dark:bg-slate-900 rounded-[2rem] p-8 shadow-sm border border-slate-100 dark:border-slate-800 hover:shadow-md transition-shadow flex flex-col">
           <h3 className="text-2xl font-bold mb-6 flex items-center gap-2 text-slate-900 dark:text-white">
             <User className="w-6 h-6 text-[var(--accent)]" /> {aboutSection.bioTitle || "About Me"}
           </h3>
@@ -123,7 +123,7 @@ export default function BentoTemplate({ portfolioData }) {
 
         {/* Skills Marquee Box */}
         {flatSkills.length > 0 && (
-            <motion.div variants={itemVariants} className="md:col-span-4 lg:col-span-4 bg-white dark:bg-slate-900 rounded-[2rem] p-8 shadow-sm border border-slate-100 dark:border-slate-800 flex items-center overflow-hidden">
+            <motion.div id="skills" variants={itemVariants} className="md:col-span-4 lg:col-span-4 bg-white dark:bg-slate-900 rounded-[2rem] p-8 shadow-sm border border-slate-100 dark:border-slate-800 flex items-center overflow-hidden">
                 <div className="font-bold text-xl mr-8 whitespace-nowrap shrink-0 flex items-center gap-2 text-slate-900 dark:text-white">
                     <FileText className="w-5 h-5 text-[var(--accent)]" /> Core Tech
                 </div>
