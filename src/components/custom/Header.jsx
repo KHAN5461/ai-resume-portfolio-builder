@@ -2,7 +2,7 @@ import React from 'react'
 import { Button } from '../ui/button'
 import { Link } from 'react-router-dom'
 import { UserButton, useUser } from '../../auth.jsx'
-import { Menu, Cloud, CloudOff, Loader2 } from 'lucide-react'
+import { Menu, Cloud, CloudOff, Loader2, HardDrive } from 'lucide-react'
 import {
   DropdownMenu,
   DropdownMenuContent,
