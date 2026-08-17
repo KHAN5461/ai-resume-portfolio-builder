@@ -12,8 +12,10 @@ import { useGoogleLogin } from '@react-oauth/google';
 import { useSelector, useDispatch } from 'react-redux';
 import { setDriveStatus, setDriveToken } from '../../store/syncSlice';
 import { disconnectDrive } from '../../service/DriveService';
+import { Settings, Puzzle } from 'lucide-react';
 
 export default function SettingsDialog({ isOpen, onOpenChange }) {
+  const [activeTab, setActiveTab] = React.useState('integrations');
   const dispatch = useDispatch();
   const driveStatus = useSelector(state => state.sync.driveStatus);
   const driveToken = useSelector(state => state.sync.driveToken);
@@ -48,19 +50,46 @@ export default function SettingsDialog({ isOpen, onOpenChange }) {
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[550px] p-0 overflow-hidden bg-white dark:bg-slate-950 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xl">
-        <div className="flex flex-col h-full">
-            <DialogHeader className="p-6 pb-4 border-b border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/50">
-                <DialogTitle className="text-2xl font-bold text-slate-900 dark:text-white">Settings</DialogTitle>
-                <DialogDescription className="text-slate-500 dark:text-slate-400">
-                    Manage your application preferences and storage.
-                </DialogDescription>
-            </DialogHeader>
+      <DialogContent className="sm:max-w-[700px] h-[500px] p-0 overflow-hidden bg-white dark:bg-slate-950 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xl flex">
+        
+        {/* Sidebar Navigation */}
+        <div className="w-48 bg-slate-50 dark:bg-slate-900/50 border-r border-slate-100 dark:border-slate-800 flex flex-col">
+            <div className="p-6 pb-4">
+                <DialogTitle className="text-xl font-bold text-slate-900 dark:text-white">Settings</DialogTitle>
+                <DialogDescription className="sr-only">Settings Navigation</DialogDescription>
+            </div>
+            
+            <nav className="flex flex-col gap-1 px-3">
+                <button 
+                    onClick={() => setActiveTab('general')}
+                    className={`flex items-center gap-3 px-3 py-2 text-sm font-medium rounded-lg transition-colors ${activeTab === 'general' ? 'bg-indigo-50 text-indigo-700 dark:bg-indigo-500/10 dark:text-indigo-400' : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-white'}`}
+                >
+                    <Settings className="w-4 h-4" /> General
+                </button>
+                <button 
+                    onClick={() => setActiveTab('integrations')}
+                    className={`flex items-center gap-3 px-3 py-2 text-sm font-medium rounded-lg transition-colors ${activeTab === 'integrations' ? 'bg-indigo-50 text-indigo-700 dark:bg-indigo-500/10 dark:text-indigo-400' : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-white'}`}
+                >
+                    <Puzzle className="w-4 h-4" /> Integrations
+                </button>
+            </nav>
+        </div>
 
-            <div className="p-6 flex flex-col gap-6">
-                
-                {/* Storage & Sync Section */}
-                <section>
+        {/* Main Content Area */}
+        <div className="flex-1 flex flex-col bg-white dark:bg-slate-950 overflow-y-auto">
+            {activeTab === 'general' && (
+                <div className="p-8 flex flex-col gap-6">
+                    <h2 className="text-lg font-semibold text-slate-900 dark:text-white border-b border-slate-100 dark:border-slate-800 pb-2">General Settings</h2>
+                    <p className="text-sm text-slate-500">More settings coming soon.</p>
+                </div>
+            )}
+
+            {activeTab === 'integrations' && (
+                <div className="p-8 flex flex-col gap-6">
+                    <h2 className="text-lg font-semibold text-slate-900 dark:text-white border-b border-slate-100 dark:border-slate-800 pb-2">Integrations</h2>
+                    
+                    {/* Storage & Sync Section */}
+                    <section>
                     <h3 className="text-sm font-semibold uppercase tracking-wider text-slate-500 mb-4 flex items-center gap-2">
                         <Database className="w-4 h-4" /> Storage & Sync
                     </h3>
@@ -101,10 +130,8 @@ export default function SettingsDialog({ isOpen, onOpenChange }) {
                         </div>
                     </div>
                 </section>
-
-                {/* Additional Settings Placeholder */}
-
-            </div>
+                </div>
+            )}
         </div>
       </DialogContent>
     </Dialog>
