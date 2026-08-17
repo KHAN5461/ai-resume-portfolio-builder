@@ -1,62 +1,12 @@
 import JSZip from 'jszip';
 
+// Vite Glob Imports to fetch raw source code of the exact portfolio components and templates
+const componentFiles = import.meta.glob('../portfolio/components/*.jsx', { query: '?raw', import: 'default', eager: true });
+const templateFiles = import.meta.glob('../portfolio/templates/*.jsx', { query: '?raw', import: 'default', eager: true });
+
 export function generatePortfolioReactCode(portfolioData) {
-  const { siteConfig, heroSection, aboutSection, projectsSection, skillsSection } = portfolioData || {};
-
-  return `import React from 'react';
-
-export default function Portfolio() {
-  return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 font-sans selection:bg-indigo-500 selection:text-white">
-      
-      {/* Hero Section */}
-      <section className="min-h-screen flex flex-col items-center justify-center text-center px-6 relative">
-        <h2 className="text-sm uppercase tracking-widest text-indigo-400 font-semibold mb-3">
-          {${JSON.stringify(heroSection?.greeting || 'Hello World')}}
-        </h2>
-        <h1 className="text-4xl md:text-6xl font-extrabold max-w-3xl tracking-tight mb-6">
-          {${JSON.stringify(heroSection?.headline || 'I build exceptional digital experiences.')}}
-        </h1>
-        <p className="text-slate-400 max-w-xl text-base md:text-lg mb-8 leading-relaxed">
-          {${JSON.stringify(heroSection?.subheadline || 'Full-stack developer focused on scalable applications.')}}
-        </p>
-        <div className="flex gap-4">
-          <a href="#projects" className="bg-indigo-600 hover:bg-indigo-500 text-white px-6 py-3 rounded-xl font-semibold transition-all shadow-lg shadow-indigo-600/20">
-            View Work
-          </a>
-        </div>
-      </section>
-
-      {/* About Section */}
-      <section id="about" className="py-24 px-6 max-w-4xl mx-auto border-t border-slate-800/80">
-        <h3 className="text-xs uppercase tracking-widest text-indigo-400 font-semibold mb-2">01. Biography</h3>
-        <h2 className="text-2xl md:text-3xl font-bold mb-6">About Me</h2>
-        <p className="text-slate-300 leading-relaxed text-lg">
-          {${JSON.stringify(aboutSection?.bioDescription || 'Add your bio description here...')}}
-        </p>
-      </section>
-
-      {/* Projects Section */}
-      <section id="projects" className="py-24 px-6 max-w-5xl mx-auto border-t border-slate-800/80">
-        <h3 className="text-xs uppercase tracking-widest text-indigo-400 font-semibold mb-2">02. Portfolio</h3>
-        <h2 className="text-2xl md:text-3xl font-bold mb-10">Featured Projects</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {/* Map Projects */}
-          {/* Example static card output */}
-          <div className="bg-slate-900/50 border border-slate-800 p-6 rounded-2xl hover:border-indigo-500/50 transition-all">
-            <h4 className="text-lg font-bold text-white mb-2">Project Showcase</h4>
-            <p className="text-slate-400 text-sm mb-4">High performance full-stack application built with React and Tailwind CSS.</p>
-            <div className="flex gap-2">
-              <span className="text-[10px] bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 px-2.5 py-1 rounded-full font-mono">React</span>
-              <span className="text-[10px] bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 px-2.5 py-1 rounded-full font-mono">Tailwind</span>
-            </div>
-          </div>
-        </div>
-      </section>
-
-    </div>
-  );
-}`;
+  // We keep this as a simple fallback if ever needed, but the ZIP now uses exact source code.
+  return `import React from 'react';\n\nexport default function Portfolio() { return <div>Basic Portfolio Export</div>; }`;
 }
 
 export async function downloadPortfolioZip(portfolioData) {
@@ -76,7 +26,8 @@ export async function downloadPortfolioZip(portfolioData) {
     "dependencies": {
       "react": "^18.2.0",
       "react-dom": "^18.2.0",
-      "lucide-react": "^0.300.0"
+      "lucide-react": "^0.300.0",
+      "framer-motion": "^11.0.0"
     },
     "devDependencies": {
       "@types/react": "^18.2.43",
@@ -94,9 +45,8 @@ export async function downloadPortfolioZip(portfolioData) {
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>My Portfolio</title>
+    <title>${portfolioData?.title || 'My Portfolio'}</title>
   </head>
   <body>
     <div id="root"></div>
@@ -108,7 +58,6 @@ export async function downloadPortfolioZip(portfolioData) {
   zip.file("vite.config.js", `import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 
-// https://vitejs.dev/config/
 export default defineConfig({
   plugins: [react()],
 })`);
@@ -149,10 +98,64 @@ ReactDOM.createRoot(document.getElementById('root')).render(
   // 7. src/index.css
   zip.file("src/index.css", `@tailwind base;
 @tailwind components;
-@tailwind utilities;`);
+@tailwind utilities;
 
-  // 8. src/App.jsx (Using the existing generator for simplicity and robustness)
-  zip.file("src/App.jsx", generatePortfolioReactCode(portfolioData));
+.dark {
+  background-color: #020617; /* slate-950 */
+  color: #f1f5f9; /* slate-100 */
+}
+`);
+
+  // 8. src/data.json - The actual injected portfolio data
+  zip.file("src/data.json", JSON.stringify(portfolioData, null, 2));
+
+  // 9. Add all components dynamically
+  Object.keys(componentFiles).forEach((path) => {
+    const filename = path.split('/').pop();
+    zip.file(`src/components/${filename}`, componentFiles[path]);
+  });
+
+  // 10. Add all templates dynamically
+  Object.keys(templateFiles).forEach((path) => {
+    const filename = path.split('/').pop();
+    zip.file(`src/templates/${filename}`, templateFiles[path]);
+  });
+
+  // 11. src/App.jsx - Acts as the standalone portfolio index
+  zip.file("src/App.jsx", `import React from 'react';
+import portfolioData from './data.json';
+import PortfolioNav from './components/PortfolioNav';
+import PortfolioFooter from './components/PortfolioFooter';
+import ModernTemplate from './templates/ModernTemplate';
+import MinimalistTemplate from './templates/MinimalistTemplate';
+import CreativeTemplate from './templates/CreativeTemplate';
+import BentoTemplate from './templates/BentoTemplate';
+
+export default function App() {
+  const themePreset = portfolioData.siteConfig?.themePreset || 'bento';
+  const themeMode = portfolioData.siteConfig?.themeMode || 'light';
+  const style = { '--accent': portfolioData.siteConfig?.accentColor || '#6366f1' };
+
+  return (
+    <div className={\`min-h-screen relative \${themeMode === 'dark' ? 'dark bg-slate-950 text-white' : ''}\`} style={style}>
+      
+      {/* Navigation */}
+      <PortfolioNav data={portfolioData} blocks={portfolioData.siteConfig?.layout || []} />
+
+      {/* Dynamic Template Engine */}
+      <div className={themeMode === 'dark' ? 'dark' : ''}>
+        {themePreset === 'bento' && <BentoTemplate portfolioData={portfolioData} />}
+        {themePreset === 'minimalist' && <MinimalistTemplate portfolioData={portfolioData} />}
+        {themePreset === 'creative' && <CreativeTemplate portfolioData={portfolioData} />}
+        {(themePreset === 'modern' || themePreset === 'default') && <ModernTemplate portfolioData={portfolioData} />}
+      </div>
+
+      {/* Footer */}
+      <PortfolioFooter data={portfolioData} />
+    </div>
+  );
+}
+`);
 
   // Generate ZIP and trigger download
   const content = await zip.generateAsync({ type: "blob" });
