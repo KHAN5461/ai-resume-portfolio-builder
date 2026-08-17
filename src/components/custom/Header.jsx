@@ -10,37 +10,15 @@ import {
   DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu"
 import useHideOnScroll from '../../hooks/useHideOnScroll'
-import { useSelector, useDispatch } from 'react-redux';
-import { setDriveStatus, setDriveToken } from '../../store/syncSlice';
-import { useGoogleLogin } from '@react-oauth/google';
+import SettingsDialog from './SettingsDialog';
 
 function Header() {
     const { user, isSignedIn } = useUser();
     const isVisible = useHideOnScroll();
-    const dispatch = useDispatch();
-    const driveStatus = useSelector(state => state.sync.driveStatus); // 'disconnected', 'connecting', 'connected'
-
-    const handleConnectDrive = useGoogleLogin({
-        onSuccess: (tokenResponse) => {
-            dispatch(setDriveToken(tokenResponse.access_token));
-            dispatch(setDriveStatus('connected'));
-        },
-        onError: (error) => {
-            console.error("Drive connection failed", error);
-            dispatch(setDriveStatus('disconnected'));
-        },
-        onNonOAuthError: () => {
-            dispatch(setDriveStatus('disconnected'));
-        },
-        scope: 'https://www.googleapis.com/auth/drive.file',
-    });
-
-    const triggerDriveConnect = () => {
-        dispatch(setDriveStatus('connecting'));
-        handleConnectDrive();
-    };
+    const [isSettingsOpen, setIsSettingsOpen] = React.useState(false);
 
     return (
+        <>
         <div className={`p-4 px-8 flex justify-between items-center bg-surface/80 backdrop-blur-md border-b border-outline-variant/30 sticky top-0 z-50 shadow-sm transition-transform duration-300 ${isVisible ? 'translate-y-0' : '-translate-y-full'}`}>
              <Link to={'/dashboard'} className="group">
                 <div className="font-semibold text-[22px] tracking-tight text-on-surface flex items-center gap-2 transition-transform duration-300 group-hover:scale-105">
@@ -63,36 +41,12 @@ function Header() {
                             <DropdownMenuContent align="end">
                                 <DropdownMenuItem asChild><Link to="/dashboard">Dashboard</Link></DropdownMenuItem>
                                 <DropdownMenuItem asChild><Link to="/profile">Profile</Link></DropdownMenuItem>
-                                <DropdownMenuItem asChild><Link to="/settings">Settings</Link></DropdownMenuItem>
+                                <DropdownMenuItem onSelect={() => setIsSettingsOpen(true)}>Settings</DropdownMenuItem>
                             </DropdownMenuContent>
                         </DropdownMenu>
                     </div>
 
-                    <div className="w-[1px] h-6 bg-outline-variant/50 mx-2 hidden md:block"></div>
 
-                    {/* Drive Sync Status Indicator */}
-                    <div className="hidden md:flex items-center" title={driveStatus === 'connected' ? 'Drive Connected (Synced)' : 'Drive Disconnected'}>
-                        {driveStatus === 'disconnected' && (
-                            <Button variant="ghost" size="sm" onClick={triggerDriveConnect} className="text-red-500 hover:text-red-600 hover:bg-red-50 flex gap-2">
-                                <HardDrive className="w-4 h-4" />
-                                <span className="text-xs">Connect Drive</span>
-                            </Button>
-                        )}
-                        {driveStatus === 'connecting' && (
-                            <div className="text-yellow-500 flex gap-2 items-center px-3">
-                                <Loader2 className="w-4 h-4 animate-spin" />
-                                <span className="text-xs">Connecting...</span>
-                            </div>
-                        )}
-                        {driveStatus === 'connected' && (
-                            <div className="text-green-500 flex gap-2 items-center px-3">
-                                <Cloud className="w-4 h-4" />
-                                <span className="text-xs">Synced</span>
-                            </div>
-                        )}
-                    </div>
-
-                    <div className="w-[1px] h-6 bg-outline-variant/50 mx-2 hidden md:block"></div>
                     <div className="hover:scale-110 transition-transform duration-200">
                         <UserButton />
                     </div>
@@ -116,6 +70,8 @@ function Header() {
                 </div>
             }
         </div>
+        <SettingsDialog isOpen={isSettingsOpen} onOpenChange={setIsSettingsOpen} />
+        </>
     )
 }
 
