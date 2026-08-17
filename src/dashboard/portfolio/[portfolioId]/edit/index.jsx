@@ -6,7 +6,7 @@ import { ActionCreators } from 'redux-undo';
 import useUndoRedoKeyboard from '@/hooks/useUndoRedoKeyboard';
 import BlockPalette from '../../components/BlockPalette';
 import CanvasArea from '../../components/CanvasArea';
-import PropertiesPanel from '../../components/PropertiesPanel';
+import UnifiedInspector from '../../components/UnifiedInspector';
 import LeftSidebar from '../../components/LeftSidebar';
 import GenerativeCanvasLoader from '../../components/GenerativeCanvasLoader';
 import PreviewWindow from './components/PreviewWindow';
@@ -346,8 +346,8 @@ export default function EditPortfolio() {
             </PreviewWindow>
           </main>
 
-          {/* 3. Right Properties Panel */}
-          {!isLoading && !isGenerating && <PropertiesPanel activeBlockId={activeBlockId} setActiveBlockId={setActiveBlockId} isOpen={isPropertiesPanelOpen} onToggle={() => setIsPropertiesPanelOpen(!isPropertiesPanelOpen)} />}
+          {/* 3. Right Properties Panel (Unified Inspector) */}
+          {!isLoading && !isGenerating && <UnifiedInspector activeBlockId={activeBlockId} setActiveBlockId={setActiveBlockId} isOpen={isPropertiesPanelOpen} onToggle={() => setIsPropertiesPanelOpen(!isPropertiesPanelOpen)} />}
         </main>
         
         <SeoSettingsModal isOpen={isSeoModalOpen} onClose={() => setIsSeoModalOpen(false)} />
