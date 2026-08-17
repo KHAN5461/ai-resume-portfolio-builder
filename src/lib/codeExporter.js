@@ -65,6 +65,7 @@ export default defineConfig({
   // 4. tailwind.config.js
   zip.file("tailwind.config.js", `/** @type {import('tailwindcss').Config} */
 export default {
+  darkMode: 'class',
   content: [
     "./index.html",
     "./src/**/*.{js,ts,jsx,tsx}",
