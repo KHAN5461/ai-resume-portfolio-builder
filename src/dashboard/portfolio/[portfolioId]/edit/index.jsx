@@ -275,7 +275,7 @@ export default function EditPortfolio() {
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -10 }}
       transition={{ duration: 0.3 }}
-      className="bg-background text-on-background font-body-md h-[100dvh] w-screen overflow-hidden flex flex-col"
+      className="fixed inset-0 bg-background text-on-background font-body-md w-full h-full overflow-hidden flex flex-col z-50"
     >
         {/* Top Toolbar */}
         <GlobalEditorToolbar 
