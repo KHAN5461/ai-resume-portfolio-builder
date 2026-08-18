@@ -103,19 +103,29 @@ function Home() {
 {/*  Decorative Background Elements  */}
 <div className="absolute top-10 left-10 w-64 h-64 bg-white/30 rounded-full blur-3xl"></div>
 <div className="absolute bottom-10 right-10 w-80 h-80 bg-secondary/10 rounded-full blur-3xl"></div>
-<div className="max-w-7xl mx-auto px-container-margin md:px-lg relative z-10 text-center flex flex-col items-center">
+<div className="max-w-7xl mx-auto px-gutter relative z-10 text-center flex flex-col items-center">
 <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/50 backdrop-blur-sm border border-white/20 mb-8 shadow-sm">
 <span className="material-symbols-outlined text-sm text-secondary" data-icon="sparkles">arrow_back_ios_new</span>
 <span className="font-label-sm text-label-sm text-on-surface font-medium">Empowered Creativity v2.0 is here</span>
 </div>
 <div className="w-full max-w-6xl mb-12 flex flex-col lg:flex-row items-center gap-12">
     <div className="flex-1 text-left">
-        <h1 className="font-headline-xl text-headline-xl md:text-[64px] font-extrabold leading-tight tracking-tight mb-6">
+        <motion.h1 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.2 }}
+            className="text-[clamp(2.5rem,5vw+1rem,4rem)] font-extrabold leading-tight tracking-tight mb-6"
+        >
             Get your resume ATS-ready in <span className="gradient-text">5 minutes</span>
-        </h1>
-        <p className="font-body-lg text-body-lg text-on-surface-variant mb-10">
+        </motion.h1>
+        <motion.p 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.3 }}
+            className="font-body-lg text-body-lg text-on-surface-variant mb-10"
+        >
             Stop guessing why you're getting rejected. Our AI analyzes, optimizes, and formats your resume to beat Applicant Tracking Systems and land you interviews.
-        </p>
+        </motion.p>
         <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto mt-4">
             <MagicImportModal renderTrigger={(onClick) => (
                 <button onClick={onClick} className="bg-primary text-on-primary font-label-md text-label-md px-8 py-4 rounded-full shadow-[0_0_20px_rgba(159,91,255,0.4)] hover:-translate-y-1 hover:shadow-[0_0_30px_rgba(159,91,255,0.6)] hover:bg-primary/90 transition-all duration-300 flex items-center justify-center gap-2 min-h-[48px] cursor-pointer">
@@ -156,9 +166,15 @@ function Home() {
 </section>
 
 {/* Before/After Transformation Showcase */}
-<section className="py-24 bg-surface-container-lowest">
-    <div className="max-w-7xl mx-auto px-container-margin md:px-lg text-center">
-        <h2 className="font-headline-lg text-headline-lg font-bold text-on-surface mb-4">From Text File to Top 1% Candidate</h2>
+<motion.section 
+    initial={{ opacity: 0, y: 50 }}
+    whileInView={{ opacity: 1, y: 0 }}
+    viewport={{ once: true, margin: "-100px" }}
+    transition={{ duration: 0.6 }}
+    className="py-24 bg-surface-container-lowest"
+>
+    <div className="max-w-7xl mx-auto px-gutter text-center">
+        <h2 className="text-[clamp(2rem,4vw+1rem,3rem)] font-bold text-on-surface mb-4">From Text File to Top 1% Candidate</h2>
         <p className="font-body-md text-body-md text-on-surface-variant mb-16 max-w-2xl mx-auto">See the difference between a standard unformatted document and a Sparkfolio optimized resume.</p>
         
         <div className="flex flex-col lg:flex-row gap-8 items-center justify-center">
@@ -208,12 +224,18 @@ function Home() {
             </div>
         </div>
     </div>
-</section>
+</motion.section>
 
 {/*  Bento Grid Feature Showcase  */}
-<section className="py-xl max-w-7xl mx-auto px-container-margin md:px-lg w-full">
+<motion.section 
+    initial={{ opacity: 0, y: 50 }}
+    whileInView={{ opacity: 1, y: 0 }}
+    viewport={{ once: true, margin: "-100px" }}
+    transition={{ duration: 0.6 }}
+    className="py-xl max-w-7xl mx-auto px-gutter w-full"
+>
 <div className="text-center mb-xl">
-<h2 className="font-headline-lg text-headline-lg text-on-surface mb-4">Everything you need to create</h2>
+<h2 className="text-[clamp(2rem,4vw+1rem,3rem)] font-bold text-on-surface mb-4">Everything you need to create</h2>
 <p className="font-body-md text-body-md text-on-surface-variant">Powerful features wrapped in a delightfully simple interface.</p>
 </div>
 <div className="grid grid-cols-1 md:grid-cols-3 gap-md md:gap-lg auto-rows-[300px]">
@@ -269,7 +291,7 @@ function Home() {
 </div>
 </motion.div>
 </div>
-</section>
+</motion.section>
 
 {/* Pricing Section */}
 <PricingSection onUpgrade={handleUpgrade} />

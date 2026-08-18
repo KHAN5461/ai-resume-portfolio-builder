@@ -14,6 +14,7 @@ import ModernTemplate from './templates/ModernTemplate';
 import MinimalistTemplate from './templates/MinimalistTemplate';
 import CreativeTemplate from './templates/CreativeTemplate';
 import BentoTemplate from './templates/BentoTemplate';
+import MagazineTemplate from './templates/MagazineTemplate';
 
 export default function Portfolio({ isPublic = false }) {
   const { portfolioId } = useParams();
@@ -95,6 +96,7 @@ export default function Portfolio({ isPublic = false }) {
         {themePreset === 'bento' && <BentoTemplate portfolioData={portfolioData} />}
         {themePreset === 'minimalist' && <MinimalistTemplate portfolioData={portfolioData} />}
         {themePreset === 'creative' && <CreativeTemplate portfolioData={portfolioData} />}
+        {themePreset === 'magazine' && <MagazineTemplate portfolioData={portfolioData} />}
         {(themePreset === 'modern' || themePreset === 'default') && <ModernTemplate portfolioData={portfolioData} />}
       </div>
 
@@ -129,6 +131,12 @@ export default function Portfolio({ isPublic = false }) {
             className={`px-4 py-1.5 rounded-full text-sm font-medium transition-colors ${themePreset === 'creative' ? 'bg-white text-slate-900' : 'text-slate-300 hover:text-white hover:bg-slate-800'}`}
           >
             Creative
+          </button>
+          <button 
+            onClick={() => updateThemePreset('magazine')}
+            className={`px-4 py-1.5 rounded-full text-sm font-medium transition-colors ${themePreset === 'magazine' ? 'bg-white text-slate-900' : 'text-slate-300 hover:text-white hover:bg-slate-800'}`}
+          >
+            Magazine
           </button>
         </div>
       )}

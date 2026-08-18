@@ -20,6 +20,7 @@ const TEMPLATES = [
   { id: 'modern', name: 'Modern Template', category: 'Creative', image: 'https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=500&q=80', description: 'Stand out with bold colors and unique typography.' },
   { id: 'minimal', name: 'Minimal Template', category: 'Professional', image: 'https://images.unsplash.com/photo-1555099962-4199c345e5dd?w=500&q=80', description: 'Clean lines and lots of whitespace. Perfect for corporate roles.' },
   { id: 'minimal-image', name: 'Minimal Image Template', category: 'Creative', image: 'https://images.unsplash.com/photo-1542831371-29b0f74f9713?w=500&q=80', description: 'Showcase your work with big visuals and a modern layout.' },
+  { id: 'magazine', name: 'Magazine Template', category: 'Creative', image: 'https://images.unsplash.com/photo-1550684848-fac1c5b4e853?w=500&q=80', description: 'Editorial layout with asymmetric grid and large typography.' },
 ];
 
 const CATEGORIES = ['All', 'Professional', 'Creative', 'Tech', 'Academic'];
@@ -44,6 +45,7 @@ export default function TemplateGallery() {
       else if (selectedTemplateId === 'modern') themeColor = '#ff6666';
       else if (selectedTemplateId === 'minimal') themeColor = '#9F5BFF';
       else if (selectedTemplateId === 'minimal-image') themeColor = '#0066cc';
+      else if (selectedTemplateId === 'magazine') themeColor = '#ff3366';
 
       const data = {
           data: {
