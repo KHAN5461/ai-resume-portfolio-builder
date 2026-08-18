@@ -45,8 +45,22 @@ export const saveToDrive = async (accessToken, data, fileName, fileId = null) =>
         : DRIVE_UPLOAD_URL;
 
     const headers = { Authorization: `Bearer ${accessToken}` };
-    if (fileId && etagCache.has(fileId)) {
-        headers['If-Match'] = etagCache.get(fileId);
+    
+    if (fileId) {
+        const metaRes = await fetch(`https://www.googleapis.com/drive/v3/files/${fileId}?fields=id`, {
+            headers: { Authorization: `Bearer ${accessToken}` }
+        });
+        if (metaRes.ok) {
+            const currentETag = metaRes.headers.get('ETag');
+            if (etagCache.has(fileId)) {
+                if (currentETag && currentETag !== etagCache.get(fileId)) {
+                    throw new Error('DATA_RACE: This file has been updated elsewhere.');
+                }
+                headers['If-Match'] = etagCache.get(fileId);
+            } else if (currentETag) {
+                headers['If-Match'] = currentETag;
+            }
+        }
     }
 
     const response = await fetch(url, {

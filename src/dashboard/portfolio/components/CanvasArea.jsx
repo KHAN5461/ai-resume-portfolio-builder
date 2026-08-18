@@ -12,6 +12,7 @@ import BentoTemplate from '../../../portfolio/templates/BentoTemplate';
 
 export default function CanvasArea({ portfolioData }) {
   const [isGenerateModalOpen, setIsGenerateModalOpen] = React.useState(false);
+  const [isPreviewMode, setIsPreviewMode] = React.useState(false);
 
   // If completely blank, show blank canvas generator
   if (!portfolioData || Object.keys(portfolioData).length === 0 || (!portfolioData.heroSection && !portfolioData.siteConfig?.layout?.length)) {
@@ -54,20 +55,28 @@ export default function CanvasArea({ portfolioData }) {
   const themePreset = portfolioData.siteConfig?.themePreset || 'bento';
 
   return (
-    <div className={`h-full w-full ${themeMode === 'dark' ? 'dark bg-slate-950 text-white' : 'bg-[#F7F7F8]'} overflow-y-auto custom-scrollbar`} style={style}>
-        {/* Navigation */}
-        <PortfolioNav data={portfolioData} blocks={portfolioData.siteConfig?.layout || []} />
+    <div className={`h-full w-full relative ${themeMode === 'dark' ? 'dark bg-slate-950 text-white' : 'bg-[#F7F7F8]'} overflow-y-auto overflow-x-hidden custom-scrollbar`} style={style}>
+        <div className={`transition-transform duration-300 ${isPreviewMode ? 'scale-50 origin-top-left w-[200%] h-[200%]' : ''}`}>
+          {/* Navigation */}
+          <PortfolioNav data={portfolioData} blocks={portfolioData.siteConfig?.layout || []} />
 
-        {/* Dynamic Template Engine - perfectly syncs with export and public view! */}
-        <div className={themeMode === 'dark' ? 'dark' : ''}>
-          {themePreset === 'bento' && <BentoTemplate portfolioData={portfolioData} />}
-          {themePreset === 'minimalist' && <MinimalistTemplate portfolioData={portfolioData} />}
-          {themePreset === 'creative' && <CreativeTemplate portfolioData={portfolioData} />}
-          {(themePreset === 'modern' || themePreset === 'default') && <ModernTemplate portfolioData={portfolioData} />}
+          {/* Dynamic Template Engine - perfectly syncs with export and public view! */}
+          <div className={themeMode === 'dark' ? 'dark' : ''}>
+            {themePreset === 'bento' && <BentoTemplate portfolioData={portfolioData} />}
+            {themePreset === 'minimalist' && <MinimalistTemplate portfolioData={portfolioData} />}
+            {themePreset === 'creative' && <CreativeTemplate portfolioData={portfolioData} />}
+            {(themePreset === 'modern' || themePreset === 'default') && <ModernTemplate portfolioData={portfolioData} />}
+          </div>
+
+          {/* Footer */}
+          <PortfolioFooter data={portfolioData} />
         </div>
 
-        {/* Footer */}
-        <PortfolioFooter data={portfolioData} />
+        {/* Mobile Toggle Button */}
+        <div className="md:hidden fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-white dark:bg-slate-800 shadow-xl rounded-full p-1 border border-slate-200 dark:border-slate-700 flex">
+           <button onClick={() => setIsPreviewMode(false)} className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${!isPreviewMode ? 'bg-indigo-600 text-white' : 'text-slate-600 dark:text-slate-300'}`}>Edit</button>
+           <button onClick={() => setIsPreviewMode(true)} className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${isPreviewMode ? 'bg-indigo-600 text-white' : 'text-slate-600 dark:text-slate-300'}`}>Preview</button>
+        </div>
     </div>
   );
 }

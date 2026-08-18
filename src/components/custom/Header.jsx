@@ -10,12 +10,9 @@ import {
   DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu"
 import useHideOnScroll from '../../hooks/useHideOnScroll'
-import SettingsDialog from './SettingsDialog';
-
 function Header() {
     const { user, isSignedIn } = useUser();
     const isVisible = useHideOnScroll();
-    const [isSettingsOpen, setIsSettingsOpen] = React.useState(false);
 
     return (
         <>
@@ -41,7 +38,7 @@ function Header() {
                             <DropdownMenuContent align="end">
                                 <DropdownMenuItem asChild><Link to="/dashboard">Dashboard</Link></DropdownMenuItem>
                                 <DropdownMenuItem asChild><Link to="/profile">Profile</Link></DropdownMenuItem>
-                                <DropdownMenuItem onSelect={() => setIsSettingsOpen(true)}>Settings</DropdownMenuItem>
+                                <DropdownMenuItem asChild><Link to="/settings">Settings</Link></DropdownMenuItem>
                             </DropdownMenuContent>
                         </DropdownMenu>
                     </div>
@@ -70,7 +67,6 @@ function Header() {
                 </div>
             }
         </div>
-        <SettingsDialog isOpen={isSettingsOpen} onOpenChange={setIsSettingsOpen} />
         </>
     )
 }

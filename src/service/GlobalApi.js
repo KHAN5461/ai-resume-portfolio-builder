@@ -40,16 +40,36 @@ const migratePortfolioData = (data) => {
     return migrated;
 };
 
-const GetUserResumes = async (userEmail) => {
+const listCache = new Map();
+
+const GetUserResumes = async (userEmail, forceRefresh = false) => {
+    const cacheKey = `resumes_${userEmail}`;
+    if (!forceRefresh && listCache.has(cacheKey)) {
+        const cached = listCache.get(cacheKey);
+        if (Date.now() - cached.timestamp < 60000) {
+            return cached.data;
+        }
+    }
     // For BYOS, the index is kept locally or in an index.json on Drive.
     // We will use local storage to simulate the index for now.
     const local = JSON.parse(localStorage.getItem('local_resumes') || '[]');
-    return { data: { data: local.filter(r => r.userEmail === userEmail).map(migrateResumeData) } };
+    const result = { data: { data: local.filter(r => r.userEmail === userEmail).map(migrateResumeData) } };
+    listCache.set(cacheKey, { data: result, timestamp: Date.now() });
+    return result;
 };
 
-const GetUserPortfolios = async (userEmail) => {
+const GetUserPortfolios = async (userEmail, forceRefresh = false) => {
+    const cacheKey = `portfolios_${userEmail}`;
+    if (!forceRefresh && listCache.has(cacheKey)) {
+        const cached = listCache.get(cacheKey);
+        if (Date.now() - cached.timestamp < 60000) {
+            return cached.data;
+        }
+    }
     const local = JSON.parse(localStorage.getItem('local_portfolios') || '[]');
-    return { data: { data: local.filter(p => p.userEmail === userEmail).map(migratePortfolioData) } };
+    const result = { data: { data: local.filter(p => p.userEmail === userEmail).map(migratePortfolioData) } };
+    listCache.set(cacheKey, { data: result, timestamp: Date.now() });
+    return result;
 };
 
 const CreateNewResume = async (payload) => {

@@ -3,6 +3,7 @@ import { useParams, Link } from 'react-router-dom'
 import FormSection from '../../components/FormSection';
 import ThemeBuilder from '../../components/ThemeBuilder';
 import ResumePreview from '../../components/ResumePreview';
+import { ResumeATSScore } from '../../components/ResumeATSScore';
 import { useDispatch, useSelector } from 'react-redux';
 import { setResumeData } from '@/store/resumeSlice';
 import { ActionCreators } from 'redux-undo';
@@ -219,6 +220,7 @@ function EditResume() {
                     <button onClick={() => setActiveTab('Content')} className={`flex-1 py-1.5 rounded-md text-center font-label-md text-[13px] transition-all ${activeTab === 'Content' ? 'bg-white shadow-sm text-stitch-primary font-bold' : 'text-on-surface-variant hover:text-on-surface'}`}>Content</button>
                     <button onClick={() => setActiveTab('Theme')} className={`flex-1 py-1.5 rounded-md text-center font-label-md text-[13px] transition-all ${activeTab === 'Theme' ? 'bg-white shadow-sm text-stitch-primary font-bold' : 'text-on-surface-variant hover:text-on-surface'}`}>Theme</button>
                     <button onClick={() => setActiveTab('Settings')} className={`flex-1 py-1.5 rounded-md text-center font-label-md text-[13px] transition-all ${activeTab === 'Settings' ? 'bg-white shadow-sm text-stitch-primary font-bold' : 'text-on-surface-variant hover:text-on-surface'}`}>Settings</button>
+                    <button onClick={() => setActiveTab('ATS')} className={`flex-1 py-1.5 rounded-md text-center font-label-md text-[13px] transition-all ${activeTab === 'ATS' ? 'bg-white shadow-sm text-stitch-primary font-bold' : 'text-on-surface-variant hover:text-on-surface'}`}>ATS</button>
                  </div>
               </div>
               
@@ -234,6 +236,7 @@ function EditResume() {
                     {activeTab === 'Content' && <FormSection />}
                     {activeTab === 'Theme' && <ThemeBuilder />}
                     {activeTab === 'Settings' && <div className="flex-1 mt-4"><RawJsonEditor /></div>}
+                    {activeTab === 'ATS' && <div className="flex-1 mt-4"><ResumeATSScore /></div>}
                   </>
                 )}
               </div>

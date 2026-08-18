@@ -23,6 +23,7 @@ const Portfolio = lazy(() => import('./portfolio/index.jsx'))
 const ProfilePage = lazy(() => import('./profile/index.jsx'))
 const TemplatesPage = lazy(() => import('./pages/TemplateGallery.jsx'))
 const NotFound = lazy(() => import('./pages/NotFound.jsx'))
+const SettingsPage = lazy(() => import('./pages/SettingsPage.jsx'))
 const CoverLetters = lazy(() => import('./dashboard/cover-letters/index.jsx'))
 const InterviewCoach = lazy(() => import('./interview/index.jsx'))
 const AIPromptStudio = lazy(() => import('./dashboard/portfolio/components/AIPromptStudio.jsx'));
@@ -68,6 +69,10 @@ const router=createBrowserRouter([
       {
         path:'/profile',
         element: <Suspense fallback={<LoadingFallback />}><ProfilePage/></Suspense>
+      },
+      {
+        path:'/settings',
+        element: <Suspense fallback={<LoadingFallback />}><SettingsPage/></Suspense>
       },
       {
         path:'/dashboard/cover-letters',

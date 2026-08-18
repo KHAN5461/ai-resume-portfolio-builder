@@ -17,8 +17,6 @@ import { Input } from "@/components/ui/input"
 import { Grid, List as ListIcon } from 'lucide-react'
 import { Skeleton } from '@/components/ui/skeleton'
 import MobileBottomNav from '../components/custom/MobileBottomNav';
-import SettingsDialog from '../components/custom/SettingsDialog';
-
 function Dashboard() {
   const {user}=useUser();
   const [resumeList,setResumeList]=useState([]);
@@ -28,7 +26,6 @@ function Dashboard() {
   const [sortBy, setSortBy] = useState('updated'); // 'updated' | 'alphabetical'
   const [isLoadingResumes, setIsLoadingResumes] = useState(true);
   const [isLoadingPortfolios, setIsLoadingPortfolios] = useState(true);
-  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
   useEffect(()=>{
     if(user) {
@@ -164,10 +161,10 @@ function Dashboard() {
           </Link>
         </nav>
         <div className="p-4 mt-auto border-t border-outline-variant/30 space-y-1">
-          <button onClick={() => setIsSettingsOpen(true)} aria-label="Settings" className="w-full flex items-center gap-md px-4 py-3 rounded-lg text-on-surface-variant font-label-md text-[14px] hover:bg-surface-variant hover:text-stitch-primary transition-colors focus:ring-2 focus:ring-stitch-primary outline-none">
+          <Link to="/settings" aria-label="Settings" className="w-full flex items-center gap-md px-4 py-3 rounded-lg text-on-surface-variant font-label-md text-[14px] hover:bg-surface-variant hover:text-stitch-primary transition-colors focus:ring-2 focus:ring-stitch-primary outline-none">
             <span className="material-symbols-outlined" aria-hidden="true">settings</span>
             Settings
-          </button>
+          </Link>
           <Link className="flex items-center gap-md px-4 py-3 rounded-lg text-on-surface-variant font-label-md text-[14px] hover:bg-surface-variant hover:text-stitch-primary transition-colors focus:ring-2 focus:ring-stitch-primary outline-none" to="/profile" aria-label="Profile">
             <span className="material-symbols-outlined" aria-hidden="true">person</span>
             Profile
@@ -458,7 +455,6 @@ function Dashboard() {
           <span className="material-symbols-outlined text-[28px]" style={{fontVariationSettings: "'FILL' 1"}}>add</span>
         </button>
       )} />
-      <SettingsDialog isOpen={isSettingsOpen} onOpenChange={setIsSettingsOpen} />
     </motion.div>
   )
 }
