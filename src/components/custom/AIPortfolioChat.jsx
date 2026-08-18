@@ -34,23 +34,23 @@ const AIPortfolioChat = ({ portfolioId }) => {
       let aiResponse = "I'm not sure how to do that yet.";
       const lowerInput = userText.toLowerCase();
 
-      if (lowerInput.includes('add contact')) {
+      if (lowerInput.includes('contact')) {
         aiResponse = "Adding a contact section...";
         dispatch(addBlock({ portfolioId, blockType: 'contact', blockName: 'Contact' }));
-      } else if (lowerInput.includes('add about')) {
+      } else if (lowerInput.includes('about')) {
         aiResponse = "Adding an about section...";
         dispatch(addBlock({ portfolioId, blockType: 'about', blockName: 'About' }));
-      } else if (lowerInput.includes('add project')) {
+      } else if (lowerInput.includes('project')) {
         aiResponse = "Adding a projects section...";
         dispatch(addBlock({ portfolioId, blockType: 'projects', blockName: 'Projects' }));
-      } else if (lowerInput.includes('add skill')) {
+      } else if (lowerInput.includes('skill')) {
         aiResponse = "Adding a skills section...";
         dispatch(addBlock({ portfolioId, blockType: 'skills', blockName: 'Skills' }));
-      } else if (lowerInput.includes('dark mode')) {
+      } else if (lowerInput.includes('dark')) {
         aiResponse = "Switching to dark mode (simulated)...";
         // Assuming we'd dispatch a theme change here
       } else {
-        aiResponse = "I understood: " + userText + ". (This is a simulated response)";
+        aiResponse = "I can help you build sections like 'About', 'Projects', 'Skills', or 'Contact'. Try asking me to add one of those!";
       }
 
       setMessages(prev => [...prev, { id: Date.now() + 1, role: 'ai', text: aiResponse }]);
