@@ -7,7 +7,7 @@ import useUndoRedoKeyboard from '@/hooks/useUndoRedoKeyboard';
 import BlockPalette from '../../components/BlockPalette';
 import CanvasArea from '../../components/CanvasArea';
 import UnifiedInspector from '../../components/UnifiedInspector';
-import LeftSidebar from '../../components/LeftSidebar';
+import AIPortfolioChat from '@/components/custom/AIPortfolioChat';
 import GenerativeCanvasLoader from '../../components/GenerativeCanvasLoader';
 import PreviewWindow from './components/PreviewWindow';
 import { updatePortfolioData } from '@/store/portfolioSlice';
@@ -308,11 +308,15 @@ export default function EditPortfolio() {
         {/* Workspace Area */}
         <main className="flex-1 flex overflow-hidden bg-surface-container-low relative pt-14 md:pt-16">
           
-          {/* 1. Left Sidebar (Tabbed: Sections | AI) */}
-          {!isLoading && <LeftSidebar activeBlockId={activeBlockId} setActiveBlockId={setActiveBlockId} isOpen={isLeftPanelOpen} onToggle={() => setIsLeftPanelOpen(!isLeftPanelOpen)} />}
+          {/* 1. Left Sidebar (AI Chat) */}
+          {!isLoading && (
+            <div className="hidden md:block w-full md:w-1/3 lg:w-[35%] h-full shrink-0 border-r border-outline-variant/30 z-10 bg-surface">
+              <AIPortfolioChat portfolioId={portfolioId} />
+            </div>
+          )}
 
           {/* 2. Center Preview Canvas */}
-          <main className="flex-1 relative flex flex-col overflow-hidden bg-slate-100 dark:bg-slate-950 p-4 md:p-6">
+          <main className="flex-1 relative flex flex-col overflow-hidden bg-slate-100 dark:bg-slate-950 p-4 md:p-6 h-full">
             <PreviewWindow rawCode={JSON.stringify(portfolioData, null, 2)}>
                {/* Mobile Only: Tabbed Bottom Sheet Toggle */}
                <div className="md:hidden absolute bottom-4 left-4 right-4 z-50 flex gap-2 justify-center">
@@ -329,18 +333,15 @@ export default function EditPortfolio() {
                       <Skeleton className="h-96 w-full rounded-xl" />
                     </div>
                   ) : (
-                    <CanvasArea 
-                      blocks={portfolioData?.siteConfig?.layout || []} 
-                      portfolioData={portfolioData}
-                      onSelectBlock={(id) => {
-                        setActiveBlockId(id);
-                        if (!isPropertiesPanelOpen) setIsPropertiesPanelOpen(true);
-                      }}
-                      activeBlockId={activeBlockId}
-                      onOpenAi={() => {
-                        setIsLeftPanelOpen(true);
-                      }}
-                    />
+                      <CanvasArea 
+                        blocks={portfolioData?.siteConfig?.layout || []} 
+                        portfolioData={portfolioData}
+                        onSelectBlock={(id) => {
+                          setActiveBlockId(id);
+                          if (!isPropertiesPanelOpen) setIsPropertiesPanelOpen(true);
+                        }}
+                        activeBlockId={activeBlockId}
+                      />
                   )}
                </div>
             </PreviewWindow>
