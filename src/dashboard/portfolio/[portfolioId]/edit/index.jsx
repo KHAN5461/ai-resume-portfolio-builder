@@ -23,7 +23,7 @@ import { calculateSeoScore } from '@/lib/seoScorer';
 import { Skeleton } from '@/components/ui/skeleton';
 import ResponsiveBreadcrumbs from '@/components/custom/ResponsiveBreadcrumbs';
 import useHideOnScroll from '@/hooks/useHideOnScroll';
-import { Undo2, Redo2, Bot, Settings2, Monitor, Tablet, Smartphone } from 'lucide-react';
+import { Undo2, Redo2, Bot, Settings2, Monitor, Tablet, Smartphone, Sparkles, ChevronLeft, ChevronRight } from 'lucide-react';
 import GlobalEditorToolbar from '@/components/custom/GlobalEditorToolbar';
 
 export default function EditPortfolio() {
@@ -45,6 +45,32 @@ export default function EditPortfolio() {
   const [activeBlockId, setActiveBlockId] = useState('hero');
   const [isLeftPanelOpen, setIsLeftPanelOpen] = useState(true);
   const [isPropertiesPanelOpen, setIsPropertiesPanelOpen] = useState(true);
+  
+  // AI Panel State
+  const [isAIChatOpen, setIsAIChatOpen] = useState(true);
+  const [chatPanelWidth, setChatPanelWidth] = useState(380);
+  
+  const startResizing = React.useCallback((e) => {
+    e.preventDefault();
+    const startX = e.clientX;
+    const startWidth = chatPanelWidth;
+
+    const onMouseMove = (moveEvent) => {
+      const newWidth = startWidth + (moveEvent.clientX - startX);
+      if (newWidth > 250 && newWidth < 800) {
+        setChatPanelWidth(newWidth);
+      }
+    };
+    const onMouseUp = () => {
+      document.removeEventListener('mousemove', onMouseMove);
+      document.removeEventListener('mouseup', onMouseUp);
+      document.body.style.cursor = 'default';
+    };
+
+    document.body.style.cursor = 'col-resize';
+    document.addEventListener('mousemove', onMouseMove);
+    document.addEventListener('mouseup', onMouseUp);
+  }, [chatPanelWidth]);
 
   // AI Generation Focus Mode
   const [searchParams, setSearchParams] = useSearchParams();
@@ -310,9 +336,41 @@ export default function EditPortfolio() {
           
           {/* 1. Left Sidebar (AI Chat) */}
           {!isLoading && (
-            <div className="hidden md:block w-full md:w-1/3 lg:w-[35%] h-full shrink-0 border-r border-outline-variant/30 z-10 bg-surface">
-              <AIPortfolioChat portfolioId={portfolioId} />
-            </div>
+            <>
+              {isAIChatOpen ? (
+                <div 
+                  className="hidden md:flex flex-col h-full shrink-0 z-10 bg-surface relative group border-r border-outline-variant/30"
+                  style={{ width: chatPanelWidth }}
+                >
+                  <AIPortfolioChat portfolioId={portfolioId} />
+                  
+                  {/* Collapse Button */}
+                  <button 
+                    onClick={() => setIsAIChatOpen(false)}
+                    className="absolute -right-3 top-6 w-6 h-6 bg-surface border border-outline-variant/30 rounded-full flex items-center justify-center shadow-sm z-50 text-on-surface-variant hover:text-stitch-primary hover:border-stitch-primary transition-colors opacity-0 group-hover:opacity-100"
+                    title="Collapse AI Panel"
+                  >
+                    <ChevronLeft className="w-3 h-3" />
+                  </button>
+
+                  {/* Drag Handle */}
+                  <div 
+                    onMouseDown={startResizing}
+                    className="absolute -right-1 top-0 w-2 h-full cursor-col-resize hover:bg-stitch-primary/30 active:bg-stitch-primary/50 transition-colors z-40"
+                  />
+                </div>
+              ) : (
+                <div className="hidden md:flex flex-col w-16 h-full shrink-0 border-r border-outline-variant/30 z-10 bg-surface items-center py-4 relative group">
+                  <button 
+                    onClick={() => setIsAIChatOpen(true)} 
+                    className="w-10 h-10 bg-gradient-to-br from-stitch-primary to-stitch-secondary text-white rounded-xl shadow-sm hover:shadow-md transition-all flex items-center justify-center hover:-translate-y-0.5" 
+                    title="Expand AI Chat"
+                  >
+                    <Sparkles className="w-5 h-5" />
+                  </button>
+                </div>
+              )}
+            </>
           )}
 
           {/* 2. Center Preview Canvas */}
