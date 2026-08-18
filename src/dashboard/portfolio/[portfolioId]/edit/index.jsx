@@ -127,7 +127,7 @@ export default function EditPortfolio() {
 
         const result = await AIChatSession.sendMessage(prompt);
         const rawText = result.response.text();
-        const cleanedJSON = JSON.parse(rawText.replace(/\`\`\`json/g, '').replace(/\`\`\`/g, '').trim());
+        const cleanedJSON = JSON.parse(rawText.replace(/```json/g, '').replace(/```/g, '').trim());
 
         dispatch({
           type: 'portfolio/updatePortfolioData',
@@ -215,7 +215,7 @@ export default function EditPortfolio() {
       
       const result = await AIChatSession.sendMessage(prompt);
       const rawText = result.response.text();
-      const parsedData = JSON.parse(rawText.replace(/\`\`\`json/g, '').replace(/\`\`\`/g, ''));
+      const parsedData = JSON.parse(rawText.replace(/```json/g, '').replace(/```/g, ''));
       
       dispatch({ 
         type: 'portfolio/updatePortfolioData', 
@@ -316,7 +316,7 @@ export default function EditPortfolio() {
           )}
 
           {/* 2. Center Preview Canvas */}
-          <main className="flex-1 relative flex flex-col overflow-hidden bg-slate-100 dark:bg-slate-950 p-4 md:p-6 h-full">
+          <main className="flex-1 relative flex flex-col overflow-hidden bg-surface-container-lowest bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] dark:bg-[radial-gradient(#1e293b_1px,transparent_1px)] [background-size:16px_16px] p-4 md:p-8 h-full shadow-[inset_0_0_40px_rgba(0,0,0,0.05)] dark:shadow-[inset_0_0_40px_rgba(0,0,0,0.2)]">
             <PreviewWindow rawCode={JSON.stringify(portfolioData, null, 2)}>
                {/* Mobile Only: Tabbed Bottom Sheet Toggle */}
                <div className="md:hidden absolute bottom-4 left-4 right-4 z-50 flex gap-2 justify-center">
@@ -324,10 +324,10 @@ export default function EditPortfolio() {
                   <button onClick={() => { setIsPropertiesPanelOpen(true); setIsLeftPanelOpen(false); }} className="px-4 py-2 bg-white text-gray-800 rounded-full shadow-lg text-sm font-semibold">Properties</button>
                </div>
 
-               <div className="flex-1 overflow-y-auto bg-background relative w-full h-full custom-scrollbar">
+               <div className="flex-1 overflow-y-auto bg-background relative w-full h-full custom-scrollbar rounded-xl shadow-lg border border-outline-variant/20 overflow-hidden ring-1 ring-black/5 dark:ring-white/5">
                   {isGenerating && <GenerativeCanvasLoader />}
                   {isLoading ? (
-                    <div className="p-10 flex flex-col gap-8">
+                    <div className="p-10 flex flex-col gap-8 bg-surface">
                       <Skeleton className="h-64 w-full rounded-xl" />
                       <Skeleton className="h-32 w-full rounded-xl" />
                       <Skeleton className="h-96 w-full rounded-xl" />

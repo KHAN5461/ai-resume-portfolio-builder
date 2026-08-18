@@ -72,13 +72,16 @@ const AIPortfolioChat = ({ portfolioId }) => {
   ];
 
   return (
-    <div className="flex flex-col h-full bg-surface border-r border-outline-variant/30">
+    <div className="flex flex-col h-full bg-gradient-to-b from-surface to-surface-container-lowest border-r border-outline-variant/20 shadow-sm relative z-10">
       {/* Header */}
-      <div className="p-4 border-b border-outline-variant/30 flex items-center gap-2 bg-surface-container-low shrink-0">
-        <div className="w-8 h-8 rounded-full bg-primary-container flex items-center justify-center">
-          <Sparkles className="w-4 h-4 text-on-primary-container" />
+      <div className="p-5 border-b border-outline-variant/20 flex items-center gap-3 bg-surface/50 backdrop-blur-md sticky top-0 z-20">
+        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-stitch-primary to-stitch-secondary flex items-center justify-center shadow-sm">
+          <Sparkles className="w-5 h-5 text-white" />
         </div>
-        <h2 className="font-title-md font-semibold text-on-surface">AI Assistant</h2>
+        <div>
+          <h2 className="font-headline-sm font-bold text-on-surface leading-tight">Sparkfolio AI</h2>
+          <p className="text-[11px] font-medium text-on-surface-variant/70 uppercase tracking-wider">Design Assistant</p>
+        </div>
       </div>
 
       {/* Messages Area */}
@@ -91,15 +94,15 @@ const AIPortfolioChat = ({ portfolioId }) => {
               animate={{ opacity: 1, y: 0 }}
               className={`flex gap-3 ${msg.role === 'user' ? 'flex-row-reverse' : ''}`}
             >
-              <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 ${msg.role === 'user' ? 'bg-secondary-container' : 'bg-primary-container'}`}>
+              <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 shadow-sm ${msg.role === 'user' ? 'bg-surface border border-outline-variant/30' : 'bg-gradient-to-br from-stitch-primary to-stitch-secondary'}`}>
                 {msg.role === 'user' ? (
-                  <User className="w-4 h-4 text-on-secondary-container" />
+                  <User className="w-4 h-4 text-on-surface-variant" />
                 ) : (
-                  <Bot className="w-4 h-4 text-on-primary-container" />
+                  <Sparkles className="w-4 h-4 text-white" />
                 )}
               </div>
-              <div className={`px-4 py-2 rounded-2xl max-w-[80%] ${msg.role === 'user' ? 'bg-primary text-on-primary rounded-tr-sm' : 'bg-surface-variant text-on-surface-variant rounded-tl-sm'}`}>
-                <p className="text-sm whitespace-pre-wrap">{msg.text}</p>
+              <div className={`px-4 py-3 rounded-2xl max-w-[85%] shadow-sm ${msg.role === 'user' ? 'bg-surface border border-outline-variant/20 text-on-surface rounded-tr-sm' : 'bg-stitch-primary text-white rounded-tl-sm'}`}>
+                <p className="text-[14px] leading-relaxed whitespace-pre-wrap">{msg.text}</p>
               </div>
             </motion.div>
           ))}
@@ -108,14 +111,14 @@ const AIPortfolioChat = ({ portfolioId }) => {
       </div>
 
       {/* Input Area */}
-      <div className="p-4 bg-surface-container-low border-t border-outline-variant/30 shrink-0">
+      <div className="p-5 bg-surface/80 backdrop-blur-md border-t border-outline-variant/20 shrink-0">
         {/* Quick Suggestions */}
-        <div className="flex gap-2 overflow-x-auto pb-3 custom-scrollbar no-scrollbar">
+        <div className="flex gap-2 overflow-x-auto pb-4 custom-scrollbar no-scrollbar">
           {suggestions.map((suggestion, idx) => (
             <button
               key={idx}
               onClick={() => handleSend(suggestion)}
-              className="whitespace-nowrap px-3 py-1.5 rounded-full border border-outline-variant/50 bg-surface hover:bg-surface-variant text-xs font-medium text-on-surface-variant transition-colors"
+              className="whitespace-nowrap px-4 py-2 rounded-full border border-outline-variant/30 bg-surface hover:bg-surface-container hover:border-stitch-primary/30 text-[13px] font-medium text-on-surface-variant transition-all hover:-translate-y-0.5 shadow-sm"
             >
               {suggestion}
             </button>
@@ -123,21 +126,21 @@ const AIPortfolioChat = ({ portfolioId }) => {
         </div>
         
         {/* Chat Input */}
-        <div className="relative flex items-center bg-surface rounded-xl border border-outline-variant/50 focus-within:border-primary focus-within:ring-1 focus-within:ring-primary overflow-hidden shadow-sm">
+        <div className="relative flex items-center bg-surface rounded-2xl border border-outline-variant/30 focus-within:border-stitch-primary focus-within:ring-2 focus-within:ring-stitch-primary/20 overflow-hidden shadow-sm transition-all">
           <textarea
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={handleKeyDown}
-            placeholder="Ask AI to edit portfolio..."
-            className="w-full bg-transparent border-none focus:ring-0 resize-none py-3 px-4 text-sm text-on-surface max-h-32 min-h-[44px]"
+            placeholder="Describe what you want to build..."
+            className="w-full bg-transparent border-none focus:ring-0 resize-none py-4 pl-5 pr-14 text-[14px] text-on-surface max-h-32 min-h-[56px] placeholder:text-on-surface-variant/50"
             rows={1}
           />
           <button
             onClick={() => handleSend()}
             disabled={!input.trim()}
-            className="absolute right-2 bottom-1.5 p-2 rounded-lg bg-primary text-on-primary hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            className="absolute right-2 bottom-2 p-2.5 rounded-xl bg-stitch-primary text-white hover:bg-stitch-primary/90 disabled:bg-surface-variant disabled:text-on-surface-variant/30 disabled:cursor-not-allowed transition-all shadow-sm"
           >
-            <Sparkles className="w-4 h-4" />
+            <Sparkles className="w-5 h-5" />
           </button>
         </div>
       </div>
