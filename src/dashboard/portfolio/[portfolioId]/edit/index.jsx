@@ -339,6 +339,7 @@ export default function EditPortfolio() {
             <>
               {isAIChatOpen ? (
                 <div 
+                  key="chat-open"
                   className="hidden md:flex flex-col h-full shrink-0 z-10 bg-surface relative group border-r border-outline-variant/30"
                   style={{ width: chatPanelWidth }}
                 >
@@ -360,7 +361,7 @@ export default function EditPortfolio() {
                   />
                 </div>
               ) : (
-                <div className="hidden md:flex flex-col w-16 h-full shrink-0 border-r border-outline-variant/30 z-10 bg-surface items-center py-4 relative group">
+                <div key="chat-closed" className="hidden md:flex flex-col w-16 h-full shrink-0 border-r border-outline-variant/30 z-10 bg-surface items-center py-4 relative group">
                   <button 
                     onClick={() => setIsAIChatOpen(true)} 
                     className="w-10 h-10 bg-gradient-to-br from-stitch-primary to-stitch-secondary text-white rounded-xl shadow-sm hover:shadow-md transition-all flex items-center justify-center hover:-translate-y-0.5" 
