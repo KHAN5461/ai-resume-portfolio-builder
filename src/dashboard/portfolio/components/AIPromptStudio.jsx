@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Sparkles, ArrowRight, LayoutTemplate } from 'lucide-react';
 import { useUser } from '@/auth.jsx';
 import GlobalApi from './../../../../service/GlobalApi';
+import { RolePrompts } from './../../../../lib/rolePrompts';
 
 const INSPIRATION_CHIPS = [
   "Minimalist Full-Stack Dev — Bento Grid, Light Mode",
@@ -16,6 +17,7 @@ const INSPIRATION_CHIPS = [
 export default function AIPromptStudio() {
   const [prompt, setPrompt] = useState('');
   const [loading, setLoading] = useState(false);
+  const [selectedRole, setSelectedRole] = useState(null);
   const navigate = useNavigate();
   const { user } = useUser();
 
@@ -36,8 +38,12 @@ export default function AIPromptStudio() {
 
       const newId = response?.data?.data?.documentId || response?.data?.id;
 
+      const finalPrompt = selectedRole 
+        ? `${RolePrompts[selectedRole]}\n\nCreative Brief: ${prompt}`
+        : prompt;
+
       navigate(`/dashboard/portfolio/${newId}/edit?generating=true`, {
-        state: { prompt }
+        state: { prompt: finalPrompt }
       });
     } catch (err) {
       console.error("Failed to initialize portfolio from AI prompt:", err);
@@ -61,6 +67,23 @@ export default function AIPromptStudio() {
         <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight text-white">
           What do you want to build?
         </h1>
+
+        {/* Role Selectors */}
+        <div className="flex flex-wrap gap-2 justify-center pt-2">
+          {Object.keys(RolePrompts).map(role => (
+            <button
+              key={role}
+              onClick={() => setSelectedRole(selectedRole === role ? null : role)}
+              className={`text-xs px-4 py-2 rounded-full font-medium transition-all shadow-sm cursor-pointer ${
+                selectedRole === role 
+                  ? 'bg-indigo-600 text-white border border-indigo-500' 
+                  : 'bg-slate-900 text-slate-400 border border-slate-800 hover:bg-slate-800 hover:text-slate-200'
+              }`}
+            >
+              {role} {selectedRole === role && '✓'}
+            </button>
+          ))}
+        </div>
 
         {/* Prompt Card */}
         <div className="bg-slate-900 border border-slate-800 rounded-2xl p-4 shadow-2xl focus-within:border-indigo-500 transition-all text-left">
