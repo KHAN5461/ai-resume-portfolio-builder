@@ -1,4 +1,9 @@
 import { auth } from '../lib/firebaseConfig';
+import { GoogleGenerativeAI } from '@google/generative-ai';
+
+// Initialize Gemini API
+const genAI = new GoogleGenerativeAI(import.meta.env.VITE_GEMINI_API_KEY || '');
+const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
 // Caching implementation to manage AI tokens and costs
 const aiCache = new Map();
@@ -22,29 +27,22 @@ export const AIChatSession = {
       return { response: { text: () => aiCache.get(hash) } };
     }
 
-    const userId = auth.currentUser?.uid;
-    if (!userId) {
-      throw new Error("User must be logged in to generate content.");
+    if (!import.meta.env.VITE_GEMINI_API_KEY) {
+       console.error("VITE_GEMINI_API_KEY is not set in .env.local");
+       throw new Error("Gemini API Key is missing. Please add VITE_GEMINI_API_KEY to your .env.local file.");
     }
 
-    const response = await fetch('/api/generate', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ prompt, userId })
-    });
-
-    const data = await response.json();
-
-    if (!response.ok) {
-      throw new Error(data.error || 'Failed to generate content');
+    try {
+      const result = await model.generateContent(prompt);
+      const text = result.response.text();
+      aiCache.set(hash, text);
+      return { response: { text: () => text } };
+    } catch (error) {
+      console.error("Gemini API Error:", error);
+      throw new Error("Failed to generate content with Gemini API.");
     }
-
-    const text = data.result;
-    aiCache.set(hash, text);
-    return { response: { text: () => text } };
   },
+  
   sendMessageStream: async (prompt) => {
     const hash = hashPrompt(prompt);
     if (aiCache.has(hash)) {
@@ -57,36 +55,34 @@ export const AIChatSession = {
       };
     }
     
-    // We lost true streaming by moving to the Vercel serverless function, 
-    // so we mock a fast stream that just yields the full text at once.
-    const userId = auth.currentUser?.uid;
-    if (!userId) {
-      throw new Error("User must be logged in to generate content.");
+    if (!import.meta.env.VITE_GEMINI_API_KEY) {
+       throw new Error("Gemini API Key is missing.");
     }
 
-    const response = await fetch('/api/generate', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ prompt, userId })
-    });
+    try {
+      const result = await model.generateContentStream(prompt);
+      
+      // We will intercept the stream to cache the final combined text
+      let fullText = '';
+      
+      const interceptStream = async function* () {
+         for await (const chunk of result.stream) {
+            const chunkText = chunk.text();
+            fullText += chunkText;
+            yield chunk;
+         }
+         aiCache.set(hash, fullText);
+      };
 
-    const data = await response.json();
-
-    if (!response.ok) {
-      throw new Error(data.error || 'Failed to generate content');
+      return {
+        stream: interceptStream()
+      };
+    } catch (error) {
+      console.error("Gemini API Streaming Error:", error);
+      throw new Error("Failed to generate streaming content.");
     }
-
-    const text = data.result;
-    aiCache.set(hash, text);
-
-    return {
-      stream: (async function* () {
-        yield { text: () => text };
-      })()
-    };
   },
+  
   cacheResult: (prompt, finalResult) => {
     const hash = hashPrompt(prompt);
     aiCache.set(hash, finalResult);
