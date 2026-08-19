@@ -5,6 +5,8 @@ import { Input } from '@/components/ui/input';
 import { updatePortfolioData } from '@/store/portfolioSlice';
 import { Button } from '@/components/ui/button';
 import { motion, AnimatePresence } from 'framer-motion';
+import { Trash2 } from 'lucide-react';
+import Accordion from './Accordion';
 
 const SkillsForm = () => {
   const { portfolioId } = useParams();
@@ -60,27 +62,26 @@ const SkillsForm = () => {
                 exit={{ opacity: 0, height: 0, overflow: 'hidden' }}
                 transition={{ duration: 0.2 }}
               >
-                <div className='p-4 bg-gray-50 dark:bg-slate-800/50 rounded-xl border border-gray-100 dark:border-slate-700/50 relative group'>
-                  <div className="flex justify-between items-center mb-3 border-b border-gray-200 dark:border-slate-700 pb-2">
-                     <h5 className="text-[11px] font-bold text-gray-500 uppercase">Category {index + 1}</h5>
-                     <button 
-                       onClick={() => removeCategory(index)}
-                       className='p-1 text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-md transition-colors opacity-0 group-hover:opacity-100'
-                     >
-                       <span className="material-symbols-outlined text-[16px] block">delete</span>
-                     </button>
-                  </div>
-                  
-                  <div className='space-y-3'>
-                    <div className="space-y-1.5">
-                      <label className='text-xs font-medium text-gray-600 dark:text-gray-400'>Category Title</label>
-                      <Input value={cat.title || ""} onChange={(e) => handleCategoryChange(index, e.target.value)} placeholder="e.g. Frontend Development" className="h-8 text-xs bg-white dark:bg-slate-900" />
+                <div className="relative group">
+                  <button 
+                    onClick={() => removeCategory(index)}
+                    className='absolute top-2 right-12 z-10 p-1.5 text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-md transition-colors opacity-0 group-hover:opacity-100'
+                    title="Delete Category"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </button>
+                  <Accordion title={cat.title || `Category ${index + 1}`} defaultOpen={index === categories.length - 1}>
+                    <div className='space-y-3'>
+                      <div className="space-y-1.5">
+                        <label className='text-xs font-medium text-gray-600 dark:text-gray-400'>Category Title</label>
+                        <Input value={cat.title || ""} onChange={(e) => handleCategoryChange(index, e.target.value)} placeholder="e.g. Frontend Development" className="h-8 text-xs bg-white dark:bg-slate-900" />
+                      </div>
+                      <div className="space-y-1.5">
+                        <label className='text-xs font-medium text-gray-600 dark:text-gray-400'>Skills (comma separated)</label>
+                        <Input value={cat.items?.join(', ') || ""} onChange={(e) => handleSkillsChange(index, e.target.value)} placeholder="React, Vue, HTML, CSS" className="h-8 text-xs bg-white dark:bg-slate-900" />
+                      </div>
                     </div>
-                    <div className="space-y-1.5">
-                      <label className='text-xs font-medium text-gray-600 dark:text-gray-400'>Skills (comma separated)</label>
-                      <Input value={cat.items?.join(', ') || ""} onChange={(e) => handleSkillsChange(index, e.target.value)} placeholder="React, Vue, HTML, CSS" className="h-8 text-xs bg-white dark:bg-slate-900" />
-                    </div>
-                  </div>
+                  </Accordion>
                 </div>
               </motion.div>
             ))}

@@ -25,6 +25,7 @@ import ResponsiveBreadcrumbs from '@/components/custom/ResponsiveBreadcrumbs';
 import useHideOnScroll from '@/hooks/useHideOnScroll';
 import { Undo2, Redo2, Bot, Settings2, Monitor, Tablet, Smartphone, Sparkles, ChevronLeft, ChevronRight } from 'lucide-react';
 import GlobalEditorToolbar from '@/components/custom/GlobalEditorToolbar';
+import PortfolioHealthScore from '../../components/PortfolioHealthScore';
 
 export default function EditPortfolio() {
   const { portfolioId } = useParams();
@@ -286,6 +287,10 @@ export default function EditPortfolio() {
           portfolioData={portfolioData}
           onSave={() => setIsDeployModalOpen(true)}
         >
+            {/* Health Score */}
+            <div className="flex items-center gap-1 border-r border-outline-variant/30 pr-2 md:pr-4 mr-1 md:mr-2">
+              <PortfolioHealthScore portfolioId={portfolioId} />
+            </div>
             {/* Undo / Redo Buttons */}
             <div className="flex items-center gap-1 border-r border-outline-variant/30 pr-2 md:pr-4 mr-1 md:mr-2">
               <button

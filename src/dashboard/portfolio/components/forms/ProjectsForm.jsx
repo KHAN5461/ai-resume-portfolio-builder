@@ -6,10 +6,11 @@ import { Textarea } from '@/components/ui/textarea';
 import { updatePortfolioData } from '@/store/portfolioSlice';
 import { Button } from '@/components/ui/button';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Github, Loader2 } from 'lucide-react';
+import { Github, Loader2, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import axios from 'axios';
+import Accordion from './Accordion';
 
 const ProjectsForm = () => {
   const { portfolioId } = useParams();
@@ -148,45 +149,44 @@ const ProjectsForm = () => {
                 exit={{ opacity: 0, height: 0, overflow: 'hidden' }}
                 transition={{ duration: 0.2 }}
               >
-                <div className='p-4 bg-gray-50 dark:bg-slate-800/50 rounded-xl border border-gray-100 dark:border-slate-700/50 relative group'>
-                  <div className="flex justify-between items-center mb-4 border-b border-gray-200 dark:border-slate-700 pb-2">
-                     <h5 className="text-[11px] font-bold text-gray-500 uppercase">Project {index + 1}</h5>
-                     <button 
-                       onClick={() => removeProject(index)}
-                       className='p-1 text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-md transition-colors opacity-0 group-hover:opacity-100'
-                     >
-                       <span className="material-symbols-outlined text-[16px] block">delete</span>
-                     </button>
-                  </div>
-                  
-                  <div className='space-y-3'>
-                    <div className="space-y-1.5">
-                      <label className='text-xs font-medium text-gray-600 dark:text-gray-400'>Project Title</label>
-                      <Input value={project.title || ""} onChange={(e) => handleProjectChange(index, 'title', e.target.value)} placeholder="e.g. E-Commerce App" className="h-8 text-xs bg-white dark:bg-slate-900" />
-                    </div>
-                    <div className="space-y-1.5">
-                      <label className='text-xs font-medium text-gray-600 dark:text-gray-400'>Tagline</label>
-                      <Input value={project.tagline || ""} onChange={(e) => handleProjectChange(index, 'tagline', e.target.value)} placeholder="e.g. Built with React & Node" className="h-8 text-xs bg-white dark:bg-slate-900" />
-                    </div>
-                    <div className="space-y-1.5">
-                      <label className='text-xs font-medium text-gray-600 dark:text-gray-400'>Description</label>
-                      <Textarea value={project.description || ""} onChange={(e) => handleProjectChange(index, 'description', e.target.value)} placeholder="What did you build?" className="text-xs resize-none h-20 custom-scrollbar bg-white dark:bg-slate-900" />
-                    </div>
-                    
-                    <div className="space-y-1.5 pt-2">
-                      <label className='text-[10px] font-bold text-gray-400 uppercase tracking-wider'>Media & Links</label>
-                      <div className="grid grid-cols-2 gap-2">
-                        <Input value={project.thumbnailUrl || ""} onChange={(e) => handleProjectChange(index, 'thumbnailUrl', e.target.value)} placeholder="Thumbnail URL" className="h-8 text-xs bg-white dark:bg-slate-900 col-span-2" />
-                        <Input value={project.githubUrl || ""} onChange={(e) => handleProjectChange(index, 'githubUrl', e.target.value)} placeholder="GitHub URL" className="h-8 text-xs bg-white dark:bg-slate-900" />
-                        <Input value={project.liveUrl || ""} onChange={(e) => handleProjectChange(index, 'liveUrl', e.target.value)} placeholder="Live URL" className="h-8 text-xs bg-white dark:bg-slate-900" />
+                <div className="relative group">
+                  <button 
+                    onClick={() => removeProject(index)}
+                    className='absolute top-2 right-12 z-10 p-1.5 text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-md transition-colors opacity-0 group-hover:opacity-100'
+                    title="Delete Project"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </button>
+                  <Accordion title={project.title || `Project ${index + 1}`} defaultOpen={index === projects.length - 1}>
+                    <div className='space-y-3'>
+                      <div className="space-y-1.5">
+                        <label className='text-xs font-medium text-gray-600 dark:text-gray-400'>Project Title</label>
+                        <Input value={project.title || ""} onChange={(e) => handleProjectChange(index, 'title', e.target.value)} placeholder="e.g. E-Commerce App" className="h-8 text-xs bg-white dark:bg-slate-900" />
+                      </div>
+                      <div className="space-y-1.5">
+                        <label className='text-xs font-medium text-gray-600 dark:text-gray-400'>Tagline</label>
+                        <Input value={project.tagline || ""} onChange={(e) => handleProjectChange(index, 'tagline', e.target.value)} placeholder="e.g. Built with React & Node" className="h-8 text-xs bg-white dark:bg-slate-900" />
+                      </div>
+                      <div className="space-y-1.5">
+                        <label className='text-xs font-medium text-gray-600 dark:text-gray-400'>Description</label>
+                        <Textarea value={project.description || ""} onChange={(e) => handleProjectChange(index, 'description', e.target.value)} placeholder="What did you build?" className="text-xs resize-none h-20 custom-scrollbar bg-white dark:bg-slate-900" />
+                      </div>
+                      
+                      <div className="space-y-1.5 pt-2">
+                        <label className='text-[10px] font-bold text-gray-400 uppercase tracking-wider'>Media & Links</label>
+                        <div className="grid grid-cols-2 gap-2">
+                          <Input value={project.thumbnailUrl || ""} onChange={(e) => handleProjectChange(index, 'thumbnailUrl', e.target.value)} placeholder="Thumbnail URL" className="h-8 text-xs bg-white dark:bg-slate-900 col-span-2" />
+                          <Input value={project.githubUrl || ""} onChange={(e) => handleProjectChange(index, 'githubUrl', e.target.value)} placeholder="GitHub URL" className="h-8 text-xs bg-white dark:bg-slate-900" />
+                          <Input value={project.liveUrl || ""} onChange={(e) => handleProjectChange(index, 'liveUrl', e.target.value)} placeholder="Live URL" className="h-8 text-xs bg-white dark:bg-slate-900" />
+                        </div>
+                      </div>
+                      
+                      <div className="space-y-1.5 pt-2">
+                        <label className='text-xs font-medium text-gray-600 dark:text-gray-400'>Tags (comma separated)</label>
+                        <Input value={project.tags?.join(', ') || ""} onChange={(e) => handleTagsChange(index, e.target.value)} placeholder="React, Node.js, MongoDB" className="h-8 text-xs bg-white dark:bg-slate-900" />
                       </div>
                     </div>
-                    
-                    <div className="space-y-1.5 pt-2">
-                      <label className='text-xs font-medium text-gray-600 dark:text-gray-400'>Tags (comma separated)</label>
-                      <Input value={project.tags?.join(', ') || ""} onChange={(e) => handleTagsChange(index, e.target.value)} placeholder="React, Node.js, MongoDB" className="h-8 text-xs bg-white dark:bg-slate-900" />
-                    </div>
-                  </div>
+                  </Accordion>
                 </div>
               </motion.div>
             ))}

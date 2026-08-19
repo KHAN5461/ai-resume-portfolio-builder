@@ -4,6 +4,7 @@ import { useParams } from 'react-router-dom';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { updateHeroSection } from '@/store/portfolioSlice';
+import Accordion from './Accordion';
 
 const HeroForm = () => {
   const { portfolioId } = useParams();
@@ -28,32 +29,29 @@ const HeroForm = () => {
   };
 
   return (
-    <div className='space-y-6'>
-      {/* Primary Content Group */}
-      <div className="space-y-4">
-         <h4 className="text-xs font-bold text-gray-500 uppercase tracking-wider">Primary Content</h4>
-         
-         <div className="space-y-1.5">
-           <label className='text-[13px] font-semibold text-gray-700 dark:text-gray-300'>Greeting</label>
-           <Input name="greeting" value={heroData.greeting || ""} onChange={handleChange} placeholder="e.g. Hello World" className="h-9 text-sm" />
-         </div>
-         
-         <div className="space-y-1.5">
-           <label className='text-[13px] font-semibold text-gray-700 dark:text-gray-300'>Headline</label>
-           <Input name="headline" value={heroData.headline || ""} onChange={handleChange} placeholder="e.g. I build things for the web" className="h-9 text-sm" />
-         </div>
-         
-         <div className="space-y-1.5">
-           <label className='text-[13px] font-semibold text-gray-700 dark:text-gray-300'>Subheadline</label>
-           <Textarea name="subheadline" value={heroData.subheadline || ""} onChange={handleChange} placeholder="Brief introduction..." className="text-sm resize-none h-24 custom-scrollbar" />
-         </div>
-      </div>
+    <div className='space-y-2'>
+      <Accordion title="Primary Content" defaultOpen={true}>
+        <div className="space-y-4">
+          <div className="space-y-1.5">
+            <label className='text-[13px] font-semibold text-gray-700 dark:text-gray-300'>Greeting</label>
+            <Input name="greeting" value={heroData.greeting || ""} onChange={handleChange} placeholder="e.g. Hello World" className="h-9 text-sm" />
+          </div>
+          
+          <div className="space-y-1.5">
+            <label className='text-[13px] font-semibold text-gray-700 dark:text-gray-300'>Headline</label>
+            <Input name="headline" value={heroData.headline || ""} onChange={handleChange} placeholder="e.g. I build things for the web" className="h-9 text-sm" />
+          </div>
+          
+          <div className="space-y-1.5">
+            <label className='text-[13px] font-semibold text-gray-700 dark:text-gray-300'>Subheadline</label>
+            <Textarea name="subheadline" value={heroData.subheadline || ""} onChange={handleChange} placeholder="Brief introduction..." className="text-sm resize-none h-24 custom-scrollbar" />
+          </div>
+        </div>
+      </Accordion>
         
-      {/* Call to Actions Group */}
-      <div className="space-y-4 pt-4 border-t border-gray-100 dark:border-slate-800">
-         <h4 className="text-xs font-bold text-gray-500 uppercase tracking-wider">Call to Actions</h4>
-         
-         <div className="p-3 bg-gray-50 dark:bg-slate-800/50 rounded-xl space-y-3 border border-gray-100 dark:border-slate-700/50">
+      <Accordion title="Call to Actions" defaultOpen={false}>
+        <div className="space-y-4">
+          <div className="p-3 bg-gray-50 dark:bg-slate-800/50 rounded-xl space-y-3 border border-gray-100 dark:border-slate-700/50">
             <h5 className="text-[11px] font-bold text-gray-500 uppercase">Primary Button</h5>
             <div className='grid grid-cols-2 gap-3'>
               <div className="space-y-1.5">
@@ -65,9 +63,9 @@ const HeroForm = () => {
                 <Input value={heroData.primaryCta?.link || ""} onChange={(e) => handleCtaChange('primaryCta', 'link', e.target.value)} placeholder="#projects" className="h-8 text-xs" />
               </div>
             </div>
-         </div>
+          </div>
 
-         <div className="p-3 bg-gray-50 dark:bg-slate-800/50 rounded-xl space-y-3 border border-gray-100 dark:border-slate-700/50">
+          <div className="p-3 bg-gray-50 dark:bg-slate-800/50 rounded-xl space-y-3 border border-gray-100 dark:border-slate-700/50">
             <h5 className="text-[11px] font-bold text-gray-500 uppercase">Secondary Button</h5>
             <div className='grid grid-cols-2 gap-3'>
               <div className="space-y-1.5">
@@ -79,16 +77,15 @@ const HeroForm = () => {
                 <Input value={heroData.secondaryCta?.link || ""} onChange={(e) => handleCtaChange('secondaryCta', 'link', e.target.value)} placeholder="mailto:..." className="h-8 text-xs" />
               </div>
             </div>
-         </div>
-      </div>
+          </div>
+        </div>
+      </Accordion>
         
-      {/* Code Snippet Group */}
-      <div className="space-y-4 pt-4 border-t border-gray-100 dark:border-slate-800">
-         <h4 className="text-xs font-bold text-gray-500 uppercase tracking-wider">Terminal Snippet</h4>
-         <div className="space-y-1.5">
-           <Textarea name="terminalCodeSnippet" value={heroData.terminalCodeSnippet || ""} onChange={handleChange} placeholder="npm install awesome-developer" className="font-mono bg-zinc-900 text-emerald-400 border-zinc-800 text-xs h-20 resize-none custom-scrollbar" />
-         </div>
-      </div>
+      <Accordion title="Terminal Snippet" defaultOpen={false}>
+        <div className="space-y-1.5">
+          <Textarea name="terminalCodeSnippet" value={heroData.terminalCodeSnippet || ""} onChange={handleChange} placeholder="npm install awesome-developer" className="font-mono bg-zinc-900 text-emerald-400 border-zinc-800 text-xs h-20 resize-none custom-scrollbar" />
+        </div>
+      </Accordion>
     </div>
   );
 }
