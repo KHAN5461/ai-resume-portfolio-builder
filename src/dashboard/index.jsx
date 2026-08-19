@@ -107,7 +107,7 @@ function Dashboard() {
     setIsProcessingPrompt(true);
     try {
       const SYSTEM_PROMPT = `Classify the user's intent into exactly one of three categories: 'RESUME', 'PORTFOLIO', or 'IMPORT'. Return ONLY a JSON object with a single key 'intent' containing the category string. User Prompt: "${aiPrompt}"`;
-      const result = await AIChatSession.sendMessage(SYSTEM_PROMPT);
+      const result = await AIChatSession.sendMessage(SYSTEM_PROMPT, 'routing');
       const responseText = await result.response.text();
       const parsed = JSON.parse(responseText.replace(/```json|```/g, '').trim());
       

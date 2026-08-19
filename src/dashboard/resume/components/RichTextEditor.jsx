@@ -78,7 +78,7 @@ function RichTextEditor({onRichTextEditorChange,index,defaultValue}) {
     }
 
     const executeAIPrompt = async (prompt) => {
-        const result = await AIChatSession.sendMessageStream(prompt);
+        const result = await AIChatSession.sendMessageStream(prompt, 'resume');
         let fullText = "";
         
         for await (const chunk of result.stream) {

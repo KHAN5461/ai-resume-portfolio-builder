@@ -26,11 +26,9 @@ function Summery({enabledNext, handleNext, handlePrev}) {
 
     const GenerateSummeryFromAI=async()=>{
         setLoading(true)
-        const PROMPT=prompt.replace('{jobTitle}',resumeInfo?.jobTitle);
-        console.log(PROMPT);
-        const result=await AIChatSession.sendMessage(PROMPT);
-        console.log(JSON.parse(result.response.text()))
-       
+        const PROMPT = prompt.replace('{jobTitle}', resumeInfo?.jobTitle);
+        const result = await AIChatSession.sendMessage(PROMPT, 'resume');
+        
         setAiGenerateSummeryList(JSON.parse(result.response.text()))
         setLoading(false);
         toast.success('Generated successfully!');

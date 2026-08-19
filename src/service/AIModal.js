@@ -1,9 +1,24 @@
 import { auth } from '../lib/firebaseConfig';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 
-// Initialize Gemini API
-const genAI = new GoogleGenerativeAI(import.meta.env.VITE_GEMINI_API_KEY || '');
-const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+const getModelForKeyType = (keyType) => {
+  let apiKey = import.meta.env.VITE_GEMINI_API_KEY; // Default fallback
+
+  if (keyType === 'portfolio' && import.meta.env.VITE_GEMINI_PORTFOLIO_API_KEY) {
+    apiKey = import.meta.env.VITE_GEMINI_PORTFOLIO_API_KEY;
+  } else if (keyType === 'resume' && import.meta.env.VITE_GEMINI_RESUME_API_KEY) {
+    apiKey = import.meta.env.VITE_GEMINI_RESUME_API_KEY;
+  } else if (keyType === 'routing' && import.meta.env.VITE_GEMINI_ROUTING_API_KEY) {
+    apiKey = import.meta.env.VITE_GEMINI_ROUTING_API_KEY;
+  }
+
+  if (!apiKey) {
+    throw new Error(`Gemini API Key is missing for context: ${keyType}. Please check your .env.local file.`);
+  }
+
+  const genAI = new GoogleGenerativeAI(apiKey);
+  return genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+};
 
 // Caching implementation to manage AI tokens and costs
 const aiCache = new Map();
@@ -20,30 +35,26 @@ const hashPrompt = (str) => {
 };
 
 export const AIChatSession = {
-  sendMessage: async (prompt) => {
+  sendMessage: async (prompt, keyType = 'default') => {
     const hash = hashPrompt(prompt);
     if (aiCache.has(hash)) {
       console.log("Serving AI response from cache");
       return { response: { text: () => aiCache.get(hash) } };
     }
 
-    if (!import.meta.env.VITE_GEMINI_API_KEY) {
-       console.error("VITE_GEMINI_API_KEY is not set in .env.local");
-       throw new Error("Gemini API Key is missing. Please add VITE_GEMINI_API_KEY to your .env.local file.");
-    }
-
     try {
+      const model = getModelForKeyType(keyType);
       const result = await model.generateContent(prompt);
       const text = result.response.text();
       aiCache.set(hash, text);
       return { response: { text: () => text } };
     } catch (error) {
       console.error("Gemini API Error:", error);
-      throw new Error("Failed to generate content with Gemini API.");
+      throw new Error(`Failed to generate content with Gemini API (${keyType} key).`);
     }
   },
   
-  sendMessageStream: async (prompt) => {
+  sendMessageStream: async (prompt, keyType = 'default') => {
     const hash = hashPrompt(prompt);
     if (aiCache.has(hash)) {
       console.log("Serving AI stream response from cache");
@@ -54,12 +65,9 @@ export const AIChatSession = {
         })()
       };
     }
-    
-    if (!import.meta.env.VITE_GEMINI_API_KEY) {
-       throw new Error("Gemini API Key is missing.");
-    }
 
     try {
+      const model = getModelForKeyType(keyType);
       const result = await model.generateContentStream(prompt);
       
       // We will intercept the stream to cache the final combined text

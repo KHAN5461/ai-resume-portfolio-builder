@@ -48,8 +48,8 @@ export default function InterviewCoach() {
     Keep your responses concise and conversational (under 50 words). Ask one question at a time.`;
 
     try {
-        const result = await AIChatSession.sendMessage(PROMPT);
-        const responseText = await result.response.text();
+        const result = await AIChatSession.sendMessage(PROMPT, 'resume');
+        const responseText = result.response.text();
         setMessages([{ role: 'interviewer', content: responseText }]);
     } catch (error) {
         toast.error('Failed to start interview.');
@@ -68,8 +68,9 @@ export default function InterviewCoach() {
 
     try {
         const result = await AIChatSession.sendMessage(`My response: ${userMessage}. 
-        Evaluate my response briefly (1 sentence) and then ask the next question based on my resume or my response. Keep it conversational.`);
-        const responseText = await result.response.text();
+        Please provide feedback and the next question if this is not the last one.
+        Maintain the strict JSON response format described initially.`, 'resume');
+        const responseText = result.response.text();
         setMessages(prev => [...prev, { role: 'interviewer', content: responseText }]);
     } catch (error) {
         toast.error('Failed to send message.');

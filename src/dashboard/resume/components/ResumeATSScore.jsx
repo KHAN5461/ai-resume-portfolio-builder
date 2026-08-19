@@ -100,8 +100,8 @@ export const ResumeATSScore = () => {
         setError(null);
         try {
             const prompt = ATS_PROMPT + JSON.stringify(resumeData || {});
-            const result = await AIChatSession.sendMessage(prompt);
-            let responseText = result.response.text();
+            const result = await AIChatSession.sendMessage(prompt, 'resume');
+            let responseText = await result.response.text();
             
             // Clean up potentially wrapped markdown JSON
             responseText = responseText.replace(/```json/g, '').replace(/```/g, '').trim();
