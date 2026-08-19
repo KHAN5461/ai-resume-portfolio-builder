@@ -2,8 +2,8 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Sparkles, ArrowRight, LayoutTemplate, ArrowLeft } from 'lucide-react';
 import { useUser } from '@/auth.jsx';
-import GlobalApi from './../../../../service/GlobalApi';
-import { RolePrompts } from './../../../../lib/rolePrompts';
+import GlobalApi from '../../../service/GlobalApi';
+import { RolePrompts } from '../../../lib/rolePrompts';
 
 export default function AIPromptStudio() {
   const [step, setStep] = useState(1);

@@ -13,7 +13,7 @@ const ExperienceBlock = React.lazy(() => import('@/components/blocks/ExperienceB
 const SkillsBlock = React.lazy(() => import('@/components/blocks/SkillsBlock'));
 const ContactBlock = React.lazy(() => import('@/components/blocks/ContactBlock'));
 
-const SortableBlock = ({ block, isActive, onClick }) => {
+const SortableBlock = ({ block, isActive, onClick, isPreview }) => {
   const { portfolioId } = useParams();
   const dispatch = useDispatch();
   
@@ -72,10 +72,10 @@ const SortableBlock = ({ block, isActive, onClick }) => {
       ref={setNodeRef} 
       style={style} 
       onClick={onClick}
-      className={`relative group w-full cursor-pointer border-2 transition-colors ${isActive ? 'border-[#6366f1]' : 'border-transparent hover:border-[#c0c1ff]/50'}`}
+      className={`relative group w-full ${!isPreview ? 'cursor-pointer border-2 transition-colors' : ''} ${!isPreview && isActive ? 'border-[#6366f1]' : ''} ${!isPreview && !isActive ? 'border-transparent hover:border-[#c0c1ff]/50' : ''}`}
     >
       {/* Block Controls (Hover/Active) */}
-      {(isActive || isDragging) && (
+      {!isPreview && (isActive || isDragging) && (
         <div className="absolute top-2 right-2 bg-surface-container rounded-lg shadow-lg border border-outline-variant flex items-center p-1 z-10 gap-1 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity">
           {/* Mobile Reorder Buttons */}
           <button
@@ -125,5 +125,6 @@ const SortableBlock = ({ block, isActive, onClick }) => {
 export default React.memo(SortableBlock, (prevProps, nextProps) => {
   return prevProps.block.id === nextProps.block.id && 
          prevProps.block.type === nextProps.block.type &&
-         prevProps.isActive === nextProps.isActive;
+         prevProps.isActive === nextProps.isActive &&
+         prevProps.isPreview === nextProps.isPreview;
 });

@@ -7,7 +7,7 @@ import AddPortfolio from './components/AddPortfolio';
 import MagicImportModal from './components/MagicImportModal';
 import { WelcomeModal } from './components/WelcomeModal';
 import GitHubSyncModal from '@/components/custom/GitHubSyncModal';
-import { Github, Loader2, Plus, LayoutGrid, FileText, ChevronDown, Check, MoreVertical, Trash, Share, Copy, Edit2, Download, Search, Filter, RefreshCcw, LayoutTemplate, Briefcase, Sparkles, Folder, FolderPlus, FolderOpen, Bell, Activity } from 'lucide-react'
+import { Github, Loader2, Plus, LayoutGrid, FileText, ChevronDown, Check, MoreVertical, Trash, Share, Copy, Edit2, Download, Search, Filter, RefreshCcw, LayoutTemplate, Briefcase, Sparkles, Folder, FolderPlus, FolderOpen, Bell, Activity, Paperclip, Globe, Settings, Mic } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { AIChatSession } from '../service/AIModal';
 import { useSelector } from 'react-redux';
@@ -222,27 +222,48 @@ function Dashboard() {
             <h1 className="font-headline-xl text-[48px] md:text-[64px] text-on-background mb-4 font-extrabold leading-tight tracking-tight relative z-10">
               What will you <span className="bg-clip-text text-transparent bg-gradient-to-r from-stitch-primary to-stitch-secondary">design</span> today?
             </h1>
-            <p className="font-body-lg text-[18px] md:text-[22px] text-on-surface-variant max-w-2xl mx-auto mb-8 relative z-10">
+            <p className="font-body-lg text-[18px] md:text-[22px] text-on-surface-variant max-w-2xl mx-auto mb-10 relative z-10">
               Just describe what you want, and our AI will build the perfect resume or portfolio for you.
             </p>
 
-            <form onSubmit={handleAIPromptSubmit} className="w-full max-w-3xl relative z-10">
-              <div className="relative flex items-center w-full shadow-[0_8px_30px_rgb(0,0,0,0.12)] rounded-full bg-surface border-2 border-surface-variant focus-within:border-stitch-primary transition-all duration-300">
-                <span className="material-symbols-outlined absolute left-6 text-2xl text-stitch-primary" style={{fontVariationSettings: "'FILL' 1"}}>auto_awesome</span>
+            <form onSubmit={handleAIPromptSubmit} className="w-full max-w-2xl relative z-10">
+              <div className="relative flex items-center w-full shadow-[0_20px_40px_rgba(0,0,0,0.2)] rounded-[32px] bg-[#1c1c1e] border border-white/10 overflow-hidden transition-all duration-300 ring-2 ring-transparent focus-within:ring-white/20">
+                
+                {/* Left Icons */}
+                <div className="flex items-center gap-4 pl-6 pr-4 border-r border-white/10">
+                  <button type="button" className="text-gray-400 hover:text-white transition-colors" aria-label="Add attachment">
+                     <Paperclip className="w-5 h-5" />
+                  </button>
+                  <button type="button" className="text-gray-400 hover:text-white transition-colors" aria-label="Web search">
+                     <Globe className="w-5 h-5" />
+                  </button>
+                  <button type="button" className="text-gray-400 hover:text-white transition-colors" aria-label="Settings">
+                     <Settings className="w-5 h-5" />
+                  </button>
+                  <button type="button" className="text-gray-400 hover:text-white transition-colors" aria-label="Folders">
+                     <Folder className="w-5 h-5" />
+                  </button>
+                </div>
+
+                {/* Input */}
                 <input
                   type="text"
                   value={aiPrompt}
                   onChange={(e) => setAiPrompt(e.target.value)}
-                  placeholder="e.g. 'A sleek portfolio for a UX Designer' or 'Software Engineer resume'"
-                  className="w-full bg-transparent border-none py-6 pl-16 pr-32 font-body-lg text-[18px] md:text-[20px] text-on-surface focus:outline-none placeholder:text-outline-variant"
+                  placeholder="Type your message here..."
+                  className="flex-1 bg-transparent border-none py-5 px-4 font-body-lg text-[16px] text-white focus:outline-none placeholder:text-gray-500"
                 />
-                <button
-                  type="submit"
-                  disabled={isProcessingPrompt || !aiPrompt.trim()}
-                  className="absolute right-3 bg-stitch-primary text-on-primary px-8 py-4 rounded-full font-label-lg font-bold hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200 disabled:opacity-50 disabled:hover:translate-y-0"
-                >
-                  {isProcessingPrompt ? <Loader2 className="w-6 h-6 animate-spin" /> : 'Generate'}
-                </button>
+
+                {/* Right Mic/Submit Button */}
+                <div className="pr-2 pl-2">
+                  <button
+                    type="submit"
+                    disabled={isProcessingPrompt || !aiPrompt.trim()}
+                    className="flex items-center justify-center w-12 h-12 bg-white rounded-full text-black hover:bg-gray-100 transition-colors disabled:opacity-50"
+                  >
+                    {isProcessingPrompt ? <Loader2 className="w-6 h-6 animate-spin" /> : <Mic className="w-5 h-5" />}
+                  </button>
+                </div>
               </div>
             </form>
           </section>

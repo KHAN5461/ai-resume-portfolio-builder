@@ -40,6 +40,7 @@
     "framer-motion": "^13.1.0",
     "jszip": "^3.10.1",
     "lucide-react": "^0.394.0",
+    "lz-string": "^1.5.0",
     "next-themes": "^0.3.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",

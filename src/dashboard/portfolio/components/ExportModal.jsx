@@ -35,14 +35,47 @@ export default function ExportModal({ isOpen, onClose, portfolioData }) {
         </div>
 
         {/* Modal Footer */}
-        <div className="flex items-center justify-between px-6 py-4 border-t border-slate-800 bg-slate-900/50">
-          <span className="text-xs text-slate-500">Ready to drop into any Vite, Next.js, or React project using Tailwind CSS.</span>
-          <button 
-            onClick={handleCopy}
-            className="bg-indigo-600 hover:bg-indigo-500 text-white px-5 py-2 rounded-xl text-xs font-semibold flex items-center gap-2 transition-all shadow-lg shadow-indigo-600/20 cursor-pointer"
-          >
-            {copied ? <><Check size={14} className="text-emerald-400" /> Copied to Clipboard</> : <><Copy size={14} /> Copy JSX Code</>}
-          </button>
+        <div className="flex flex-col sm:flex-row items-center justify-between px-6 py-4 border-t border-slate-800 bg-slate-900/50 gap-4">
+          <span className="text-xs text-slate-500 text-center sm:text-left">Ready to drop into any Vite, Next.js, or React project using Tailwind CSS.</span>
+          <div className="flex items-center gap-3 w-full sm:w-auto">
+            <button 
+              onClick={handleCopy}
+              className="bg-slate-800 hover:bg-slate-700 text-white px-4 py-2 rounded-xl text-xs font-semibold flex items-center gap-2 transition-all flex-1 sm:flex-none justify-center cursor-pointer"
+            >
+              {copied ? <><Check size={14} className="text-emerald-400" /> Copied</> : <><Copy size={14} /> Copy Code</>}
+            </button>
+            <button 
+              onClick={() => {
+                import('../../../lib/codeExporter').then(m => m.downloadPortfolioZip(portfolioData));
+              }}
+              className="bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-2 rounded-xl text-xs font-semibold flex items-center gap-2 transition-all shadow-lg shadow-indigo-600/20 flex-1 sm:flex-none justify-center cursor-pointer"
+            >
+              <Terminal size={14} /> Download ZIP
+            </button>
+            <button 
+              onClick={async () => {
+                const { getCodeSandboxFiles } = await import('../../../lib/codeExporter');
+                const files = getCodeSandboxFiles(portfolioData);
+                try {
+                  const response = await fetch('https://codesandbox.io/api/v1/sandboxes/define?json=1', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+                    body: JSON.stringify({ files })
+                  });
+                  const data = await response.json();
+                  if (data.sandbox_id) {
+                    window.open(`https://codesandbox.io/s/${data.sandbox_id}`, '_blank');
+                  }
+                } catch (e) {
+                  console.error('Error creating CodeSandbox:', e);
+                  alert('Failed to deploy to CodeSandbox.');
+                }
+              }}
+              className="bg-sky-600 hover:bg-sky-500 text-white px-4 py-2 rounded-xl text-xs font-semibold flex items-center gap-2 transition-all shadow-lg shadow-sky-600/20 flex-1 sm:flex-none justify-center cursor-pointer"
+            >
+              Deploy to CodeSandbox
+            </button>
+          </div>
         </div>
 
       </div>

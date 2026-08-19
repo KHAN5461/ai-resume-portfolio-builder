@@ -5,7 +5,7 @@ import { useSelector } from 'react-redux';
 import { useParams } from 'react-router-dom';
 import { hexToHslString, getForegroundHsl } from '@/lib/colorUtils';
 
-export default function CanvasArea({ blocks, previewMode, activeBlockId, setActiveBlockId }) {
+export default function CanvasArea({ blocks, previewMode, activeBlockId, setActiveBlockId, isPreview }) {
   const { portfolioId } = useParams();
   const portfolioData = useSelector((state) => state.portfolio?.present?.portfolios?.[portfolioId]);
   
@@ -53,7 +53,8 @@ export default function CanvasArea({ blocks, previewMode, activeBlockId, setActi
                 key={block.id} 
                 block={block} 
                 isActive={activeBlockId === block.id}
-                onClick={() => setActiveBlockId(block.id)}
+                onClick={() => !isPreview && setActiveBlockId(block.id)}
+                isPreview={isPreview}
               />
             ))}
           </SortableContext>

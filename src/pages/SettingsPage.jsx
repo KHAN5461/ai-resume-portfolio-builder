@@ -4,7 +4,7 @@ import { HardDrive, Cloud, Loader2, Database, Settings, Puzzle, ArrowLeft } from
 import { useGoogleLogin } from '@react-oauth/google';
 import { useSelector, useDispatch } from 'react-redux';
 import { setDriveStatus, setDriveToken } from '../store/syncSlice';
-import { disconnectDrive } from '../../service/DriveService';
+import { disconnectDrive } from '../service/DriveService';
 import { useNavigate } from 'react-router-dom';
 
 export default function SettingsPage() {

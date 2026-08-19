@@ -12,6 +12,7 @@ import GenerativeCanvasLoader from '../../components/GenerativeCanvasLoader';
 import PreviewWindow from './components/PreviewWindow';
 import { updatePortfolioData } from '@/store/portfolioSlice';
 import GlobalApi from './../../../../../service/GlobalApi';
+import { generatePortfolioReactCode } from '@/lib/codeExporter';
 import { toast } from 'sonner';
 import { motion, AnimatePresence } from 'framer-motion';
 import ErrorBoundary from '@/components/ErrorBoundary';
@@ -381,7 +382,7 @@ export default function EditPortfolio() {
 
           {/* 2. Center Preview Canvas */}
           <main className="flex-1 relative flex flex-col overflow-hidden bg-surface-container-lowest bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] dark:bg-[radial-gradient(#1e293b_1px,transparent_1px)] [background-size:16px_16px] p-4 md:p-8 h-full shadow-[inset_0_0_40px_rgba(0,0,0,0.05)] dark:shadow-[inset_0_0_40px_rgba(0,0,0,0.2)]">
-            <PreviewWindow rawCode={JSON.stringify(portfolioData, null, 2)}>
+            <PreviewWindow rawCode={portfolioData ? generatePortfolioReactCode(portfolioData) : ""}>
                {/* Mobile Only: Tabbed Bottom Sheet Toggle */}
                <div className="md:hidden absolute bottom-4 left-4 right-4 z-50 flex gap-2 justify-center">
                   <button onClick={() => { setIsLeftPanelOpen(true); setIsPropertiesPanelOpen(false); }} className="px-4 py-2 bg-indigo-600 text-white rounded-full shadow-lg text-sm font-semibold">Menu</button>
@@ -405,6 +406,7 @@ export default function EditPortfolio() {
                           if (!isPropertiesPanelOpen) setIsPropertiesPanelOpen(true);
                         }}
                         activeBlockId={activeBlockId}
+                        isPreview={view === 'preview'}
                       />
                   )}
                </div>

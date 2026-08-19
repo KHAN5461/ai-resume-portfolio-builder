@@ -5,8 +5,37 @@ const componentFiles = import.meta.glob('../portfolio/components/*.jsx', { query
 const templateFiles = import.meta.glob('../portfolio/templates/*.jsx', { query: '?raw', import: 'default', eager: true });
 
 export function generatePortfolioReactCode(portfolioData) {
-  // We keep this as a simple fallback if ever needed, but the ZIP now uses exact source code.
-  return `import React from 'react';\n\nexport default function Portfolio() { return <div>Basic Portfolio Export</div>; }`;
+  const themePreset = portfolioData.siteConfig?.themePreset || 'bento';
+  const themeMode = portfolioData.siteConfig?.themeMode || 'light';
+  
+  return `import React from 'react';
+import PortfolioNav from './components/PortfolioNav';
+import PortfolioFooter from './components/PortfolioFooter';
+import ModernTemplate from './templates/ModernTemplate';
+import MinimalistTemplate from './templates/MinimalistTemplate';
+import CreativeTemplate from './templates/CreativeTemplate';
+import BentoTemplate from './templates/BentoTemplate';
+
+const portfolioData = ${JSON.stringify(portfolioData, null, 2)};
+
+export default function Portfolio() {
+  const themePreset = "${themePreset}";
+  const themeMode = "${themeMode}";
+  const style = { '--accent': "${portfolioData.siteConfig?.accentColor || '#6366f1'}" };
+
+  return (
+    <div className={\`min-h-screen relative \${themeMode === 'dark' ? 'dark bg-slate-950 text-white' : ''}\`} style={style}>
+      <PortfolioNav data={portfolioData} blocks={portfolioData.siteConfig?.layout || []} />
+      <div className={themeMode === 'dark' ? 'dark' : ''}>
+        {themePreset === 'bento' && <BentoTemplate portfolioData={portfolioData} />}
+        {themePreset === 'minimalist' && <MinimalistTemplate portfolioData={portfolioData} />}
+        {themePreset === 'creative' && <CreativeTemplate portfolioData={portfolioData} />}
+        {(themePreset === 'modern' || themePreset === 'default') && <ModernTemplate portfolioData={portfolioData} />}
+      </div>
+      <PortfolioFooter data={portfolioData} />
+    </div>
+  );
+}`;
 }
 
 export async function downloadPortfolioZip(portfolioData) {
@@ -170,4 +199,113 @@ export default function App() {
   link.click();
   document.body.removeChild(link);
   window.URL.revokeObjectURL(url);
+}
+
+export function getCodeSandboxFiles(portfolioData) {
+  const files = {};
+  const addFile = (path, content) => {
+    files[path] = { content: content, isBinary: false };
+  };
+
+  addFile("package.json", JSON.stringify({
+    "name": "portfolio-source",
+    "private": true,
+    "version": "0.0.0",
+    "type": "module",
+    "scripts": { "dev": "vite", "build": "vite build", "preview": "vite preview" },
+    "dependencies": {
+      "react": "^18.2.0", "react-dom": "^18.2.0", "lucide-react": "^0.300.0", "framer-motion": "^11.0.0"
+    },
+    "devDependencies": {
+      "@vitejs/plugin-react": "^4.2.1", "autoprefixer": "^10.4.16", "postcss": "^8.4.32", "tailwindcss": "^3.4.0", "vite": "^5.0.8"
+    }
+  }, null, 2));
+
+  addFile("index.html", `<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>${portfolioData?.title || 'My Portfolio'}</title>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>`);
+
+  addFile("vite.config.js", `import { defineConfig } from 'vite'
+import react from '@vitejs/plugin-react'
+
+export default defineConfig({ plugins: [react()] })`);
+
+  addFile("tailwind.config.js", `/** @type {import('tailwindcss').Config} */
+export default {
+  darkMode: 'class',
+  content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
+  theme: { extend: {} },
+  plugins: [],
+}`);
+
+  addFile("postcss.config.js", `export default { plugins: { tailwindcss: {}, autoprefixer: {} } }`);
+
+  addFile("src/main.jsx", `import React from 'react'
+import ReactDOM from 'react-dom/client'
+import App from './App.jsx'
+import './index.css'
+
+ReactDOM.createRoot(document.getElementById('root')).render(
+  <React.StrictMode>
+    <App />
+  </React.StrictMode>,
+)`);
+
+  addFile("src/index.css", `@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.dark {
+  background-color: #020617; /* slate-950 */
+  color: #f1f5f9; /* slate-100 */
+}`);
+
+  addFile("src/data.json", JSON.stringify(portfolioData, null, 2));
+
+  Object.keys(componentFiles).forEach((path) => {
+    addFile(`src/components/${path.split('/').pop()}`, componentFiles[path]);
+  });
+
+  Object.keys(templateFiles).forEach((path) => {
+    addFile(`src/templates/${path.split('/').pop()}`, templateFiles[path]);
+  });
+
+  addFile("src/App.jsx", `import React from 'react';
+import portfolioData from './data.json';
+import PortfolioNav from './components/PortfolioNav';
+import PortfolioFooter from './components/PortfolioFooter';
+import ModernTemplate from './templates/ModernTemplate';
+import MinimalistTemplate from './templates/MinimalistTemplate';
+import CreativeTemplate from './templates/CreativeTemplate';
+import BentoTemplate from './templates/BentoTemplate';
+
+export default function App() {
+  const themePreset = portfolioData.siteConfig?.themePreset || 'bento';
+  const themeMode = portfolioData.siteConfig?.themeMode || 'light';
+  const style = { '--accent': portfolioData.siteConfig?.accentColor || '#6366f1' };
+
+  return (
+    <div className={\`min-h-screen relative \${themeMode === 'dark' ? 'dark bg-slate-950 text-white' : ''}\`} style={style}>
+      <PortfolioNav data={portfolioData} blocks={portfolioData.siteConfig?.layout || []} />
+      <div className={themeMode === 'dark' ? 'dark' : ''}>
+        {themePreset === 'bento' && <BentoTemplate portfolioData={portfolioData} />}
+        {themePreset === 'minimalist' && <MinimalistTemplate portfolioData={portfolioData} />}
+        {themePreset === 'creative' && <CreativeTemplate portfolioData={portfolioData} />}
+        {(themePreset === 'modern' || themePreset === 'default') && <ModernTemplate portfolioData={portfolioData} />}
+      </div>
+      <PortfolioFooter data={portfolioData} />
+    </div>
+  );
+}`);
+
+  return files;
 }
