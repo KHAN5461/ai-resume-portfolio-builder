@@ -9,7 +9,7 @@ import { WelcomeModal } from './components/WelcomeModal';
 import GitHubSyncModal from '@/components/custom/GitHubSyncModal';
 import { Github, Loader2, Plus, LayoutGrid, FileText, ChevronDown, Check, MoreVertical, Trash, Share, Copy, Edit2, Download, Search, Filter, RefreshCcw, LayoutTemplate, Briefcase, Sparkles, Folder, FolderPlus, FolderOpen, Bell, Activity } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { AnalyticsDashboard } from './components/AnalyticsDashboard';
+import { AIChatSession } from '../service/AIModal';
 import { useSelector } from 'react-redux';
 import { useNavigate, Link } from 'react-router-dom';
 import { toast } from 'sonner';
@@ -26,6 +26,8 @@ function Dashboard() {
   const [sortBy, setSortBy] = useState('updated'); // 'updated' | 'alphabetical'
   const [isLoadingResumes, setIsLoadingResumes] = useState(true);
   const [isLoadingPortfolios, setIsLoadingPortfolios] = useState(true);
+  const [aiPrompt, setAiPrompt] = useState('');
+  const [isProcessingPrompt, setIsProcessingPrompt] = useState(false);
 
   useEffect(()=>{
     if(user) {
@@ -98,6 +100,34 @@ function Dashboard() {
 
   const showResumes = filter === 'All' || filter === 'Resumes';
   const showPortfolios = filter === 'All' || filter === 'Portfolios';
+
+  const handleAIPromptSubmit = async (e) => {
+    e.preventDefault();
+    if (!aiPrompt.trim()) return;
+    setIsProcessingPrompt(true);
+    try {
+      const SYSTEM_PROMPT = `Classify the user's intent into exactly one of three categories: 'RESUME', 'PORTFOLIO', or 'IMPORT'. Return ONLY a JSON object with a single key 'intent' containing the category string. User Prompt: "${aiPrompt}"`;
+      const result = await AIChatSession.sendMessage(SYSTEM_PROMPT);
+      const responseText = await result.response.text();
+      const parsed = JSON.parse(responseText.replace(/```json|```/g, '').trim());
+      
+      const intent = parsed.intent;
+      if (intent === 'RESUME') {
+        navigate('/dashboard/resume/new/ai', { state: { prompt: aiPrompt } });
+      } else if (intent === 'PORTFOLIO') {
+        navigate('/dashboard/portfolio/new/ai', { state: { prompt: aiPrompt } });
+      } else if (intent === 'IMPORT') {
+        navigate('/dashboard/import', { state: { prompt: aiPrompt } });
+      } else {
+        toast.error('Could not understand your intent. Please try rephrasing.');
+      }
+    } catch (error) {
+      console.error(error);
+      toast.error('Failed to process prompt. Please try again.');
+    } finally {
+      setIsProcessingPrompt(false);
+    }
+  };
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -186,139 +216,49 @@ function Dashboard() {
         <div className="max-w-7xl mx-auto px-gutter md:px-lg py-lg md:py-xl flex flex-col gap-xl">
           
           {/* Header Section */}
-          <section className="flex flex-col md:flex-row justify-between items-start md:items-end gap-md">
-            <div>
-              <h1 className="font-headline-xl text-[48px] text-on-background mb-xs font-extrabold leading-tight tracking-tight">Welcome back, {user?.firstName || 'Creator'}!</h1>
-              <p className="font-body-lg text-[18px] text-on-surface-variant">Ready to showcase your next big idea?</p>
-            </div>
+          <section className="flex flex-col items-center justify-center text-center gap-md py-12 md:py-20 relative">
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-4xl h-96 bg-gradient-to-r from-stitch-primary/10 via-stitch-secondary/10 to-primary-container/10 blur-3xl pointer-events-none rounded-full"></div>
             
-            <AddResume renderTrigger={(onClick) => (
-              <button onClick={onClick} className="hidden md:flex items-center justify-center gap-sm bg-stitch-primary text-on-primary px-6 py-3 rounded-full font-label-md text-[14px] hover:-translate-y-0.5 hover:shadow-[0px_8px_16px_rgba(0,0,0,0.08)] transition-all duration-200 active:scale-95 min-h-[48px]">
-                <span className="material-symbols-outlined" style={{fontVariationSettings: "'FILL' 1"}}>add</span>
-                Create New Resume
-              </button>
-            )} />
-          </section>
+            <h1 className="font-headline-xl text-[48px] md:text-[64px] text-on-background mb-4 font-extrabold leading-tight tracking-tight relative z-10">
+              What will you <span className="bg-clip-text text-transparent bg-gradient-to-r from-stitch-primary to-stitch-secondary">design</span> today?
+            </h1>
+            <p className="font-body-lg text-[18px] md:text-[22px] text-on-surface-variant max-w-2xl mx-auto mb-8 relative z-10">
+              Just describe what you want, and our AI will build the perfect resume or portfolio for you.
+            </p>
 
-          {/* Quick Actions (Bento Grid Style) */}
-          <section className="grid grid-cols-1 md:grid-cols-3 gap-md">
-            <AddResume renderTrigger={(onClick) => (
-              <button onClick={onClick} className="group relative overflow-hidden rounded-xl bg-surface/80 backdrop-blur-sm border border-outline-variant/30 p-6 flex flex-col justify-between items-start h-48 hover:-translate-y-1 hover:shadow-lg hover:border-primary-container transition-all duration-300 text-left w-full">
-                <div className="absolute -right-8 -top-8 w-32 h-32 bg-stitch-primary/10 rounded-full group-hover:scale-[1.7] transition-transform duration-700 ease-in-out"></div>
-                <div className="w-12 h-12 rounded-lg bg-primary-container/20 text-stitch-primary flex items-center justify-center mb-4 relative z-10 group-hover:bg-stitch-primary group-hover:text-on-primary transition-colors duration-300 shadow-sm group-hover:shadow-md">
-                  <span className="material-symbols-outlined group-hover:scale-110 group-hover:rotate-3 transition-transform duration-300" style={{fontVariationSettings: "'FILL' 1"}}>description</span>
-                </div>
-                <div className="relative z-10">
-                  <h3 className="font-headline-md text-[24px] font-bold text-on-surface mb-1 group-hover:text-stitch-primary transition-colors">New Resume</h3>
-                  <p className="font-body-sm text-[14px] text-on-surface-variant">Start from a professional template</p>
-                </div>
-              </button>
-            )} />
-
-            <AddPortfolio renderTrigger={(onClick) => (
-              <button onClick={onClick} className="group relative overflow-hidden rounded-xl bg-surface/80 backdrop-blur-sm border border-outline-variant/30 p-6 flex flex-col justify-between items-start h-48 hover:-translate-y-1 hover:shadow-lg hover:border-secondary-container transition-all duration-300 text-left w-full">
-                <div className="absolute -right-8 -top-8 w-32 h-32 bg-stitch-secondary/10 rounded-full group-hover:scale-[1.7] transition-transform duration-700 ease-in-out"></div>
-                <div className="w-12 h-12 rounded-lg bg-secondary-container/20 text-stitch-secondary flex items-center justify-center mb-4 relative z-10 group-hover:bg-stitch-secondary group-hover:text-on-secondary-fixed transition-colors duration-300 shadow-sm group-hover:shadow-md">
-                  <span className="material-symbols-outlined group-hover:scale-110 group-hover:rotate-3 transition-transform duration-300" style={{fontVariationSettings: "'FILL' 1"}}>view_cozy</span>
-                </div>
-                <div className="relative z-10">
-                  <h3 className="font-headline-md text-[24px] font-bold text-on-surface mb-1 group-hover:text-stitch-secondary transition-colors">New Portfolio</h3>
-                  <p className="font-body-sm text-[14px] text-on-surface-variant">Build a stunning showcase</p>
-                </div>
-              </button>
-            )} />
-
-            <MagicImportModal renderTrigger={(onClick) => (
-              <button onClick={onClick} className="group relative overflow-hidden rounded-xl bg-surface/80 backdrop-blur-sm border border-outline-variant/30 p-6 flex flex-col justify-between items-start h-48 hover:-translate-y-1 hover:shadow-lg hover:border-stitch-primary transition-all duration-300 text-left w-full">
-                <div className="absolute -right-8 -top-8 w-32 h-32 bg-stitch-primary/10 rounded-full group-hover:scale-[1.7] transition-transform duration-700 ease-in-out"></div>
-                <div className="w-12 h-12 rounded-lg bg-stitch-primary/10 text-stitch-primary flex items-center justify-center mb-4 relative z-10 group-hover:bg-stitch-primary group-hover:text-on-primary transition-colors duration-300 shadow-sm group-hover:shadow-md">
-                  <span className="material-symbols-outlined group-hover:scale-110 group-hover:rotate-12 transition-transform duration-300" style={{fontVariationSettings: "'FILL' 1"}}>auto_fix_high</span>
-                </div>
-                <div className="relative z-10">
-                  <h3 className="font-headline-md text-[24px] font-bold text-on-surface mb-1 group-hover:text-stitch-primary transition-colors">Magic Import</h3>
-                  <p className="font-body-sm text-[14px] text-on-surface-variant">Import from PDF or LinkedIn</p>
-                </div>
-              </button>
-            )} />
+            <form onSubmit={handleAIPromptSubmit} className="w-full max-w-3xl relative z-10">
+              <div className="relative flex items-center w-full shadow-[0_8px_30px_rgb(0,0,0,0.12)] rounded-full bg-surface border-2 border-surface-variant focus-within:border-stitch-primary transition-all duration-300">
+                <span className="material-symbols-outlined absolute left-6 text-2xl text-stitch-primary" style={{fontVariationSettings: "'FILL' 1"}}>auto_awesome</span>
+                <input
+                  type="text"
+                  value={aiPrompt}
+                  onChange={(e) => setAiPrompt(e.target.value)}
+                  placeholder="e.g. 'A sleek portfolio for a UX Designer' or 'Software Engineer resume'"
+                  className="w-full bg-transparent border-none py-6 pl-16 pr-32 font-body-lg text-[18px] md:text-[20px] text-on-surface focus:outline-none placeholder:text-outline-variant"
+                />
+                <button
+                  type="submit"
+                  disabled={isProcessingPrompt || !aiPrompt.trim()}
+                  className="absolute right-3 bg-stitch-primary text-on-primary px-8 py-4 rounded-full font-label-lg font-bold hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200 disabled:opacity-50 disabled:hover:translate-y-0"
+                >
+                  {isProcessingPrompt ? <Loader2 className="w-6 h-6 animate-spin" /> : 'Generate'}
+                </button>
+              </div>
+            </form>
           </section>
 
           {/* Document Grid Section */}
-          <section className="flex gap-8 w-full mt-8">
+          <section className="flex gap-8 w-full mt-4">
             {/* Main Documents Area */}
             <div className="flex-1 w-full flex flex-col gap-lg">
 
-              {/* Dashboard Hero / Analytics Area */}
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-2">
-                <div className="lg:col-span-2">
-                    <AnalyticsDashboard totalViews={totalViews} />
-                </div>
-                <div className="bg-surface-container-low rounded-2xl p-6 border border-outline-variant/30 flex flex-col shadow-sm h-[250px] overflow-hidden">
-                    <div className="flex justify-between items-center mb-4">
-                        <h3 className="font-headline-sm text-[16px] font-bold text-on-surface flex items-center gap-2">
-                            <Activity className="w-4 h-4 text-stitch-primary" /> Activity Feed
-                        </h3>
-                    </div>
-                    <div className="flex-1 overflow-y-auto custom-scrollbar flex flex-col gap-4 pr-2">
-                        <div className="flex gap-3 items-start">
-                            <div className="w-8 h-8 rounded-full bg-blue-500/10 flex items-center justify-center shrink-0">
-                                <span className="material-symbols-outlined text-[16px] text-blue-600">visibility</span>
-                            </div>
-                            <div>
-                                <p className="font-body-sm text-[13px] text-on-surface"><span className="font-bold">Portfolio</span> was viewed</p>
-                                <p className="font-label-sm text-[11px] text-on-surface-variant">2 mins ago • San Francisco</p>
-                            </div>
-                        </div>
-                        <div className="flex gap-3 items-start">
-                            <div className="w-8 h-8 rounded-full bg-stitch-primary/10 flex items-center justify-center shrink-0">
-                                <span className="material-symbols-outlined text-[16px] text-stitch-primary">edit</span>
-                            </div>
-                            <div>
-                                <p className="font-body-sm text-[13px] text-on-surface">Updated <span className="font-bold">Tech Professional</span></p>
-                                <p className="font-label-sm text-[11px] text-on-surface-variant">1 hour ago</p>
-                            </div>
-                        </div>
-                        <div className="flex gap-3 items-start">
-                            <div className="w-8 h-8 rounded-full bg-green-500/10 flex items-center justify-center shrink-0">
-                                <span className="material-symbols-outlined text-[16px] text-green-600">publish</span>
-                            </div>
-                            <div>
-                                <p className="font-body-sm text-[13px] text-on-surface">Published <span className="font-bold">Resume v2</span></p>
-                                <p className="font-label-sm text-[11px] text-on-surface-variant">3 hours ago</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-              </div>
-
-              {/* Filters and Search */}
-            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-md mt-4">
-              <h2 className="font-headline-md text-[24px] font-bold text-on-surface">All Drafts</h2>
-              <div className="flex p-1 bg-surface-container-low rounded-lg w-full sm:w-auto">
-                <button onClick={() => setFilter('All')} className={`flex-1 sm:flex-none px-4 py-2 rounded-md font-label-md text-[14px] transition-all ${filter === 'All' ? 'bg-surface shadow-sm text-stitch-primary' : 'text-on-surface-variant hover:text-on-surface'}`}>All</button>
-                <button onClick={() => setFilter('Resumes')} className={`flex-1 sm:flex-none px-4 py-2 rounded-md font-label-md text-[14px] transition-all ${filter === 'Resumes' ? 'bg-surface shadow-sm text-stitch-primary' : 'text-on-surface-variant hover:text-on-surface'}`}>Resumes</button>
-                <button onClick={() => setFilter('Portfolios')} className={`flex-1 sm:flex-none px-4 py-2 rounded-md font-label-md text-[14px] transition-all ${filter === 'Portfolios' ? 'bg-surface shadow-sm text-stitch-primary' : 'text-on-surface-variant hover:text-on-surface'}`}>Portfolios</button>
-              </div>
-              
-              <div className="flex gap-3 w-full sm:w-auto">
-                <div className="relative w-full sm:w-64 flex-shrink-0">
-                  <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline">search</span>
-                  <input 
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className="w-full bg-surface-container-low border-0 rounded-lg pl-10 pr-4 py-2 font-body-sm text-[14px] text-on-surface focus:bg-surface-container-lowest focus:ring-2 focus:ring-stitch-primary focus:outline-none transition-all placeholder:text-outline shadow-none h-10" 
-                    placeholder="Search documents..." 
-                    type="text"
-                  />
-                </div>
-                
-                <select 
-                  value={sortBy}
-                  onChange={(e) => setSortBy(e.target.value)}
-                  className="bg-surface-container-low border-0 rounded-lg px-4 py-2 font-label-md text-[14px] text-on-surface-variant focus:bg-surface-container-lowest focus:ring-2 focus:ring-stitch-primary focus:outline-none h-10 cursor-pointer"
-                >
-                  <option value="updated">Recently Updated</option>
-                  <option value="alphabetical">Alphabetical</option>
-                </select>
+            {/* Filters and Search */}
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-md mb-2">
+              <h2 className="font-headline-md text-[28px] font-bold text-on-surface tracking-tight">Recent Designs</h2>
+              <div className="flex p-1.5 bg-surface-container-low rounded-xl w-full sm:w-auto shadow-inner">
+                <button onClick={() => setFilter('All')} className={`flex-1 sm:flex-none px-6 py-2 rounded-lg font-label-md text-[14px] transition-all duration-300 ${filter === 'All' ? 'bg-surface shadow text-stitch-primary font-bold' : 'text-on-surface-variant hover:text-on-surface'}`}>All</button>
+                <button onClick={() => setFilter('Resumes')} className={`flex-1 sm:flex-none px-6 py-2 rounded-lg font-label-md text-[14px] transition-all duration-300 ${filter === 'Resumes' ? 'bg-surface shadow text-stitch-primary font-bold' : 'text-on-surface-variant hover:text-on-surface'}`}>Resumes</button>
+                <button onClick={() => setFilter('Portfolios')} className={`flex-1 sm:flex-none px-6 py-2 rounded-lg font-label-md text-[14px] transition-all duration-300 ${filter === 'Portfolios' ? 'bg-surface shadow text-stitch-primary font-bold' : 'text-on-surface-variant hover:text-on-surface'}`}>Portfolios</button>
               </div>
             </div>
 
@@ -351,29 +291,31 @@ function Dashboard() {
               ))}
               
               {isLoadingPortfolios && showPortfolios && [1, 2, 3].map((item, index) => (
-                <motion.div variants={itemVariants} key={`port-skel-${index}`} className="h-[280px] rounded-xl border border-outline-variant/20 p-4 flex flex-col justify-between">
-                  <div>
-                    <Skeleton className="h-40 w-full mb-4 rounded-lg bg-surface-variant/30" />
+                <motion.div variants={itemVariants} key={`port-skel-${index}`} className="h-[320px] rounded-2xl border border-outline-variant/20 p-4 flex flex-col justify-between bg-surface shadow-sm">
+                  <Skeleton className="h-48 w-full mb-4 rounded-xl bg-surface-variant/30" />
+                  <div className="mt-4">
                     <Skeleton className="h-6 w-3/4 mb-2 bg-surface-variant/30" />
                     <Skeleton className="h-4 w-1/2 bg-surface-variant/30" />
                   </div>
-                  <Skeleton className="h-8 w-24 rounded-full mt-4 bg-surface-variant/30" />
                 </motion.div>
               ))}
               {!isLoadingPortfolios && showPortfolios && processedPortfolios.map((portfolio) => (
-                <motion.div variants={itemVariants} key={portfolio.documentId} onClick={() => navigate(`/dashboard/portfolio/${portfolio.documentId}/edit`)} className="group flex flex-col sm:flex-col max-sm:flex-row bg-surface-container-lowest/80 backdrop-blur-sm rounded-xl border border-outline-variant/40 overflow-hidden hover:shadow-[0px_12px_24px_rgba(0,0,0,0.12)] hover:-translate-y-2 transition-all duration-300 cursor-pointer h-auto sm:h-[280px]">
-                  <div className="relative w-full max-sm:w-28 h-40 max-sm:h-auto max-sm:min-h-full bg-surface-container overflow-hidden flex items-center justify-center bg-secondary-container/20">
-                    <span className="material-symbols-outlined text-stitch-secondary text-4xl group-hover:scale-110 transition-transform">view_cozy</span>
-                    <div className="absolute top-2 right-2 bg-surface/90 backdrop-blur-sm px-2 py-1 rounded-full flex items-center gap-1 shadow-sm">
+                <motion.div variants={itemVariants} key={portfolio.documentId} onClick={() => navigate(`/dashboard/portfolio/${portfolio.documentId}/edit`)} className="group flex flex-col bg-surface rounded-2xl border border-outline-variant/30 overflow-hidden hover:shadow-[0_20px_40px_rgba(0,0,0,0.08)] hover:-translate-y-2 transition-all duration-300 cursor-pointer h-[320px]">
+                  <div className="relative w-full h-48 bg-gradient-to-br from-indigo-50 to-purple-50 overflow-hidden flex items-center justify-center border-b border-outline-variant/20">
+                    <span className="material-symbols-outlined text-stitch-secondary text-5xl group-hover:scale-110 group-hover:rotate-3 transition-transform duration-500 opacity-80">view_cozy</span>
+                    <div className="absolute top-4 left-4 bg-white/90 backdrop-blur-md px-3 py-1.5 rounded-full flex items-center gap-1.5 shadow-sm border border-outline-variant/10">
                       <span className="w-2 h-2 rounded-full bg-[#FBBC04]"></span>
-                      <span className="font-label-sm text-[12px] text-on-surface">Draft</span>
+                      <span className="font-label-sm font-semibold text-on-surface">Draft</span>
                     </div>
                   </div>
-                  <div className="p-4 flex flex-col flex-1">
-                    <h4 className="font-headline-md text-[18px] font-bold text-on-surface mb-1 truncate group-hover:text-stitch-secondary transition-colors">{portfolio.title}</h4>
+                  <div className="p-5 flex flex-col flex-1 bg-surface">
+                    <h4 className="font-headline-sm text-[20px] font-bold text-on-surface mb-2 truncate group-hover:text-stitch-secondary transition-colors">{portfolio.title || 'Untitled Portfolio'}</h4>
                     <p className="font-body-sm text-[14px] text-on-surface-variant mb-4">Updated recently</p>
                     <div className="mt-auto flex justify-between items-center">
-                      <span className="inline-flex items-center rounded-full bg-stitch-secondary/10 px-2.5 py-0.5 font-label-sm text-[12px] text-stitch-secondary">Portfolio</span>
+                      <span className="inline-flex items-center rounded-lg bg-secondary-container/50 px-3 py-1.5 font-label-sm font-medium text-stitch-secondary">
+                        <span className="material-symbols-outlined text-[16px] mr-1.5" style={{fontVariationSettings: "'FILL' 1"}}>web</span>
+                        Portfolio
+                      </span>
                     </div>
                   </div>
                 </motion.div>
