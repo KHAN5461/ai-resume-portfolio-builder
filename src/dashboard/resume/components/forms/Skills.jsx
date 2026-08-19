@@ -57,6 +57,7 @@ function Skills({handleNext, handlePrev}) {
         setSkillsList(newSkills);
         setInputValue("");
         setSuggestions([]);
+        toast(`Added ${name.trim()}`);
     }
 
     const handleKeyDown = (e) => {
@@ -68,12 +69,14 @@ function Skills({handleNext, handlePrev}) {
 
     const removeSkill = (indexToRemove) => {
         setSkillsList(skillsList.filter((_, index) => index !== indexToRemove));
+        toast('Skill removed');
     }
 
     const onSave = () => {
         setLoading(true);
         setTimeout(() => {
             setLoading(false);
+            toast('Skills saved');
             if (handleNext) handleNext();
         }, 10);
     }

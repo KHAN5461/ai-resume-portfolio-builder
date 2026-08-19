@@ -1,7 +1,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 
-export default function HeroSection({ data }) {
+const HeroSection = React.memo(({ data }) => {
   if (!data) return null;
 
   return (
@@ -62,4 +62,6 @@ export default function HeroSection({ data }) {
       </div>
     </section>
   );
-}
+});
+
+export default HeroSection;

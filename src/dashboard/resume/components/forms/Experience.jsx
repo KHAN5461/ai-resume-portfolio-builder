@@ -58,6 +58,7 @@ function Experience({handleNext, handlePrev}) {
 
     const RemoveExperience=(indexToRemove)=>{
         setExperinceList(experinceList.filter((_, index) => index !== indexToRemove));
+        toast('Experience Removed');
     }
 
     const handleRichTextEditor=(e,name,index)=>{
@@ -87,6 +88,7 @@ function Experience({handleNext, handlePrev}) {
         setLoading(true);
         setTimeout(() => {
             setLoading(false);
+            toast('Experience details saved');
             if (handleNext) handleNext();
         }, 10);
     }
@@ -145,6 +147,7 @@ function Experience({handleNext, handlePrev}) {
                                                     <Button 
                                                         variant="ghost" 
                                                         size="icon" 
+                                                        aria-label="Remove experience"
                                                         className="absolute top-2 right-2 text-on-surface-variant hover:text-red-500 hover:bg-red-500/10 h-8 w-8 rounded-full"
                                                         onClick={(e) => { e.stopPropagation(); RemoveExperience(index); }}
                                                     >
@@ -228,6 +231,7 @@ function Experience({handleNext, handlePrev}) {
                                                         <Button 
                                                             variant="ghost" 
                                                             size="icon" 
+                                                            aria-label="Remove experience"
                                                             className="text-on-surface-variant hover:text-red-500 hover:bg-red-500/10 h-8 w-8 rounded-full"
                                                             onClick={(e) => { e.stopPropagation(); RemoveExperience(index); }}
                                                         >

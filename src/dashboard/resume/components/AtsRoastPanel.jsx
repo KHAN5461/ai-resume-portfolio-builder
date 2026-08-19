@@ -93,7 +93,7 @@ export function AtsRoastPanel({ isOpen, onClose }) {
                                 </h2>
                                 <p className="font-body-sm text-on-surface-variant">Analyze your resume against a specific job.</p>
                             </div>
-                            <button onClick={onClose} className="p-2 hover:bg-surface-variant rounded-full text-on-surface-variant transition-colors">
+                            <button aria-label="Close ATS Roast panel" onClick={onClose} className="p-2 hover:bg-surface-variant rounded-full text-on-surface-variant transition-colors">
                                 <X className="w-5 h-5" />
                             </button>
                         </div>

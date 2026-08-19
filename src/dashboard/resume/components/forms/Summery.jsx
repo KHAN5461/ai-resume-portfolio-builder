@@ -33,6 +33,7 @@ function Summery({enabledNext, handleNext, handlePrev}) {
        
         setAiGenerateSummeryList(JSON.parse(result.response.text()))
         setLoading(false);
+        toast.success('Generated successfully!');
     }
 
     const onSave=(e)=>{
@@ -41,6 +42,7 @@ function Summery({enabledNext, handleNext, handlePrev}) {
         dispatch(updatePersonalInfo({ summery }));
         setTimeout(() => {
             setLoading(false);
+            toast('Summary saved');
             enabledNext(true);
             if (handleNext) handleNext();
         }, 10);

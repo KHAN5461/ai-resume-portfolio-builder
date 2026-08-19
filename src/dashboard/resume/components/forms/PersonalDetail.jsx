@@ -6,6 +6,7 @@ import { LoaderCircle, ArrowLeft, ArrowRight } from 'lucide-react';
 import React, { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom';
 import { handleFormKeyDown } from '@/lib/keyboard';
+import { toast } from 'sonner';
 
 function PersonalDetail({enabledNext, handleNext, handlePrev}) {
     const params=useParams();
@@ -44,6 +45,7 @@ function PersonalDetail({enabledNext, handleNext, handlePrev}) {
         dispatch(updatePersonalInfo(formData));
         setTimeout(() => {
             setLoading(false);
+            toast('Details saved');
             enabledNext(true);
             if (handleNext) handleNext();
         }, 10);

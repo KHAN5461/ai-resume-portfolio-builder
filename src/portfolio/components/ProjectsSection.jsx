@@ -1,7 +1,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 
-export default function ProjectsSection({ data }) {
+const ProjectsSection = React.memo(({ data }) => {
   if (!data || data.length === 0) return null;
 
   return (
@@ -90,4 +90,6 @@ export default function ProjectsSection({ data }) {
       </div>
     </section>
   );
-}
+});
+
+export default ProjectsSection;

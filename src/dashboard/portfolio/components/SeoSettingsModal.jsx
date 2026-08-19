@@ -50,7 +50,7 @@ export default function SeoSettingsModal({ isOpen, onClose }) {
                 <Search className="w-5 h-5" />
                 <h2 className="text-xl font-bold font-headline-md">SEO Settings</h2>
               </div>
-              <button onClick={onClose} className="p-2 hover:bg-surface-variant rounded-full text-on-surface-variant">
+              <button aria-label="Close SEO settings" onClick={onClose} className="p-2 hover:bg-surface-variant rounded-full text-on-surface-variant">
                 <X className="w-5 h-5" />
               </button>
             </div>

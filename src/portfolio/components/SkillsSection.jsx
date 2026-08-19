@@ -1,7 +1,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 
-export default function SkillsSection({ data }) {
+const SkillsSection = React.memo(({ data }) => {
   if (!data || !data.categories || data.categories.length === 0) return null;
 
   return (
@@ -54,4 +54,6 @@ export default function SkillsSection({ data }) {
       </div>
     </section>
   );
-}
+});
+
+export default SkillsSection;

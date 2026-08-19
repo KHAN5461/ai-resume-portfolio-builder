@@ -57,11 +57,13 @@ function Education({handleNext, handlePrev}) {
   }
   const RemoveEducation=(indexToRemove)=>{
     setEducationalList(educationalList.filter((_, index) => index !== indexToRemove));
+    toast('Education Removed');
   }
   const onSave=()=>{
     setLoading(true);
     setTimeout(() => {
         setLoading(false);
+        toast('Education details saved');
         if (handleNext) handleNext();
     }, 10);
   }
@@ -130,6 +132,7 @@ function Education({handleNext, handlePrev}) {
                           <Button 
                               variant="ghost" 
                               size="icon" 
+                              aria-label="Remove education"
                               className="absolute top-2 right-2 text-on-surface-variant hover:text-red-500 hover:bg-red-500/10 h-8 w-8 rounded-full"
                               onClick={(e) => { e.stopPropagation(); RemoveEducation(index); }}
                           >
@@ -206,6 +209,7 @@ function Education({handleNext, handlePrev}) {
                                 <Button 
                                     variant="ghost" 
                                     size="icon" 
+                                    aria-label="Remove education"
                                     className="text-on-surface-variant hover:text-red-500 hover:bg-red-500/10 h-8 w-8 rounded-full"
                                     onClick={(e) => { e.stopPropagation(); RemoveEducation(index); }}
                                 >

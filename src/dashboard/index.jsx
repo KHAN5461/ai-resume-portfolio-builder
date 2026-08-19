@@ -451,7 +451,7 @@ function Dashboard() {
 
       {/* FAB (Mobile Only) */}
       <AddResume renderTrigger={(onClick) => (
-        <button onClick={onClick} className="md:hidden fixed right-4 bottom-20 z-50 w-14 h-14 bg-stitch-primary text-on-primary rounded-full shadow-[0px_12px_32px_rgba(0,0,0,0.12)] flex items-center justify-center active:scale-95 transition-transform">
+        <button aria-label="Create new resume" onClick={onClick} className="md:hidden fixed right-4 bottom-20 z-50 w-14 h-14 bg-stitch-primary text-on-primary rounded-full shadow-[0px_12px_32px_rgba(0,0,0,0.12)] flex items-center justify-center active:scale-95 transition-transform">
           <span className="material-symbols-outlined text-[28px]" style={{fontVariationSettings: "'FILL' 1"}}>add</span>
         </button>
       )} />

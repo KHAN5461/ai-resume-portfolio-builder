@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { HardDrive, Cloud, Loader2, Database, Settings, Puzzle, ArrowLeft } from 'lucide-react';
 import { useGoogleLogin } from '@react-oauth/google';
 import { useSelector, useDispatch } from 'react-redux';
-import { setDriveStatus, setDriveToken } from '../../store/syncSlice';
+import { setDriveStatus, setDriveToken } from '../store/syncSlice';
 import { disconnectDrive } from '../../service/DriveService';
 import { useNavigate } from 'react-router-dom';
 

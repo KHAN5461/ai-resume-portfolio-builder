@@ -77,10 +77,10 @@ function ResumeCardItem({resume,refreshData, optimisticDelete, rollbackDelete, v
             <span className="inline-flex items-center rounded-full bg-stitch-primary/10 px-2.5 py-0.5 font-label-sm text-[12px] text-stitch-primary">Resume</span>
             
             <div className="flex sm:hidden items-center gap-2">
-              <button onClick={(e) => { e.stopPropagation(); e.preventDefault(); navigation('/dashboard/resume/'+resume.documentId+"/edit"); }} className="p-1.5 text-on-surface-variant hover:bg-surface-variant rounded-full">
+              <button aria-label="Edit resume" onClick={(e) => { e.stopPropagation(); e.preventDefault(); navigation('/dashboard/resume/'+resume.documentId+"/edit"); }} className="p-1.5 text-on-surface-variant hover:bg-surface-variant rounded-full">
                 <Edit2 className="w-4 h-4" />
               </button>
-              <button onClick={(e) => { e.stopPropagation(); e.preventDefault(); setOpenAlert(true); }} className="p-1.5 text-error hover:bg-error-container rounded-full">
+              <button aria-label="Delete resume" onClick={(e) => { e.stopPropagation(); e.preventDefault(); setOpenAlert(true); }} className="p-1.5 text-error hover:bg-error-container rounded-full">
                 <Trash className="w-4 h-4" />
               </button>
             </div>
