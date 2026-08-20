@@ -40,7 +40,7 @@ export const AIChatSession = {
       return { response: { text: () => aiCache.get(hash) } };
     }
 
-    if (keyType === 'routing') {
+    if (keyType === 'routing' || keyType === 'planning') {
       const openRouterKey = import.meta.env.VITE_OPENROUTER_API_KEY;
       if (!openRouterKey) {
         throw new Error("OpenRouter API Key is missing for routing. Please add VITE_OPENROUTER_API_KEY to your .env.local file.");
@@ -53,7 +53,7 @@ export const AIChatSession = {
             "Content-Type": "application/json"
           },
           body: JSON.stringify({
-            model: "nvidia/nemotron-3.5-lightning:free",
+            model: "google/gemma-4-26b-a4b-it:free",
             messages: [{ role: "user", content: prompt }]
           })
         });
@@ -69,7 +69,7 @@ export const AIChatSession = {
         return { response: { text: () => text } };
       } catch (error) {
         console.error("OpenRouter API Error:", error);
-        throw new Error("Failed to generate content with OpenRouter API (Nemotron).");
+        throw new Error("Failed to generate content with OpenRouter API (Gemma).");
       }
     }
 
