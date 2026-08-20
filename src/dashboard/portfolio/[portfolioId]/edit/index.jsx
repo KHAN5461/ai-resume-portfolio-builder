@@ -118,80 +118,7 @@ export default function EditPortfolio() {
     }
   }, [portfolioData, portfolioId]);
 
-  // AI Generation Workflow
-  useEffect(() => {
-    if (!isGenerating || !portfolioId || isLoading) return;
-
-    const runGeneration = async () => {
-      try {
-        const prompt = `
-          You are an expert portfolio architect. Based on this creative brief, generate a complete portfolio data payload.
-          
-          Creative Brief: "${aiPrompt}"
-          
-          Return ONLY valid JSON matching this exact structure:
-          {
-            "heroSection": {
-              "greeting": "Hi, I'm [Name]",
-              "headline": "A punchy 3-5 word professional title",
-              "subheadline": "A compelling 1-2 sentence value proposition"
-            },
-            "aboutSection": {
-              "bioTitle": "About Me",
-              "bioDescription": "A conversational 2-3 paragraph biography."
-            },
-            "skillsSection": {
-              "categories": [
-                { "categoryName": "Category", "skills": ["Skill1", "Skill2"] }
-              ]
-            },
-            "contactSection": {
-              "heading": "Get In Touch",
-              "subheading": "A friendly invitation message.",
-              "email": "hello@example.com"
-            }
-          }
-        `;
-
-        const result = await AIChatSession.sendMessage(prompt, 'portfolio');
-        const aiResponse = result.response.text();
-        const cleanedJSON = JSON.parse(aiResponse.replace(/```json/g, '').replace(/```/g, '').trim());
-
-        dispatch({
-          type: 'portfolio/updatePortfolioData',
-          payload: {
-            id: portfolioId,
-            data: cleanedJSON
-          }
-        });
-
-        // Exit generation mode
-        setIsGenerating(false);
-        setIsPropertiesPanelOpen(true);
-        setSearchParams({}, { replace: true });
-
-        toast('✨ AI generated your portfolio.', {
-          action: {
-            label: 'Undo',
-            onClick: () => {
-              dispatch(ActionCreators.undo());
-              toast.info('Reverted AI generation.');
-            },
-          },
-        });
-      } catch (error) {
-        console.error('AI Generation failed:', error);
-        toast.error('Failed to synthesize portfolio. Please try again.');
-        setIsGenerating(false);
-        setIsPropertiesPanelOpen(true);
-        setSearchParams({}, { replace: true });
-      }
-    };
-
-    // Hide right panel during generation
-    setIsPropertiesPanelOpen(false);
-    runGeneration();
-  }, [isGenerating, portfolioId, isLoading]);
+  // AI Generation Workflow moved to AIPortfolioChat for visible scaffolding
 
   const handleAutoFill = async () => {
     if (!user) {
@@ -349,7 +276,7 @@ export default function EditPortfolio() {
                   className="hidden md:flex flex-col h-full shrink-0 z-10 bg-surface relative group border-r border-outline-variant/30"
                   style={{ width: chatPanelWidth }}
                 >
-                  <AIPortfolioChat portfolioId={portfolioId} />
+                  <AIPortfolioChat portfolioId={portfolioId} initialPrompt={aiPrompt} isGenerating={isGenerating} />
                   
                   {/* Collapse Button */}
                   <button 
@@ -390,7 +317,7 @@ export default function EditPortfolio() {
                </div>
 
                <div className="flex-1 overflow-y-auto bg-background relative w-full h-full custom-scrollbar rounded-xl shadow-lg border border-outline-variant/20 overflow-hidden ring-1 ring-black/5 dark:ring-white/5">
-                  {isGenerating && <GenerativeCanvasLoader />}
+                  {/* Removed GenerativeCanvasLoader */}
                   {isLoading ? (
                     <div className="p-10 flex flex-col gap-8 bg-surface">
                       <Skeleton className="h-64 w-full rounded-xl" />

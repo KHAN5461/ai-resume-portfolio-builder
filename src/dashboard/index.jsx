@@ -115,7 +115,15 @@ function Dashboard() {
       if (intent === 'RESUME') {
         navigate('/dashboard/resume/new/ai', { state: { prompt: aiPrompt } });
       } else if (intent === 'PORTFOLIO') {
-        navigate('/dashboard/portfolio/new/ai', { state: { prompt: aiPrompt } });
+        const response = await GlobalApi.CreateNewPortfolio({
+          data: {
+            title: (aiPrompt.slice(0, 30) + (aiPrompt.length > 30 ? '...' : '')),
+            userEmail: user?.primaryEmailAddress?.emailAddress,
+            userName: user?.fullName
+          }
+        });
+        const newId = response?.data?.data?.documentId || response?.data?.id;
+        navigate(`/dashboard/portfolio/${newId}/edit?generating=true`, { state: { prompt: aiPrompt } });
       } else if (intent === 'IMPORT') {
         navigate('/dashboard/import', { state: { prompt: aiPrompt } });
       } else {

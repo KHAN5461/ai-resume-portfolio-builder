@@ -14,7 +14,7 @@ import { Sparkles, User, Loader2, Zap, Palette, Layout, Type, FileText, Wand2, R
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'sonner';
 
-const AIPortfolioChat = ({ portfolioId }) => {
+const AIPortfolioChat = ({ portfolioId, initialPrompt, isGenerating }) => {
   const dispatch = useDispatch();
   const portfolioData = useSelector((state) => state.portfolio.present?.portfolios?.[portfolioId] || state.portfolio.portfolios?.[portfolioId]);
   const [input, setInput] = useState('');
@@ -27,6 +27,7 @@ const AIPortfolioChat = ({ portfolioId }) => {
     }
   ]);
   const messagesEndRef = useRef(null);
+  const hasInitialized = useRef(false);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -35,6 +36,65 @@ const AIPortfolioChat = ({ portfolioId }) => {
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
+
+  useEffect(() => {
+    if (isGenerating && initialPrompt && !hasInitialized.current) {
+      hasInitialized.current = true;
+      const autoScaffold = async () => {
+        setMessages(prev => [...prev, { id: Date.now(), role: 'user', text: initialPrompt }]);
+        setIsLoading(true);
+        try {
+          const prompt = `
+            You are an expert portfolio architect. Based on this creative brief, generate a complete portfolio data payload.
+            
+            Creative Brief: "${initialPrompt}"
+            
+            Return ONLY valid JSON matching this exact structure:
+            {
+              "heroSection": {
+                "greeting": "Hi, I'm [Name]",
+                "headline": "A punchy 3-5 word professional title",
+                "subheadline": "A compelling 1-2 sentence value proposition"
+              },
+              "aboutSection": {
+                "bioTitle": "About Me",
+                "bioDescription": "A conversational 2-3 paragraph biography."
+              },
+              "skillsSection": {
+                "categories": [
+                  { "categoryName": "Category", "skills": ["Skill1", "Skill2"] }
+                ]
+              },
+              "contactSection": {
+                "heading": "Get In Touch",
+                "subheading": "A friendly invitation message.",
+                "email": "hello@example.com"
+              }
+            }
+          `;
+
+          const result = await AIChatSession.sendMessage(prompt, 'portfolio');
+          const aiResponse = result.response.text();
+          const cleanedJSON = JSON.parse(aiResponse.replace(/```json/g, '').replace(/```/g, '').trim());
+
+          dispatch(updatePortfolioData({
+            id: portfolioId,
+            data: cleanedJSON
+          }));
+
+          setMessages(prev => [...prev, { id: Date.now() + 1, role: 'ai', text: "✨ Boom! I've fully scaffolded your portfolio layout based on your brief! Feel free to ask me to tweak the colors, rewrite the bio, or add new sections." }]);
+        } catch (error) {
+          console.error("Scaffold failed:", error);
+          setMessages(prev => [...prev, { id: Date.now() + 1, role: 'ai', text: "Sorry, I had trouble parsing that into a layout. Let's try again!" }]);
+        } finally {
+          setIsLoading(false);
+          // Clean up the URL parameter gracefully
+          window.history.replaceState({}, '', window.location.pathname);
+        }
+      };
+      autoScaffold();
+    }
+  }, [isGenerating, initialPrompt, portfolioId, dispatch]);
 
   // ── Intent Engine ───────────────────────────────────────────────
   const processIntent = async (userText) => {
