@@ -307,7 +307,7 @@ const AIPortfolioChat = ({ portfolioId, initialPrompt, isGenerating }) => {
   // ── Gemini AI Helper ────────────────────────────────────────────
   const generateWithAI = async (prompt, onSuccess, successMessage) => {
     try {
-      const result = await AIChatSession.sendMessage(prompt);
+      const result = await AIChatSession.sendMessage(prompt, 'portfolio');
       const text = result.response.text();
       if (onSuccess) onSuccess(text);
       return successMessage || text;
@@ -329,7 +329,7 @@ const AIPortfolioChat = ({ portfolioId, initialPrompt, isGenerating }) => {
           "skillsSection": { "categories": [{ "categoryName": "Category", "skills": ["Skill1", "Skill2"] }] },
           "contactSection": { "heading": "Get In Touch", "subheading": "Friendly invitation", "email": "hello@example.com" }
         }
-      `);
+      `, 'portfolio');
       const rawText = result.response.text();
       const parsed = JSON.parse(rawText.replace(/```json/g, '').replace(/```/g, '').trim());
       dispatch(updatePortfolioData({ id: portfolioId, data: parsed }));
