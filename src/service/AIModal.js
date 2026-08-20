@@ -8,8 +8,6 @@ const getModelForKeyType = (keyType) => {
     apiKey = import.meta.env.VITE_GEMINI_PORTFOLIO_API_KEY;
   } else if (keyType === 'resume' && import.meta.env.VITE_GEMINI_RESUME_API_KEY) {
     apiKey = import.meta.env.VITE_GEMINI_RESUME_API_KEY;
-  } else if (keyType === 'routing' && import.meta.env.VITE_GEMINI_ROUTING_API_KEY) {
-    apiKey = import.meta.env.VITE_GEMINI_ROUTING_API_KEY;
   }
 
   if (!apiKey) {
@@ -40,6 +38,39 @@ export const AIChatSession = {
     if (aiCache.has(hash)) {
       console.log("Serving AI response from cache");
       return { response: { text: () => aiCache.get(hash) } };
+    }
+
+    if (keyType === 'routing') {
+      const openRouterKey = import.meta.env.VITE_OPENROUTER_API_KEY;
+      if (!openRouterKey) {
+        throw new Error("OpenRouter API Key is missing for routing. Please add VITE_OPENROUTER_API_KEY to your .env.local file.");
+      }
+      try {
+        const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+          method: "POST",
+          headers: {
+            "Authorization": `Bearer ${openRouterKey}`,
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            model: "nvidia/nemotron-3.5-lightning:free",
+            messages: [{ role: "user", content: prompt }]
+          })
+        });
+        
+        if (!response.ok) {
+           const errData = await response.json();
+           throw new Error(errData.error?.message || "OpenRouter API error");
+        }
+        
+        const data = await response.json();
+        const text = data.choices[0].message.content;
+        aiCache.set(hash, text);
+        return { response: { text: () => text } };
+      } catch (error) {
+        console.error("OpenRouter API Error:", error);
+        throw new Error("Failed to generate content with OpenRouter API (Nemotron).");
+      }
     }
 
     try {
