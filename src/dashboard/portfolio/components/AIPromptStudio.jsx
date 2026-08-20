@@ -32,10 +32,6 @@ export default function AIPromptStudio() {
 
       const newId = response?.data?.data?.documentId || response?.data?.id;
 
-      const result = await AIChatSession.sendMessage(prompt, 'portfolio');
-      const responseText = await result.response.text();
-      const parsedData = JSON.parse(responseText.replace(/```json|```/g, '').trim());
-      
       const basePrompt = RolePrompts[role] ? RolePrompts[role] : '';
       const finalPrompt = basePrompt 
         ? `${basePrompt}\n\nCreative Brief: ${prompt}`

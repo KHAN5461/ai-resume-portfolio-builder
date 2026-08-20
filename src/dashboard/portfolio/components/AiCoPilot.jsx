@@ -43,7 +43,7 @@ export default function AiCoPilot({ activeBlockId, isOpen, onToggle }) {
         
         setTimeout(() => setLoadingStateText('Drafting response...'), 1500);
 
-        const result = await AIChatSession.sendMessage(prompt);
+        const result = await AIChatSession.sendMessage(prompt, 'portfolio');
         const aiResponse = result.response.text();
         setChatHistory(prev => [...prev, { role: 'ai', text: aiResponse }]);
     } catch (error) {

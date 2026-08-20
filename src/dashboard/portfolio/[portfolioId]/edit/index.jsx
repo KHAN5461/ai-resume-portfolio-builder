@@ -153,9 +153,9 @@ export default function EditPortfolio() {
           }
         `;
 
-        const result = await AIChatSession.sendMessage(prompt);
-        const rawText = result.response.text();
-        const cleanedJSON = JSON.parse(rawText.replace(/```json/g, '').replace(/```/g, '').trim());
+        const result = await AIChatSession.sendMessage(prompt, 'portfolio');
+        const aiResponse = result.response.text();
+        const cleanedJSON = JSON.parse(aiResponse.replace(/```json/g, '').replace(/```/g, '').trim());
 
         dispatch({
           type: 'portfolio/updatePortfolioData',
@@ -241,7 +241,7 @@ export default function EditPortfolio() {
         }
       `;
       
-      const result = await AIChatSession.sendMessage(prompt);
+      const result = await AIChatSession.sendMessage(prompt, 'portfolio');
       const rawText = result.response.text();
       const parsedData = JSON.parse(rawText.replace(/```json/g, '').replace(/```/g, ''));
       
