@@ -45,11 +45,14 @@ const AIPortfolioChat = ({ portfolioId, initialPrompt, isGenerating }) => {
         setIsLoading(true);
         try {
           const prompt = `
-            You are an expert portfolio architect. Based on this creative brief, generate a complete portfolio data payload.
+            Role: You are a Senior Frontend Architect and UI/UX Engineer specialized in building production-grade portfolio data payloads.
+            Objective: Translate user requirements into a strictly valid JSON-based schema that our Redux store can ingest.
             
-            Creative Brief: "${initialPrompt}"
+            Current Context/User Input: "${initialPrompt}"
             
-            Return ONLY valid JSON matching this exact structure:
+            Format Requirements:
+            Return ONLY a JSON object that strictly adheres to the following structure. Do not include conversational filler, markdown formatting, or code blocks.
+            
             {
               "heroSection": {
                 "greeting": "Hi, I'm [Name]",
@@ -71,7 +74,13 @@ const AIPortfolioChat = ({ portfolioId, initialPrompt, isGenerating }) => {
                 "email": "hello@example.com"
               }
             }
+
+            Constraints:
+            - The output must be perfectly valid, parseable JSON.
+            - If the user input is ambiguous, infer a professional, data-dense layout suitable for an engineer's portfolio.
+            - Do not invent new root keys. Stick to heroSection, aboutSection, skillsSection, and contactSection.
           `;
+
 
           const result = await AIChatSession.sendMessage(prompt, 'portfolio');
           const aiResponse = result.response.text();
