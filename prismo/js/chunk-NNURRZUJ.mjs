@@ -1,0 +1,2 @@
+function a(t,e){return{description:"Boost productivity with seamless task and team management. Effortlessly manage tasks, collaborate with teams, and meet deadlines with precision and clarity.",favicon:"https://framerusercontent.com/assets/L7lPTGKAy3EVCbHX4FJhIsH6Z0.png",robots:"max-image-preview:large",title:"Prismo - Task Management Template"}}export{a};
+//# sourceMappingURL=chunk-NNURRZUJ.mjs.map

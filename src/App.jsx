@@ -50,7 +50,7 @@ function App() {
     fetchUserData();
   }, [isSignedIn, user?.id, dispatch]);
 
-  if(!isSignedIn&&isLoaded)
+  if(!isSignedIn && isLoaded && location.pathname !== '/')
   {
     return <Navigate to={'/auth/sign-in'} />
   }
