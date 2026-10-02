@@ -10,11 +10,7 @@ import PortfolioNav from './components/PortfolioNav';
 import PortfolioFooter from './components/PortfolioFooter';
 import GlobalApi from './../../service/GlobalApi';
 
-import ModernTemplate from './templates/ModernTemplate';
-import MinimalistTemplate from './templates/MinimalistTemplate';
-import CreativeTemplate from './templates/CreativeTemplate';
-import BentoTemplate from './templates/BentoTemplate';
-import MagazineTemplate from './templates/MagazineTemplate';
+import { getAllPortfolioTemplates, getPortfolioTemplateById } from './templates/registry';
 
 export default function Portfolio({ isPublic = false }) {
   const { portfolioId } = useParams();
@@ -22,7 +18,7 @@ export default function Portfolio({ isPublic = false }) {
   const reduxPortfolioData = useSelector((state) => state.portfolio.present.portfolios[portfolioId]);
   const [localData, setLocalData] = useState(reduxPortfolioData);
   const [loading, setLoading] = useState(!reduxPortfolioData);
-  const [isThemePanelOpen, setIsThemePanelOpen] = useState(false);
+  const allTemplates = getAllPortfolioTemplates();
 
   useEffect(() => {
     let isMounted = true;
@@ -72,17 +68,23 @@ export default function Portfolio({ isPublic = false }) {
 
   const themePreset = portfolioData.siteConfig?.themePreset || 'bento';
   const themeMode = portfolioData.siteConfig?.themeMode || 'light';
+  const activeTemplate = getPortfolioTemplateById(themePreset);
+  const ActiveTemplateComponent = activeTemplate?.component;
 
   const updateThemePreset = (preset) => {
-    // Optimistic UI update
-    setLocalData({
+    const updated = {
       ...localData,
       siteConfig: {
-        ...localData.siteConfig,
+        ...(localData.siteConfig || {}),
         themePreset: preset
       }
-    });
-    // In a real app, we would also call GlobalApi.UpdatePortfolio to persist this to the DB.
+    };
+    setLocalData(updated);
+    if (portfolioId) {
+      GlobalApi.UpdatePortfolioDetail(portfolioId, { data: updated }).catch((err) => {
+        console.warn('Could not persist theme update:', err);
+      });
+    }
   };
 
   return (
@@ -93,11 +95,7 @@ export default function Portfolio({ isPublic = false }) {
 
       {/* Dynamic Template Engine */}
       <div className={themeMode === 'dark' ? 'dark' : ''}>
-        {themePreset === 'bento' && <BentoTemplate portfolioData={portfolioData} />}
-        {themePreset === 'minimalist' && <MinimalistTemplate portfolioData={portfolioData} />}
-        {themePreset === 'creative' && <CreativeTemplate portfolioData={portfolioData} />}
-        {themePreset === 'magazine' && <MagazineTemplate portfolioData={portfolioData} />}
-        {(themePreset === 'modern' || themePreset === 'default') && <ModernTemplate portfolioData={portfolioData} />}
+        {ActiveTemplateComponent && <ActiveTemplateComponent portfolioData={portfolioData} />}
       </div>
 
       {/* Footer */}
@@ -105,39 +103,27 @@ export default function Portfolio({ isPublic = false }) {
 
       {/* Floating Theme Switcher UI */}
       {!isPublic && (
-        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 flex items-center gap-2 p-2 bg-slate-900/80 backdrop-blur-md rounded-full shadow-2xl border border-slate-700/50">
-          <span className="material-symbols-outlined text-slate-300 ml-2 text-[20px]">palette</span>
-          <div className="h-4 w-px bg-slate-700 mx-1"></div>
-          <button 
-            onClick={() => updateThemePreset('bento')}
-            className={`px-4 py-1.5 rounded-full text-sm font-medium transition-colors ${themePreset === 'bento' ? 'bg-white text-slate-900' : 'text-slate-300 hover:text-white hover:bg-slate-800'}`}
-          >
-            Bento
-          </button>
-          <button 
-            onClick={() => updateThemePreset('modern')}
-            className={`px-4 py-1.5 rounded-full text-sm font-medium transition-colors ${themePreset === 'modern' || themePreset === 'default' ? 'bg-white text-slate-900' : 'text-slate-300 hover:text-white hover:bg-slate-800'}`}
-          >
-            Modern
-          </button>
-          <button 
-            onClick={() => updateThemePreset('minimalist')}
-            className={`px-4 py-1.5 rounded-full text-sm font-medium transition-colors ${themePreset === 'minimalist' ? 'bg-white text-slate-900' : 'text-slate-300 hover:text-white hover:bg-slate-800'}`}
-          >
-            Minimalist
-          </button>
-          <button 
-            onClick={() => updateThemePreset('creative')}
-            className={`px-4 py-1.5 rounded-full text-sm font-medium transition-colors ${themePreset === 'creative' ? 'bg-white text-slate-900' : 'text-slate-300 hover:text-white hover:bg-slate-800'}`}
-          >
-            Creative
-          </button>
-          <button 
-            onClick={() => updateThemePreset('magazine')}
-            className={`px-4 py-1.5 rounded-full text-sm font-medium transition-colors ${themePreset === 'magazine' ? 'bg-white text-slate-900' : 'text-slate-300 hover:text-white hover:bg-slate-800'}`}
-          >
-            Magazine
-          </button>
+        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 flex items-center gap-1.5 p-1.5 bg-slate-900/95 backdrop-blur-md rounded-full shadow-2xl border border-slate-700 max-w-[90vw] overflow-x-auto">
+          <span className="material-symbols-outlined text-slate-300 ml-2.5 text-[18px] shrink-0">palette</span>
+          <div className="h-4 w-px bg-slate-700 mx-1 shrink-0"></div>
+          {allTemplates.map((tmpl) => (
+            <button
+              key={tmpl.id}
+              onClick={() => updateThemePreset(tmpl.id)}
+              className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors shrink-0 flex items-center gap-1.5 ${
+                themePreset === tmpl.id
+                  ? 'bg-white text-slate-900 shadow-sm font-semibold'
+                  : 'text-slate-300 hover:text-white hover:bg-slate-800'
+              }`}
+            >
+              <span>{tmpl.name}</span>
+              {tmpl.isCustom && (
+                <span className="text-[9px] uppercase px-1 py-0.2 rounded bg-emerald-500/20 text-emerald-400 font-bold">
+                  Custom
+                </span>
+              )}
+            </button>
+          ))}
         </div>
       )}
 

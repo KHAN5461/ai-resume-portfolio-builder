@@ -26,8 +26,8 @@ function FormSection() {
   
   return (
     <div className="flex flex-col gap-6 h-full">
-        <div className='flex justify-center items-center py-2 shrink-0'>
-          <div className="flex bg-surface p-2 rounded-full border border-outline-variant/30 shadow-sm items-center gap-1 md:gap-2">
+        <div className='flex justify-center items-center py-1 md:py-2 shrink-0 max-w-full overflow-hidden'>
+          <div className="flex bg-surface p-1.5 md:p-2 rounded-full border border-outline-variant/30 shadow-sm items-center gap-1 md:gap-2 overflow-x-auto max-w-full no-scrollbar">
              {steps.map((step) => {
                 const Icon = step.icon;
                 const isActive = activeFormIndex === step.id;
@@ -37,14 +37,13 @@ function FormSection() {
                    <button 
                      key={step.id}
                      onClick={() => setActiveFormIndex(step.id)}
-                     className={`flex items-center gap-2 px-4 py-2.5 rounded-full transition-all duration-300 outline-none ${isActive ? 'bg-stitch-primary text-white shadow-md shadow-stitch-primary/20' : isCompleted ? 'hover:bg-surface-variant text-stitch-primary/80' : 'hover:bg-surface-variant text-on-surface-variant/60'}`}
+                     className={`flex items-center gap-1.5 md:gap-2 px-3 md:px-4 py-2 rounded-full transition-all duration-300 outline-none shrink-0 min-h-[44px] active:scale-95 ${isActive ? 'bg-stitch-primary text-white shadow-md shadow-stitch-primary/20' : isCompleted ? 'hover:bg-surface-variant text-stitch-primary/80' : 'hover:bg-surface-variant text-on-surface-variant/60'}`}
+                     aria-label={`Step ${step.id}: ${step.name}`}
                    >
                       <Icon className={`w-4 h-4 ${isActive ? 'text-white' : ''}`} />
-                      {isActive && (
-                          <span className="text-sm font-bold tracking-wide">
-                            {step.name}
-                          </span>
-                      )}
+                      <span className={`text-xs md:text-sm font-bold tracking-wide ${isActive ? 'inline' : 'hidden sm:inline'}`}>
+                        {step.name}
+                      </span>
                    </button>
                 )
              })}
@@ -52,7 +51,7 @@ function FormSection() {
         </div>
         
         {/* Form Components Wrapper */}
-        <motion.div layout className="bg-surface rounded-xl border border-outline-variant/30 shadow-sm p-4 flex-1 overflow-y-auto custom-scrollbar relative">
+        <motion.div layout className="flex-1 overflow-y-auto overflow-x-hidden custom-scrollbar relative -mx-4 px-2 sm:px-4 w-[calc(100%+2rem)] max-w-[calc(100%+2rem)]">
           <AnimatePresence mode="wait">
             <motion.div
                 key={`guided-step-${activeFormIndex}`}
@@ -60,6 +59,7 @@ function FormSection() {
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: -20 }}
                 transition={{ duration: 0.3 }}
+                className="w-full overflow-x-hidden"
             >
                 {activeFormIndex==1?  
                 <PersonalDetail enabledNext={(v)=>setEnableNext(v)} handleNext={() => setActiveFormIndex(2)} handlePrev={null} />

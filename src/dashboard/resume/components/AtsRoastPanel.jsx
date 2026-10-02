@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Sparkles, CheckCircle2, AlertTriangle, XCircle, FileSearch, X, Target, LoaderCircle, Check } from 'lucide-react';
 import { useSelector } from 'react-redux';
 import { motion, AnimatePresence } from 'framer-motion';
-import { AIChatSession } from '@/service/AIModal';
+import { AIChatSession, extractCleanJson } from '@/service/AIModal';
 
 export function AtsRoastPanel({ isOpen, onClose }) {
     const resumeInfo = useSelector(state => state.resume.present.resumeData);
@@ -46,10 +46,12 @@ export function AtsRoastPanel({ isOpen, onClose }) {
         try {
             const result = await AIChatSession.sendMessage(prompt);
             const responseText = result.response.text();
-            // clean potential markdown formatting from JSON
-            const cleanJson = responseText.replace(/```json/g, '').replace(/```/g, '').trim();
-            const parsedData = JSON.parse(cleanJson);
-            setScanResults(parsedData);
+            const parsedData = extractCleanJson(responseText);
+            if (parsedData) {
+                setScanResults(parsedData);
+            } else {
+                throw new Error("Could not parse ATS roast JSON");
+            }
         } catch (error) {
             console.error("AI Scan Failed:", error);
             // Fallback mock data if AI fails
@@ -75,7 +77,7 @@ export function AtsRoastPanel({ isOpen, onClose }) {
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
-                        className="fixed inset-0 bg-black/20 backdrop-blur-sm z-50"
+                        className="fixed inset-0 bg-slate-950/75 z-50"
                         onClick={onClose}
                     />
                     <motion.div 
@@ -83,9 +85,9 @@ export function AtsRoastPanel({ isOpen, onClose }) {
                         animate={{ x: 0 }}
                         exit={{ x: '100%' }}
                         transition={{ type: "spring", bounce: 0, duration: 0.4 }}
-                        className="fixed right-0 top-0 h-full w-full max-w-[500px] bg-surface-container-lowest border-l border-outline-variant/30 shadow-2xl z-50 flex flex-col"
+                        className="fixed right-0 top-0 h-full w-full max-w-[500px] bg-white dark:bg-slate-900 border-l border-slate-200 dark:border-slate-800 shadow-2xl z-50 flex flex-col"
                     >
-                        <div className="p-6 border-b border-outline-variant/20 flex justify-between items-center bg-surface sticky top-0 z-10">
+                        <div className="p-6 border-b border-slate-200 dark:border-slate-800 flex justify-between items-center bg-white dark:bg-slate-900 sticky top-0 z-10">
                             <div>
                                 <h2 className="font-headline-sm font-bold text-on-surface flex items-center gap-2">
                                     <Target className="w-5 h-5 text-stitch-primary" />

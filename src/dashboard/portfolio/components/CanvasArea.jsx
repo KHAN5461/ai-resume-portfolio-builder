@@ -12,7 +12,6 @@ import BentoTemplate from '../../../portfolio/templates/BentoTemplate';
 
 export default function CanvasArea({ portfolioData }) {
   const [isGenerateModalOpen, setIsGenerateModalOpen] = React.useState(false);
-  const [isPreviewMode, setIsPreviewMode] = React.useState(false);
 
   // If completely blank, show blank canvas generator
   if (!portfolioData || Object.keys(portfolioData).length === 0 || (!portfolioData.heroSection && !portfolioData.siteConfig?.layout?.length)) {
@@ -26,7 +25,7 @@ export default function CanvasArea({ portfolioData }) {
           </div>
           <div className="w-full max-w-4xl h-48 bg-slate-200 rounded-2xl animate-pulse delay-300"></div>
         </div>
-        <div className="text-center space-y-6 relative z-10 bg-white/80 backdrop-blur-xl p-10 rounded-3xl shadow-xl border border-gray-100 max-w-md mx-4">
+        <div className="text-center space-y-6 relative z-10 bg-white dark:bg-slate-900 p-10 rounded-3xl shadow-xl border border-slate-200 dark:border-slate-800 max-w-md mx-4">
           <div className="w-16 h-16 bg-indigo-50 text-indigo-500 rounded-full flex items-center justify-center mx-auto mb-4">
             <span className="material-symbols-outlined text-[32px]">auto_awesome</span>
           </div>
@@ -56,7 +55,7 @@ export default function CanvasArea({ portfolioData }) {
 
   return (
     <div className={`h-full w-full relative ${themeMode === 'dark' ? 'dark bg-slate-950 text-white' : 'bg-[#F7F7F8]'} overflow-y-auto overflow-x-hidden custom-scrollbar`} style={style}>
-        <div className={`transition-transform duration-300 ${isPreviewMode ? 'scale-50 origin-top-left w-[200%] h-[200%]' : ''}`}>
+        <div>
           {/* Navigation */}
           <PortfolioNav data={portfolioData} blocks={portfolioData.siteConfig?.layout || []} />
 
@@ -70,12 +69,6 @@ export default function CanvasArea({ portfolioData }) {
 
           {/* Footer */}
           <PortfolioFooter data={portfolioData} />
-        </div>
-
-        {/* Mobile Toggle Button */}
-        <div className="md:hidden fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-white dark:bg-slate-800 shadow-xl rounded-full p-1 border border-slate-200 dark:border-slate-700 flex">
-           <button onClick={() => setIsPreviewMode(false)} className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${!isPreviewMode ? 'bg-indigo-600 text-white' : 'text-slate-600 dark:text-slate-300'}`}>Edit</button>
-           <button onClick={() => setIsPreviewMode(true)} className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${isPreviewMode ? 'bg-indigo-600 text-white' : 'text-slate-600 dark:text-slate-300'}`}>Preview</button>
         </div>
     </div>
   );

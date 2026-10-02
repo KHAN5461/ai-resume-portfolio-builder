@@ -12,18 +12,23 @@ import GlobalApi from './../../../../service/GlobalApi'
 import { useParams } from 'react-router-dom'
 import { toast } from 'sonner'
 
+import { isAccessibleContrast } from '@/lib/contrast';
+
 function ThemeColor() {
     const colors=[
-        "#FF5733", "#33FF57", "#3357FF", "#FF33A1", "#A133FF",
-        "#33FFA1", "#FF7133", "#71FF33", "#7133FF", "#FF3371",
-        "#33FF71", "#3371FF", "#A1FF33", "#33A1FF", "#FF5733",
-        "#5733FF", "#33FF5A", "#5A33FF", "#FF335A", "#335AFF"
+        "#1E40AF", "#0369A1", "#0D9488", "#15803D", "#B45309",
+        "#B91C1C", "#BE185D", "#4C1D95", "#0F172A", "#334155",
+        "#52525B", "#6366f1", "#0ea5e9", "#10B981", "#3B82F6",
+        "#FF5733", "#5733FF", "#A133FF", "#3357FF", "#0284c7"
     ]
 
     const dispatch = useDispatch();
     const resumeInfo = useSelector(state => state.resume.present.resumeData);
-    const [selectedColor,setSelectedColor]=useState();
+    const [selectedColor,setSelectedColor]=useState(resumeInfo?.themeColor || '#0284c7');
     const {resumeId}=useParams();
+    
+    const contrastInfo = isAccessibleContrast(selectedColor || '#0284c7', '#FFFFFF');
+
     const onColorSelect=(color)=>{
         setSelectedColor(color)
         dispatch(setResumeData({
@@ -36,34 +41,46 @@ function ThemeColor() {
             }
         }
         GlobalApi.UpdateResumeDetail(resumeId,data).then(resp=>{
-            console.log(resp);
-            toast('Theme Color Updated')
-        })
+            toast.success('Theme Color Updated');
+        });
     }
 
   return (
     <Popover>
   <PopoverTrigger asChild>
   <Button variant="outline" size="sm" 
-          className="flex gap-2" > <LayoutGrid/> Theme</Button>
+          className="flex gap-2" > <LayoutGrid className="w-4 h-4" /> Theme</Button>
   </PopoverTrigger>
-  <PopoverContent>
-    <h2 className='mb-2 text-sm font-bold'>Select Theme Color</h2>
-    <div className='grid grid-cols-5 gap-3'>
+  <PopoverContent className="w-64 p-4 rounded-xl shadow-lg border border-slate-200 dark:border-slate-800">
+    <div className="flex items-center justify-between mb-3">
+      <h2 className='text-xs font-bold text-slate-900 dark:text-white uppercase tracking-wider'>Theme Color</h2>
+      <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${contrastInfo.isAccessible ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'}`}>
+        {contrastInfo.isAccessible ? `WCAG ${contrastInfo.level}` : 'Low Contrast'}
+      </span>
+    </div>
+    <div className='grid grid-cols-5 gap-1 mb-3'>
         {colors.map((item,index)=>(
-            <div 
-            onClick={()=>onColorSelect(item)}
-            className={`h-5 w-5 rounded-full cursor-pointer
-             hover:border-black border
-             ${selectedColor==item&&'border border-black'}
-             `}
-            style={{
-                background:item
-            }}>
-
-            </div>
+            <button
+                type="button" 
+                key={item || index}
+                onClick={()=>onColorSelect(item)}
+                aria-label={`Select theme color ${item}`}
+                className="min-w-[44px] min-h-[44px] flex items-center justify-center p-1 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors focus:outline-none focus:ring-2 focus:ring-sky-500"
+            >
+                <div 
+                    className={`h-7 w-7 rounded-full transition-transform hover:scale-110 flex items-center justify-center
+                    ${selectedColor===item ? 'ring-2 ring-offset-2 ring-slate-900 dark:ring-slate-100 shadow-md' : 'border border-slate-300 dark:border-slate-700'}
+                    `}
+                    style={{ background: item }}
+                />
+            </button>
         ))}
     </div>
+    {!contrastInfo.isAccessible && (
+      <p className="text-[11px] text-amber-600 dark:text-amber-400 mt-2 font-medium">
+        Contrast ratio ({contrastInfo.ratio}:1) is below 4.5:1. Consider choosing a darker shade for better ATS legibility.
+      </p>
+    )}
   </PopoverContent>
 </Popover>
   )

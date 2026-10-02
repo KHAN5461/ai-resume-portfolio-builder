@@ -1,0 +1,61 @@
+{
+  "entities": {
+    "User": {
+      "title": "User",
+      "description": "User profile with plan details",
+      "type": "object",
+      "properties": {
+        "username": { "type": "string" },
+        "email": { "type": "string" },
+        "lastLogin": { "type": "string" },
+        "plan": { "type": "string" },
+        "isPremium": { "type": "boolean" }
+      }
+    },
+    "Resume": {
+      "title": "Resume",
+      "description": "Resume data object synchronized across devices",
+      "type": "object",
+      "properties": {
+        "documentId": { "type": "string" },
+        "resumeId": { "type": "string" },
+        "title": { "type": "string" },
+        "userEmail": { "type": "string" },
+        "userName": { "type": "string" },
+        "userId": { "type": "string" },
+        "updatedAt": { "type": "string" },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["documentId"]
+    },
+    "Portfolio": {
+      "title": "Portfolio",
+      "description": "Portfolio website document synchronized across devices",
+      "type": "object",
+      "properties": {
+        "documentId": { "type": "string" },
+        "portfolioId": { "type": "string" },
+        "title": { "type": "string" },
+        "userEmail": { "type": "string" },
+        "userId": { "type": "string" },
+        "updatedAt": { "type": "string" },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["documentId"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "User",
+      "description": "User profile records"
+    },
+    "/resumes/{resumeId}": {
+      "schema": "Resume",
+      "description": "Synchronized user resumes"
+    },
+    "/portfolios/{portfolioId}": {
+      "schema": "Portfolio",
+      "description": "Synchronized user portfolios"
+    }
+  }
+}

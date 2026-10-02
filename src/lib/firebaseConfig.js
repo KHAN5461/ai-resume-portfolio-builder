@@ -1,27 +1,55 @@
-import { initializeApp } from "firebase/app";
+import { initializeApp, getApps, getApp } from "firebase/app";
 import { getAuth, GoogleAuthProvider, setPersistence, browserSessionPersistence } from "firebase/auth";
-import { getFirestore } from "firebase/firestore";
+import { 
+  getFirestore, 
+  initializeFirestore, 
+  persistentLocalCache, 
+  persistentMultipleTabManager 
+} from "firebase/firestore";
+import appletConfig from "../../firebase-applet-config.json";
 
 const firebaseConfig = {
-  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
-  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
-  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
-  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
-  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
-  appId: import.meta.env.VITE_FIREBASE_APP_ID
+  apiKey: appletConfig.apiKey || import.meta.env.VITE_FIREBASE_API_KEY,
+  authDomain: appletConfig.authDomain || import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+  projectId: appletConfig.projectId || import.meta.env.VITE_FIREBASE_PROJECT_ID,
+  storageBucket: appletConfig.storageBucket || import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: appletConfig.messagingSenderId || import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+  appId: appletConfig.appId || import.meta.env.VITE_FIREBASE_APP_ID
 };
 
-const app = initializeApp(firebaseConfig);
+export const isFirebaseConfigured = Boolean(firebaseConfig.apiKey && firebaseConfig.projectId);
+export const currentFirebaseProjectId = firebaseConfig.projectId;
+export const currentFirebaseAuthDomain = firebaseConfig.authDomain;
+
+const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
 export const auth = getAuth(app);
 
-// Set persistence to session storage so sessions die when tab is closed
-setPersistence(auth, browserSessionPersistence)
-  .then(() => {
-    console.log("Firebase Auth persistence set to browserSessionPersistence");
-  })
-  .catch((error) => {
-    console.error("Error setting persistence:", error);
-  });
+// Use session persistence for iframe preview reliability
+setPersistence(auth, browserSessionPersistence).catch((error) => {
+  console.warn("Session persistence warning:", error);
+});
 
-export const db = getFirestore(app);
+const databaseId = appletConfig.firestoreDatabaseId || "(default)";
+
+let dbInstance;
+try {
+  dbInstance = initializeFirestore(app, {
+    localCache: persistentLocalCache({
+      tabManager: persistentMultipleTabManager()
+    })
+  }, databaseId);
+} catch (e) {
+  try {
+    dbInstance = getFirestore(app, databaseId);
+  } catch (err) {
+    dbInstance = getFirestore(app);
+  }
+}
+
+export const db = dbInstance;
 export const googleProvider = new GoogleAuthProvider();
+googleProvider.setCustomParameters({
+  prompt: 'select_account'
+});
+
+export default app;

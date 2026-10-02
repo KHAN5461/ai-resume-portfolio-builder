@@ -1,4 +1,4 @@
-import { Loader2, PlusSquare, Sparkles } from 'lucide-react';
+import { Loader2, Plus, Sparkles, Globe } from 'lucide-react';
 import React, { useState } from 'react';
 import {
     Dialog,
@@ -9,12 +9,10 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { v4 as uuidv4 } from 'uuid';
 import { useUser } from '../../auth.jsx';
 import { useNavigate } from 'react-router-dom';
-import { useDispatch } from 'react-redux';
-import { createPortfolio } from '@/store/portfolioSlice';
 import GlobalApi from './../../../service/GlobalApi';
+import { toast } from 'sonner';
 
 function AddPortfolio({ renderTrigger }) {
     const [openDialog, setOpenDialog] = useState(false);
@@ -22,9 +20,12 @@ function AddPortfolio({ renderTrigger }) {
     const { user } = useUser();
     const [loading, setLoading] = useState(false);
     const navigation = useNavigate();
-    const dispatch = useDispatch();
 
     const onCreate = async () => {
+        if (!portfolioTitle.trim()) {
+            toast.error('Please enter a title for your portfolio');
+            return;
+        }
         setLoading(true);
         const data = {
             data: {
@@ -37,9 +38,12 @@ function AddPortfolio({ renderTrigger }) {
         GlobalApi.CreateNewPortfolio(data).then(resp => {
             if(resp) {
                 setLoading(false);
+                setOpenDialog(false);
                 navigation('/dashboard/portfolio/' + resp.data.data.documentId + "/edit");
             }
         }, (error) => {
+            console.error(error);
+            toast.error('Failed to create portfolio');
             setLoading(false);
         });
     };
@@ -49,48 +53,78 @@ function AddPortfolio({ renderTrigger }) {
            {renderTrigger ? (
               renderTrigger(() => setOpenDialog(true))
            ) : (
-             <div className='p-14 py-24 items-center flex justify-center bg-[var(--color-paper)] rounded-[16px] h-[280px] hover:border-[var(--color-signal-blue)] cursor-pointer border border-[var(--color-chalk)] group transition-colors'
-             onClick={() => setOpenDialog(true)}
+             <div 
+                className='p-8 items-center flex flex-col justify-center bg-white dark:bg-slate-900 rounded-xl h-[280px] hover:border-indigo-500/50 cursor-pointer border border-slate-200 dark:border-slate-800 shadow-xs group transition-all'
+                onClick={() => setOpenDialog(true)}
              >
-                 <PlusSquare className="text-[var(--color-fog)] group-hover:text-[var(--color-signal-blue)] transition-colors w-10 h-10 stroke-[1.5px]" />
+                 <div className="w-12 h-12 rounded-xl bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 flex items-center justify-center mb-3 group-hover:scale-105 transition-transform">
+                     <Globe className="w-6 h-6 stroke-[2px]" />
+                 </div>
+                 <span className="text-xs font-semibold text-slate-800 dark:text-slate-200">Create Portfolio</span>
              </div>
            )}
 
             <Dialog open={openDialog} onOpenChange={setOpenDialog}>
-                <DialogContent className="bg-[var(--color-paper)] border-[var(--color-chalk)] rounded-[16px]">
+                <DialogContent 
+                    onPointerDownOutside={(e) => e.preventDefault()}
+                    onInteractOutside={(e) => e.preventDefault()}
+                    className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-xl max-w-md p-6"
+                >
                     <DialogHeader>
-                        <DialogTitle className="text-[24px] font-semibold text-[var(--color-carbon)]">Create New Portfolio</DialogTitle>
-                        <DialogDescription>
-                            <p className="text-[var(--color-pencil)] mt-1">Add a title for your new portfolio site</p>
-                            <Input className="my-4 border-[var(--color-chalk)] text-[var(--color-ink)]" 
-                            placeholder="Ex. Software Engineer Portfolio"
-                            onChange={(e) => setPortfolioTitle(e.target.value)}
-                            />
+                        <DialogTitle className="text-lg font-bold text-slate-900 dark:text-white">Create New Portfolio</DialogTitle>
+                        <DialogDescription className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+                            Name your portfolio site or professional portfolio brand
                         </DialogDescription>
-                        <div className='flex justify-end gap-3'>
-                            <Button onClick={() => setOpenDialog(false)} variant="ghost" className="text-[var(--color-pencil)] hover:bg-[var(--color-mist)] rounded-[36px]">Cancel</Button>
-                            <Button 
-                                disabled={!portfolioTitle || loading}
-                                onClick={() => onCreate()}
-                                className="bg-[var(--color-signal-blue)] hover:bg-[var(--color-deep-signal)] text-white rounded-[36px]"
+                    </DialogHeader>
+                    <div className="space-y-4 pt-2">
+                        <Input 
+                            className="bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-xs text-slate-900 dark:text-slate-100 rounded-lg focus:ring-2 focus:ring-indigo-500/20" 
+                            placeholder="e.g. Alex Rivera — Senior Product Designer"
+                            value={portfolioTitle}
+                            onChange={(e) => setPortfolioTitle(e.target.value)}
+                            onKeyDown={(e) => {
+                                if (e.key === 'Enter') onCreate();
+                            }}
+                            autoFocus
+                        />
+                        <div className="p-3 bg-indigo-50 dark:bg-indigo-950/40 border border-indigo-200/50 dark:border-indigo-800/50 rounded-xl flex items-center justify-between">
+                            <div className="flex items-center gap-2">
+                                <Sparkles className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
+                                <span className="text-xs text-indigo-900 dark:text-indigo-200 font-medium">Generate with AI studio?</span>
+                            </div>
+                            <Button
+                                type="button"
+                                size="sm"
+                                variant="outline"
+                                onClick={() => {
+                                    setOpenDialog(false);
+                                    navigation('/dashboard/portfolio/new/ai');
+                                }}
+                                className="text-xs h-7 border-indigo-300 dark:border-indigo-700 text-indigo-600 dark:text-indigo-300 hover:bg-indigo-100 dark:hover:bg-indigo-900/40 rounded-lg"
                             >
-                                {loading ?
-                                <Loader2 className='animate-spin' /> : 'Create'   
-                                }
+                                AI Generator
                             </Button>
                         </div>
-                        <div className="pt-3 mt-3 border-t border-[var(--color-chalk)]">
-                          <button
-                            onClick={() => { setOpenDialog(false); navigation('/dashboard/portfolio/new/ai'); }}
-                            className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white px-4 py-2.5 rounded-[36px] text-sm font-semibold shadow-lg shadow-indigo-600/20 transition-all cursor-pointer"
-                          >
-                            <Sparkles size={16} /> Generate with AI instead
-                          </button>
+                        <div className='flex justify-end gap-2 pt-2'>
+                            <Button 
+                                onClick={() => setOpenDialog(false)} 
+                                variant="ghost" 
+                                className="text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg text-xs"
+                            >
+                                Cancel
+                            </Button>
+                            <Button 
+                                disabled={!portfolioTitle.trim() || loading}
+                                onClick={onCreate}
+                                className="bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-xs font-semibold shadow-xs"
+                            >
+                                {loading ? <Loader2 className='w-3.5 h-3.5 animate-spin mr-1.5' /> : null}
+                                <span>Create</span>
+                            </Button>
                         </div>
-                    </DialogHeader>
+                    </div>
                 </DialogContent>
             </Dialog>
-
         </div>
     );
 }

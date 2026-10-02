@@ -1,4 +1,5 @@
 import React from 'react'
+import { sanitizeHtml } from '@/lib/sanitize';
 
 function ExperiencePreview({resumeInfo}) {
   return (
@@ -12,8 +13,8 @@ function ExperiencePreview({resumeInfo}) {
             borderColor:resumeInfo?.themeColor
         }} />
 
-        {resumeInfo?.Experience?.map((experience,index)=>(
-            <div key={index} className='my-5'>
+        {(Array.isArray(resumeInfo?.Experience) ? resumeInfo.Experience : []).map((experience,index)=>(
+            <div key={index} className='my-5 break-inside-avoid resume-section-item'>
                 <h2 className='text-sm font-bold'
                  style={{
                     color:resumeInfo?.themeColor
@@ -23,10 +24,7 @@ function ExperiencePreview({resumeInfo}) {
                 {experience?.state}
                 <span>{experience?.startDate} To {experience?.currentlyWorking?'Present':experience.endDate} </span>
                 </h2>
-                {/* <p className='text-xs my-2'>
-                    {experience.workSummery}
-                </p> */}
-                <div className='text-xs my-2' dangerouslySetInnerHTML={{__html:experience?.workSummery}} />
+                <div className='text-xs my-2 leading-relaxed' dangerouslySetInnerHTML={{__html: sanitizeHtml(experience?.workSummery)}} />
             </div>
         ))}
     </div>

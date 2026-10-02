@@ -38,7 +38,7 @@ export default function GenerativeCanvasLoader() {
   }, []);
 
   return (
-    <div className="absolute inset-0 bg-slate-950/90 backdrop-blur-xl z-50 flex flex-col items-center justify-center text-center p-6">
+    <div className="absolute inset-0 bg-slate-950 z-50 flex flex-col items-center justify-center text-center p-6">
 
       {/* Pulsing Aura */}
       <div className="relative w-20 h-20 mb-6 flex items-center justify-center">

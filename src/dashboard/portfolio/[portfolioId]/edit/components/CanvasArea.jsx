@@ -32,7 +32,7 @@ export default function CanvasArea({ blocks, previewMode, activeBlockId, setActi
   if (!blocks || blocks.length === 0) {
     return (
       <div className="flex-1 w-full flex items-center justify-center p-8" style={themeStyles}>
-        <div className="border-2 border-dashed border-outline-variant rounded-xl p-12 text-center bg-surface-container/50 backdrop-blur-sm w-full max-w-lg">
+        <div className="border-2 border-dashed border-outline-variant rounded-xl p-12 text-center bg-white dark:bg-slate-900 w-full max-w-lg shadow-sm">
           <div className="bg-surface-container-high w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 border border-outline-variant">
              <span className="material-symbols-outlined text-stitch-primary text-[32px]">drag_indicator</span>
           </div>

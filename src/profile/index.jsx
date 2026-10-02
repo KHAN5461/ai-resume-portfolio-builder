@@ -135,12 +135,12 @@ export default function ProfilePage() {
   ];
 
   return (
-    <div className="fixed inset-0 z-[100] bg-black/40 backdrop-blur-md flex items-center justify-center p-4 sm:p-8">
+    <div className="fixed inset-0 z-[100] bg-slate-950/75 flex items-center justify-center p-4 sm:p-8">
         <motion.div 
             initial={{ opacity: 0, scale: 0.95, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-            className="w-full max-w-5xl h-[85vh] bg-surface-container-lowest rounded-3xl shadow-2xl overflow-hidden flex flex-col md:flex-row border border-outline-variant/30 relative"
+            className="w-full max-w-5xl h-[85vh] bg-white dark:bg-slate-900 rounded-3xl shadow-2xl overflow-hidden flex flex-col md:flex-row border border-slate-200 dark:border-slate-800 relative"
         >
             {/* Close Button */}
             <Link to="/dashboard" className="absolute top-4 right-4 w-8 h-8 rounded-full bg-surface-variant flex items-center justify-center hover:bg-outline-variant/30 transition-colors z-20">

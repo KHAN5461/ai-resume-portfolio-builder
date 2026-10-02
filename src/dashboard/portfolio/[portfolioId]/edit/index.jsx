@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { useParams, Link, useSearchParams, useLocation } from 'react-router-dom';
+import { useParams, Link, useSearchParams, useLocation, useNavigate } from 'react-router-dom';
+import { v4 as uuidv4 } from 'uuid';
 import { useDispatch, useSelector } from 'react-redux';
 import { setCurrentPortfolio } from '@/store/portfolioSlice';
 import { ActionCreators } from 'redux-undo';
@@ -17,19 +18,23 @@ import { toast } from 'sonner';
 import { motion, AnimatePresence } from 'framer-motion';
 import ErrorBoundary from '@/components/ErrorBoundary';
 import { useUser } from '@/auth.jsx';
-import { AIChatSession } from '@/service/AIModal';
+import { AIChatSession, extractCleanJson } from '@/service/AIModal';
 import SeoSettingsModal from '../../components/SeoSettingsModal';
 import { DeployModal } from '../../components/DeployModal';
 import { calculateSeoScore } from '@/lib/seoScorer';
 import { Skeleton } from '@/components/ui/skeleton';
 import ResponsiveBreadcrumbs from '@/components/custom/ResponsiveBreadcrumbs';
 import useHideOnScroll from '@/hooks/useHideOnScroll';
-import { Undo2, Redo2, Bot, Settings2, Monitor, Tablet, Smartphone, Sparkles, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Undo2, Redo2, Bot, Settings2, Monitor, Tablet, Smartphone, Sparkles, ChevronLeft, ChevronRight, LayoutGrid, Eye, MoreHorizontal, ArrowLeft, Palette, ShieldCheck, Download, PanelRightOpen, PanelRight } from 'lucide-react';
 import GlobalEditorToolbar from '@/components/custom/GlobalEditorToolbar';
 import PortfolioHealthScore from '../../components/PortfolioHealthScore';
+import SharedThemeBuilder from '@/components/custom/SharedThemeBuilder';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
+import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from '@/components/ui/dropdown-menu';
 
 export default function EditPortfolio() {
   const { portfolioId } = useParams();
+  const navigate = useNavigate();
   useUndoRedoKeyboard();
   const dispatch = useDispatch();
   const portfolioData = useSelector((state) => state.portfolio.present.portfolios[portfolioId]);
@@ -38,12 +43,48 @@ export default function EditPortfolio() {
   const { user } = useUser();
   const seoData = calculateSeoScore(portfolioData, portfolioData?.blocks || []);
 
-  const [view, setView] = useState('builder'); // 'builder' or 'preview'
+  const handleCreateNewPortfolio = async () => {
+    const toastId = toast.loading("Creating a new blank portfolio...");
+    try {
+      const uuid = uuidv4();
+      const data = {
+        data: {
+          title: "Untitled Portfolio",
+          portfolioId: uuid,
+          userEmail: user?.primaryEmailAddress?.emailAddress,
+          userName: user?.fullName || "Anonymous",
+          themeColor: '#4f46e5',
+          siteConfig: {
+            layout: [
+              { id: 'hero', visible: true, name: 'Hero' },
+              { id: 'about', visible: true, name: 'About' },
+              { id: 'projects', visible: true, name: 'Projects' },
+              { id: 'skills', visible: true, name: 'Skills' },
+              { id: 'contact', visible: true, name: 'Contact' }
+            ]
+          }
+        }
+      };
+      const resp = await GlobalApi.CreateNewPortfolio(data);
+      if (resp) {
+        toast.success("New portfolio created!", { id: toastId });
+        navigate('/dashboard/portfolio/' + resp.data.data.documentId + "/edit");
+        window.location.reload();
+      }
+    } catch (error) {
+      console.error(error);
+      toast.error("Failed to create new portfolio", { id: toastId });
+    }
+  };
+
+  const [view, setView] = useState('builder'); // 'chat', 'builder', or 'preview'
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [isSyncing, setIsSyncing] = useState(false);
   const [isSeoModalOpen, setIsSeoModalOpen] = useState(false);
   const [isDeployModalOpen, setIsDeployModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [isThemeModalOpen, setIsThemeModalOpen] = useState(false);
   const [activeBlockId, setActiveBlockId] = useState('hero');
   const [isLeftPanelOpen, setIsLeftPanelOpen] = useState(true);
   const [isPropertiesPanelOpen, setIsPropertiesPanelOpen] = useState(true);
@@ -170,7 +211,27 @@ export default function EditPortfolio() {
       
       const result = await AIChatSession.sendMessage(prompt, 'portfolio');
       const rawText = result.response.text();
-      const parsedData = JSON.parse(rawText.replace(/```json/g, '').replace(/```/g, ''));
+      let parsedData = extractCleanJson(rawText);
+      
+      if (!parsedData) {
+        console.warn("[Portfolio Sync] Sync generation failed to parse. Utilizing structured fallbacks.");
+        parsedData = {
+          heroSection: {
+            greeting: `Hi, I'm ${latestResume.personalInfo?.name || "a Professional"}`,
+            headline: latestResume.personalInfo?.title || "Software Engineer",
+            subheadline: latestResume.summary || "Professional software engineer with a dedication to craft, detail, and quality solutions."
+          },
+          aboutSection: {
+            bioTitle: "About Me",
+            bioDescription: latestResume.summary || "I am a dedicated software engineer with deep passion for building robust web applications and solving complex architectural problems."
+          },
+          skillsSection: {
+            categories: [
+              { name: "Core Skills", skills: (latestResume.skills || []).map(s => typeof s === 'string' ? s : s.name).filter(Boolean) }
+            ]
+          }
+        };
+      }
       
       dispatch({ 
         type: 'portfolio/updatePortfolioData', 
@@ -214,6 +275,7 @@ export default function EditPortfolio() {
           title={`Portfolio Editor`}
           portfolioData={portfolioData}
           onSave={() => setIsDeployModalOpen(true)}
+          onAddNew={handleCreateNewPortfolio}
         >
             {/* Health Score */}
             <div className="flex items-center gap-1 border-r border-outline-variant/30 pr-2 md:pr-4 mr-1 md:mr-2">
@@ -238,34 +300,84 @@ export default function EditPortfolio() {
                 <Redo2 className="w-5 h-5 group-hover:translate-x-0.5 transition-transform" />
               </button>
             </div>
+
+            {/* More Options Icon in Header */}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <button
+                  className="w-9 h-9 rounded-xl border border-outline-variant/30 flex items-center justify-center text-on-surface-variant hover:text-stitch-primary hover:bg-surface-variant transition-colors cursor-pointer"
+                  title="More Options"
+                  aria-label="More options"
+                >
+                  <MoreHorizontal className="w-5 h-5" />
+                </button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-56 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl shadow-xl p-1 z-50">
+                <DropdownMenuItem 
+                  onClick={() => setIsThemeModalOpen(true)}
+                  className="flex items-center gap-2.5 px-3 py-2 text-xs font-semibold rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer text-slate-700 dark:text-slate-200"
+                >
+                  <Palette className="w-4 h-4 text-indigo-500" />
+                  <span>Theme & Architecture</span>
+                </DropdownMenuItem>
+                <DropdownMenuItem 
+                  onClick={() => setIsAIChatOpen(!isAIChatOpen)}
+                  className="flex items-center gap-2.5 px-3 py-2 text-xs font-semibold rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer text-slate-700 dark:text-slate-200"
+                >
+                  <Sparkles className="w-4 h-4 text-indigo-500" />
+                  <span>{isAIChatOpen ? 'Hide AI Copilot' : 'Show AI Copilot'}</span>
+                </DropdownMenuItem>
+                <DropdownMenuItem 
+                  onClick={() => setIsPropertiesPanelOpen(!isPropertiesPanelOpen)}
+                  className="flex items-center gap-2.5 px-3 py-2 text-xs font-semibold rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer text-slate-700 dark:text-slate-200"
+                >
+                  <Settings2 className="w-4 h-4 text-purple-500" />
+                  <span>{isPropertiesPanelOpen ? 'Hide Properties' : 'Show Properties'}</span>
+                </DropdownMenuItem>
+                <DropdownMenuItem 
+                  onClick={() => setIsSeoModalOpen(true)}
+                  className="flex items-center gap-2.5 px-3 py-2 text-xs font-semibold rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer text-slate-700 dark:text-slate-200"
+                >
+                  <ShieldCheck className="w-4 h-4 text-amber-500" />
+                  <span>SEO Settings</span>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
         </GlobalEditorToolbar>
 
-        {/* Pill Tab Switcher (Mobile Only) */}
-        <div className="md:hidden w-full bg-surface py-2 px-4 flex justify-center z-40 border-b border-outline-variant/30 shrink-0">
-          <div className="flex bg-surface-variant/30 rounded-full p-1 border border-outline-variant/20 relative w-full max-w-sm">
-            {['builder', 'preview'].map((tab) => (
-              <button
-                key={tab}
-                onClick={() => setView(tab)}
-                className={`flex-1 py-2 rounded-full font-label-md capitalize relative z-10 transition-colors ${
-                  view === tab ? 'text-on-primary-container font-bold' : 'text-on-surface-variant'
-                }`}
-              >
-                {view === tab && (
-                  <motion.div
-                    layoutId="portfolio-active-pill"
-                    className="absolute inset-0 bg-primary-container rounded-full -z-10 shadow-sm"
-                    transition={{ type: "spring", stiffness: 300, damping: 30 }}
-                  />
-                )}
-                {tab}
-              </button>
-            ))}
-          </div>
-        </div>
-
         {/* Workspace Area */}
-        <main className="flex-1 flex overflow-hidden bg-surface-container-low relative pt-14 md:pt-16">
+        <main className="flex-1 flex overflow-hidden bg-surface-container-low relative md:pt-16">
+          {/* Mobile Gemini-style Chat Workspace */}
+          {view === 'chat' && (
+            <div className="md:hidden flex-1 flex flex-col bg-slate-50 dark:bg-slate-950 h-full overflow-hidden">
+                {/* 1. Ran / Active Top Panel */}
+                <div className="p-3 bg-white dark:bg-slate-900 border-b border-slate-100 dark:border-slate-800 text-xs text-slate-500 dark:text-slate-400 flex items-center justify-between shrink-0">
+                  <div className="flex items-center gap-2">
+                    <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shadow-sm"></span>
+                    <span className="font-semibold text-slate-700 dark:text-slate-300">Gemini 3.5 Flash • Ran for 90s</span>
+                  </div>
+                  <span className="text-[10px] font-mono opacity-85">Auto-saved</span>
+                </div>
+
+                {/* 2. Messages / Active Chat Panel */}
+                <div className="flex-1 overflow-hidden">
+                  <AIPortfolioChat portfolioId={portfolioId} initialPrompt={aiPrompt} isGenerating={isGenerating} />
+                </div>
+            </div>
+          )}
+
+          {/* Editor Workspace (Property Panel Page) */}
+          {view === 'builder' && (
+            <div className="md:hidden flex-1 flex flex-col bg-white dark:bg-slate-950 h-full overflow-hidden">
+              <UnifiedInspector 
+                activeBlockId={activeBlockId} 
+                setActiveBlockId={setActiveBlockId} 
+                isOpen={true} 
+                onToggle={() => {}} 
+                isFullPage={true}
+              />
+            </div>
+          )}
           
           {/* 1. Left Sidebar (AI Chat) */}
           {!isLoading && (
@@ -276,7 +388,10 @@ export default function EditPortfolio() {
                   className="hidden md:flex flex-col h-full shrink-0 z-10 bg-surface relative group border-r border-outline-variant/30"
                   style={{ width: chatPanelWidth }}
                 >
-                  <AIPortfolioChat portfolioId={portfolioId} initialPrompt={aiPrompt} isGenerating={isGenerating} />
+                  {/* Left Sidebar Body Content */}
+                  <div className="flex-1 overflow-hidden flex flex-col h-full">
+                    <AIPortfolioChat portfolioId={portfolioId} initialPrompt={aiPrompt} isGenerating={isGenerating} />
+                  </div>
                   
                   {/* Collapse Button */}
                   <button 
@@ -293,29 +408,26 @@ export default function EditPortfolio() {
                     className="absolute -right-1 top-0 w-2 h-full cursor-col-resize hover:bg-stitch-primary/30 active:bg-stitch-primary/50 transition-colors z-40"
                   />
                 </div>
-              ) : (
-                <div key="chat-closed" className="hidden md:flex flex-col w-16 h-full shrink-0 border-r border-outline-variant/30 z-10 bg-surface items-center py-4 relative group">
-                  <button 
-                    onClick={() => setIsAIChatOpen(true)} 
-                    className="w-10 h-10 bg-gradient-to-br from-stitch-primary to-stitch-secondary text-white rounded-xl shadow-sm hover:shadow-md transition-all flex items-center justify-center hover:-translate-y-0.5" 
-                    title="Expand AI Chat"
-                  >
-                    <Sparkles className="w-5 h-5" />
-                  </button>
-                </div>
-              )}
+              ) : null}
             </>
           )}
 
-          {/* 2. Center Preview Canvas */}
-          <main className="flex-1 relative flex flex-col overflow-hidden bg-surface-container-lowest bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] dark:bg-[radial-gradient(#1e293b_1px,transparent_1px)] [background-size:16px_16px] p-4 md:p-8 h-full shadow-[inset_0_0_40px_rgba(0,0,0,0.05)] dark:shadow-[inset_0_0_40px_rgba(0,0,0,0.2)]">
-            <PreviewWindow rawCode={portfolioData ? generatePortfolioReactCode(portfolioData) : ""}>
-               {/* Mobile Only: Tabbed Bottom Sheet Toggle */}
-               <div className="md:hidden absolute bottom-4 left-4 right-4 z-50 flex gap-2 justify-center">
-                  <button onClick={() => { setIsLeftPanelOpen(true); setIsPropertiesPanelOpen(false); }} className="px-4 py-2 bg-indigo-600 text-white rounded-full shadow-lg text-sm font-semibold">Menu</button>
-                  <button onClick={() => { setIsPropertiesPanelOpen(true); setIsLeftPanelOpen(false); }} className="px-4 py-2 bg-white text-gray-800 rounded-full shadow-lg text-sm font-semibold">Properties</button>
-               </div>
+          {/* Floating tab on left edge to open AI panel when closed */}
+          {!isAIChatOpen && !isLoading && (
+            <button
+              onClick={() => setIsAIChatOpen(true)}
+              className="hidden md:flex absolute left-0 top-1/2 -translate-y-1/2 z-40 bg-white dark:bg-slate-900 border-r border-y border-slate-200 dark:border-slate-800 shadow-xl px-2.5 py-4 rounded-r-xl flex-col items-center gap-2 text-slate-600 hover:text-indigo-600 dark:text-slate-300 dark:hover:text-indigo-400 transition-all cursor-pointer group hover:pl-3.5"
+              title="Open AI Copilot"
+              aria-label="Open AI Copilot"
+            >
+              <Sparkles className="w-4 h-4 text-indigo-600 dark:text-indigo-400 group-hover:scale-110 transition-transform" />
+              <span className="[writing-mode:vertical-rl] rotate-180 text-[10px] font-bold tracking-wider uppercase text-slate-500 group-hover:text-indigo-600 dark:text-slate-400 dark:group-hover:text-indigo-400">AI Copilot</span>
+            </button>
+          )}
 
+          {/* 2. Center Preview Canvas */}
+          <main className={`flex-1 relative flex flex-col overflow-hidden bg-surface-container-lowest bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] dark:bg-[radial-gradient(#1e293b_1px,transparent_1px)] [background-size:16px_16px] p-4 md:p-8 h-full shadow-[inset_0_0_40px_rgba(0,0,0,0.05)] dark:shadow-[inset_0_0_40px_rgba(0,0,0,0.2)] ${view === 'preview' ? 'flex' : 'hidden md:flex'}`}>
+            <PreviewWindow rawCode={portfolioData ? generatePortfolioReactCode(portfolioData) : ""} hideHeader={view === 'preview'}>
                <div className="flex-1 overflow-y-auto bg-background relative w-full h-full custom-scrollbar rounded-xl shadow-lg border border-outline-variant/20 overflow-hidden ring-1 ring-black/5 dark:ring-white/5">
                   {/* Removed GenerativeCanvasLoader */}
                   {isLoading ? (
@@ -340,12 +452,149 @@ export default function EditPortfolio() {
             </PreviewWindow>
           </main>
 
+          {/* Floating tab on right edge to open right side panel when closed */}
+          {!isPropertiesPanelOpen && !isLoading && !isGenerating && (
+            <button
+              onClick={() => setIsPropertiesPanelOpen(true)}
+              className="hidden md:flex absolute right-0 top-1/2 -translate-y-1/2 z-40 bg-white dark:bg-slate-900 border-l border-y border-slate-200 dark:border-slate-800 shadow-xl px-2 py-4 rounded-l-xl flex-col items-center gap-2 text-slate-600 hover:text-indigo-600 dark:text-slate-300 dark:hover:text-indigo-400 transition-all cursor-pointer group hover:pr-3"
+              title="Open Right Side Panel"
+              aria-label="Open Right Side Panel"
+            >
+              <PanelRightOpen className="w-4 h-4 text-indigo-600 dark:text-indigo-400 group-hover:scale-110 transition-transform" />
+              <span className="[writing-mode:vertical-rl] text-[10px] font-bold tracking-wider uppercase text-slate-500 group-hover:text-indigo-600 dark:text-slate-400 dark:group-hover:text-indigo-400">Properties</span>
+            </button>
+          )}
+
           {/* 3. Right Properties Panel (Unified Inspector) */}
           {!isLoading && !isGenerating && <UnifiedInspector activeBlockId={activeBlockId} setActiveBlockId={setActiveBlockId} isOpen={isPropertiesPanelOpen} onToggle={() => setIsPropertiesPanelOpen(!isPropertiesPanelOpen)} />}
         </main>
         
+
+
         <SeoSettingsModal isOpen={isSeoModalOpen} onClose={() => setIsSeoModalOpen(false)} />
         <DeployModal isOpen={isDeployModalOpen} onOpenChange={setIsDeployModalOpen} portfolioId={portfolioId} portfolioData={portfolioData} />
+
+        {/* Gemini-style Mobile bottom bar */}
+        <div className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl border-t border-slate-200/80 dark:border-slate-800/80 px-4 pt-3 pb-[calc(0.7rem+env(safe-area-inset-bottom,0px))] flex items-center justify-between gap-1 shadow-lg">
+          {/* Left Back Arrow */}
+          <Link to="/dashboard" className="p-2 text-slate-500 hover:text-slate-900 dark:hover:text-white active:scale-95 transition-all">
+            <ArrowLeft className="w-5 h-5" />
+          </Link>
+
+          {/* Center Pill Switcher */}
+          <div className="flex bg-slate-100 dark:bg-slate-800 rounded-full p-1 border border-slate-200 dark:border-slate-700/60 max-w-[280px] flex-1">
+            <button
+              onClick={() => setView('chat')}
+              className={`relative flex-1 py-1.5 rounded-full text-xs font-semibold flex items-center justify-center gap-1 transition-all ${
+                view === 'chat'
+                  ? 'bg-white dark:bg-slate-950 shadow-sm text-indigo-600 dark:text-indigo-400 font-bold'
+                  : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'
+              }`}
+            >
+              Chat
+            </button>
+            <button
+              onClick={() => setView('preview')}
+              className={`relative flex-1 py-1.5 rounded-full text-xs font-semibold flex items-center justify-center gap-1 transition-all ${
+                view === 'preview'
+                  ? 'bg-white dark:bg-slate-950 shadow-sm text-indigo-600 dark:text-indigo-400 font-bold'
+                  : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'
+              }`}
+            >
+              Preview
+            </button>
+            <button
+              onClick={() => setView('builder')}
+              className={`relative flex-1 py-1.5 rounded-full text-xs font-semibold flex items-center justify-center gap-1 transition-all ${
+                view === 'builder'
+                  ? 'bg-white dark:bg-slate-950 shadow-sm text-indigo-600 dark:text-indigo-400 font-bold'
+                  : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'
+              }`}
+            >
+              Editor
+            </button>
+          </div>
+
+          {/* Right Option Menu (Three Dots) */}
+          <button
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            className="p-2 text-slate-500 hover:text-slate-900 dark:hover:text-white relative active:scale-95 transition-all"
+            aria-label="More options"
+          >
+            <MoreHorizontal className="w-5 h-5" />
+          </button>
+        </div>
+
+        {/* Gemini-style Three-Dots Floating Menu Options Overlay */}
+        <AnimatePresence>
+          {mobileMenuOpen && (
+            <>
+              <div className="fixed inset-0 z-40 bg-black/10 dark:bg-black/40 backdrop-blur-xs" onClick={() => setMobileMenuOpen(false)} />
+              <motion.div
+                initial={{ opacity: 0, y: 20, scale: 0.95 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ opacity: 0, y: 20, scale: 0.95 }}
+                transition={{ duration: 0.15, ease: "easeOut" }}
+                className="fixed bottom-[80px] right-4 z-50 w-56 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-2xl py-2 px-1 flex flex-col gap-0.5"
+              >
+                <button
+                  onClick={() => { setIsThemeModalOpen(true); setMobileMenuOpen(false); }}
+                  className="w-full text-left px-3.5 py-2.5 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center gap-2.5 text-xs font-semibold text-slate-700 dark:text-slate-200 transition-colors"
+                >
+                  <Palette className="w-4 h-4 text-indigo-500" />
+                  <span>Theme & Architecture</span>
+                </button>
+                <button
+                  onClick={() => { setIsDeployModalOpen(true); setMobileMenuOpen(false); }}
+                  className="w-full text-left px-3.5 py-2.5 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center gap-2.5 text-xs font-semibold text-slate-700 dark:text-slate-200 transition-colors"
+                >
+                  <Download className="w-4 h-4 text-emerald-500" />
+                  <span>Deploy / Export Live Site</span>
+                </button>
+                <button
+                  onClick={() => { setIsPropertiesPanelOpen(true); setView('builder'); setMobileMenuOpen(false); }}
+                  className="w-full text-left px-3.5 py-2.5 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center gap-2.5 text-xs font-semibold text-slate-700 dark:text-slate-200 transition-colors"
+                >
+                  <Settings2 className="w-4 h-4 text-purple-500" />
+                  <span>Inspect Block Elements</span>
+                </button>
+                <button
+                  onClick={() => { setIsSeoModalOpen(true); setMobileMenuOpen(false); }}
+                  className="w-full text-left px-3.5 py-2.5 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center gap-2.5 text-xs font-semibold text-slate-700 dark:text-slate-200 transition-colors"
+                >
+                  <ShieldCheck className="w-4 h-4 text-amber-500" />
+                  <span>SEO Score & Tags</span>
+                </button>
+                <button
+                  onClick={() => { handleAutoFill(); setMobileMenuOpen(false); }}
+                  disabled={isSyncing}
+                  className="w-full text-left px-3.5 py-2.5 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center gap-2.5 text-xs font-semibold text-slate-700 dark:text-slate-200 transition-colors disabled:opacity-45"
+                >
+                  <Sparkles className="w-4 h-4 text-sky-500" />
+                  <span>{isSyncing ? "Syncing..." : "Sync from CV data"}</span>
+                </button>
+              </motion.div>
+            </>
+          )}
+        </AnimatePresence>
+
+        {/* Theme, Layout & Colors Modal */}
+        <Dialog open={isThemeModalOpen} onOpenChange={setIsThemeModalOpen}>
+          <DialogContent className="sm:max-w-2xl max-h-[85vh] overflow-y-auto custom-scrollbar p-6 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl">
+            <DialogHeader className="mb-2">
+              <DialogTitle className="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                <Palette className="w-5 h-5 text-indigo-500" />
+                Theme, Colors & Architecture
+              </DialogTitle>
+              <DialogDescription className="text-xs text-slate-500 dark:text-slate-400">
+                Customize layout architecture, color palette, and color scheme.
+              </DialogDescription>
+            </DialogHeader>
+            <div className="mt-2">
+              <SharedThemeBuilder type="portfolio" documentId={portfolioId} />
+            </div>
+          </DialogContent>
+        </Dialog>
     </motion.div>
     </ErrorBoundary>
   );

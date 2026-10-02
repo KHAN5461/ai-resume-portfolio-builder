@@ -58,4 +58,6 @@ const ContactSection = React.memo(({ data }) => {
   );
 });
 
+ContactSection.displayName = 'ContactSection';
+
 export default ContactSection;

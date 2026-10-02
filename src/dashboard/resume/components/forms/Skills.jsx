@@ -16,6 +16,42 @@ const SUGGESTIONS = [
     "Machine Learning", "Data Analysis", "SEO", "Marketing", "Sales"
 ];
 
+const parseSkills = (raw) => {
+    if (!raw) return [];
+    if (Array.isArray(raw)) {
+        return raw.map(s => {
+            if (typeof s === 'string') return { name: s, rating: 100 };
+            if (s && typeof s === 'object') return { name: s.name || s.skill || '', rating: s.rating ?? 100 };
+            return null;
+        }).filter(s => s && s.name);
+    }
+    if (typeof raw === 'object') {
+        const list = [];
+        Object.values(raw).forEach(val => {
+            if (Array.isArray(val)) {
+                val.forEach(item => {
+                    if (typeof item === 'string') list.push({ name: item, rating: 100 });
+                    else if (item && typeof item === 'object') list.push({ name: item.name || item.skill || '', rating: item.rating ?? 100 });
+                });
+            } else if (typeof val === 'string') {
+                val.split(',').forEach(item => {
+                    if (item.trim()) list.push({ name: item.trim(), rating: 100 });
+                });
+            }
+        });
+        return list.filter(s => s && s.name);
+    }
+    if (typeof raw === 'string') {
+        try {
+            const parsed = JSON.parse(raw);
+            return parseSkills(parsed);
+        } catch {
+            return raw.split(',').map(s => ({ name: s.trim(), rating: 100 })).filter(s => s.name);
+        }
+    }
+    return [];
+};
+
 function Skills({handleNext, handlePrev}) {
     const {resumeId} = useParams();
     const [loading, setLoading] = useState(false);
@@ -23,8 +59,7 @@ function Skills({handleNext, handlePrev}) {
     const resumeInfo = useSelector(state => state.resume.present.resumeData);
 
     const [skillsList, setSkillsList] = useState(() => {
-        const sk = resumeInfo?.skills || resumeInfo?.Skills || [];
-        return sk.map(s => typeof s === 'string' ? { name: s, rating: 0 } : s);
+        return parseSkills(resumeInfo?.skills || resumeInfo?.Skills);
     });
 
     const [inputValue, setInputValue] = useState("");

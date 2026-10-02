@@ -92,4 +92,6 @@ const ProjectsSection = React.memo(({ data }) => {
   );
 });
 
+ProjectsSection.displayName = 'ProjectsSection';
+
 export default ProjectsSection;

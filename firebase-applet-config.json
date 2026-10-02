@@ -1,0 +1,12 @@
+{
+  "projectId": "launchpad-portfolios",
+  "appId": "1:758319839380:web:b43e241175fa179dde9c81",
+  "apiKey": "AIzaSyBWS6NbEU27Jn-wN1dVzU0mcWYP5BMyR9A",
+  "authDomain": "launchpad-portfolios.firebaseapp.com",
+  "firestoreDatabaseId": "(default)",
+  "storageBucket": "launchpad-portfolios.firebasestorage.app",
+  "messagingSenderId": "758319839380",
+  "measurementId": "",
+  "oAuthClientId": "",
+  "recaptchaSiteKey": ""
+}

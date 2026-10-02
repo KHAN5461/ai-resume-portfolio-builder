@@ -106,7 +106,7 @@ export function HeroAnimation() {
                         initial={{ opacity: 0, scale: 0.8 }}
                         animate={{ opacity: 1, scale: 1 }}
                         exit={{ opacity: 0 }}
-                        className="absolute inset-0 bg-white/60 backdrop-blur-sm flex items-center justify-center z-10"
+                        className="absolute inset-0 bg-white/90 dark:bg-slate-900/90 flex items-center justify-center z-10"
                     >
                         <div className="bg-green-500 text-white font-bold py-2 px-4 rounded-xl shadow-lg flex items-center gap-2">
                             <span className="material-symbols-outlined">check_circle</span>

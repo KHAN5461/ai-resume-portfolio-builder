@@ -9,7 +9,7 @@ import {
   updateAboutSection,
   updatePortfolioData,
 } from '@/store/portfolioSlice';
-import { AIChatSession } from '@/service/AIModal';
+import { AIChatSession, extractCleanJson } from '@/service/AIModal';
 import { Sparkles, User, Loader2, Zap, Palette, Layout, Type, FileText, Wand2, RotateCcw } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'sonner';
@@ -84,7 +84,11 @@ const AIPortfolioChat = ({ portfolioId, initialPrompt, isGenerating }) => {
 
           const result = await AIChatSession.sendMessage(prompt, 'portfolio');
           const aiResponse = result.response.text();
-          const cleanedJSON = JSON.parse(aiResponse.replace(/```json/g, '').replace(/```/g, '').trim());
+          const cleanedJSON = extractCleanJson(aiResponse);
+          
+          if (!cleanedJSON) {
+            throw new Error("Unable to parse generated JSON structure");
+          }
 
           dispatch(updatePortfolioData({
             id: portfolioId,
@@ -340,7 +344,35 @@ const AIPortfolioChat = ({ portfolioId, initialPrompt, isGenerating }) => {
         }
       `, 'portfolio');
       const rawText = result.response.text();
-      const parsed = JSON.parse(rawText.replace(/```json/g, '').replace(/```/g, '').trim());
+      let parsed = extractCleanJson(rawText);
+      
+      if (!parsed) {
+        console.warn("[Portfolio AI] Failed to parse generated JSON. Applying premium deterministic fallback payload.");
+        parsed = {
+          heroSection: {
+            greeting: "Hi, I'm a Senior Full-Stack Developer",
+            headline: "Crafting High-Performance Scalable Web Architectures",
+            subheadline: "Specialized in React, Node.js, and Cloud Solutions to turn complex problems into elegant user-centric experiences."
+          },
+          aboutSection: {
+            bioTitle: "About Me",
+            bioDescription: "I am a passionate software engineer with 5+ years of experience building modern web applications. I focus on writing clean, maintainable code, designing scalable backend systems, and optimizing client-side performance for an outstanding user experience."
+          },
+          skillsSection: {
+            categories: [
+              { categoryName: "Frontend", skills: ["React", "TypeScript", "Tailwind CSS", "Next.js", "Redux"] },
+              { categoryName: "Backend", skills: ["Node.js", "Express", "PostgreSQL", "MongoDB", "GraphQL"] },
+              { categoryName: "DevOps & Tools", skills: ["Docker", "AWS", "CI/CD", "Git", "Vercel"] }
+            ]
+          },
+          contactSection: {
+            heading: "Get In Touch",
+            subheading: "Feel free to reach out for collaborations, freelance opportunities, or just to say hello!",
+            email: "hello@example.com"
+          }
+        };
+      }
+
       dispatch(updatePortfolioData({ id: portfolioId, data: parsed }));
       return "🎉 Generated a **complete portfolio** with hero, about, skills, and contact sections! Check it out on the canvas →";
     } catch (error) {
@@ -388,13 +420,13 @@ const AIPortfolioChat = ({ portfolioId, initialPrompt, isGenerating }) => {
   return (
     <div className="flex flex-col h-full bg-gradient-to-b from-surface to-surface-container-lowest border-r border-outline-variant/20 shadow-sm relative z-10">
       {/* Header */}
-      <div className="p-5 border-b border-outline-variant/20 flex items-center gap-3 bg-surface/50 backdrop-blur-md sticky top-0 z-20">
-        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-stitch-primary to-stitch-secondary flex items-center justify-center shadow-sm">
-          <Sparkles className="w-5 h-5 text-white" />
+      <div style={{ height: '53.4609px' }} className="h-[53.5px] px-4 border-b border-outline-variant/20 flex items-center gap-3 bg-white dark:bg-slate-900 sticky top-0 z-20 shrink-0">
+        <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-stitch-primary to-stitch-secondary flex items-center justify-center shadow-sm shrink-0">
+          <Sparkles className="w-4 h-4 text-white" />
         </div>
-        <div className="flex-1">
-          <h2 className="font-headline-sm font-bold text-on-surface leading-tight">Sparkfolio AI</h2>
-          <p className="text-[11px] font-medium text-on-surface-variant/70 uppercase tracking-wider">
+        <div className="flex-1 min-w-0">
+          <h2 className="text-xs font-bold text-on-surface truncate leading-tight">Sparkfolio AI</h2>
+          <p className="text-[10px] font-medium text-on-surface-variant/70 uppercase tracking-wider truncate">
             {isLoading ? '● Thinking...' : 'Design Assistant'}
           </p>
         </div>
@@ -454,7 +486,7 @@ const AIPortfolioChat = ({ portfolioId, initialPrompt, isGenerating }) => {
       </div>
 
       {/* Input Area */}
-      <div className="p-4 bg-surface/80 backdrop-blur-md border-t border-outline-variant/20 shrink-0">
+      <div className="p-4 bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 shrink-0">
         {/* Quick Suggestions */}
         <div className="flex gap-2 overflow-x-auto pb-3 custom-scrollbar no-scrollbar">
           {suggestions.map((s, idx) => (

@@ -27,10 +27,10 @@ export function CommandPalette() {
   if (!open) return null;
 
   return (
-    <div className="fixed inset-0 z-[100] bg-black/40 backdrop-blur-sm flex items-start justify-center pt-[15vh]">
-      <div className="bg-surface w-full max-w-xl rounded-2xl shadow-2xl overflow-hidden border border-outline-variant/30 flex flex-col cmdk-container relative">
+    <div className="fixed inset-0 z-[100] bg-slate-950/75 flex items-start justify-center pt-[15vh]">
+      <div className="bg-white dark:bg-slate-900 w-full max-w-xl rounded-2xl shadow-2xl overflow-hidden border border-slate-200 dark:border-slate-800 flex flex-col cmdk-container relative">
         <Command label="Global Command Menu" shouldFilter={true} className="flex flex-col w-full">
-          <div className="flex items-center border-b border-outline-variant/30 px-4" cmdk-input-wrapper="">
+          <div className="flex items-center border-b border-outline-variant/30 px-4">
             <Search className="w-5 h-5 text-on-surface-variant shrink-0" />
             <Command.Input 
               autoFocus 

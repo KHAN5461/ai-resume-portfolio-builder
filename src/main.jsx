@@ -28,6 +28,9 @@ const CoverLetters = lazy(() => import('./dashboard/cover-letters/index.jsx'))
 const InterviewCoach = lazy(() => import('./interview/index.jsx'))
 const AIPromptStudio = lazy(() => import('./dashboard/portfolio/components/AIPromptStudio.jsx'));
 
+const ImportHub = lazy(() => import('./pages/ImportHub.jsx'));
+const AiResumeGenerator = lazy(() => import('./dashboard/resume/AiResumeGeneratorPage.jsx'));
+
 const LoadingFallback = () => (
   <div className="h-screen w-screen flex items-center justify-center bg-surface-container-lowest">
     <div className="w-12 h-12 border-4 border-stitch-primary border-t-transparent rounded-full animate-spin"></div>
@@ -55,6 +58,14 @@ const router=createBrowserRouter([
         element: <Suspense fallback={<LoadingFallback />}><EditResume/></Suspense>
       },
       {
+        path:'/dashboard/resume/new/ai',
+        element: <Suspense fallback={<LoadingFallback />}><AiResumeGenerator/></Suspense>
+      },
+      {
+        path:'/dashboard/import',
+        element: <Suspense fallback={<LoadingFallback />}><ImportHub/></Suspense>
+      },
+      {
         path:'/dashboard/portfolio/:portfolioId/edit',
         element: <Suspense fallback={<LoadingFallback />}><EditPortfolio/></Suspense>
       },
@@ -77,6 +88,14 @@ const router=createBrowserRouter([
       {
         path:'/dashboard/cover-letters',
         element: <Suspense fallback={<LoadingFallback />}><CoverLetters/></Suspense>
+      },
+      {
+        path:'/cover-letters',
+        element: <Suspense fallback={<LoadingFallback />}><CoverLetters/></Suspense>
+      },
+      {
+        path:'/interview',
+        element: <Suspense fallback={<LoadingFallback />}><InterviewCoach/></Suspense>
       },
       {
         path:'/interview/:resumeId',

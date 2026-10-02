@@ -16,11 +16,11 @@ export default function ExportModal({ isOpen, onClose, portfolioData }) {
   };
 
   return (
-    <div className="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 flex items-center justify-center p-4">
+    <div className="fixed inset-0 bg-slate-950/75 z-50 flex items-center justify-center p-4">
       <div className="bg-slate-900 border border-slate-800 rounded-2xl w-full max-w-3xl overflow-hidden shadow-2xl flex flex-col max-h-[85vh]">
         
         {/* Modal Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-slate-800 bg-slate-900/50">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-slate-800 bg-slate-900">
           <div className="flex items-center gap-2 text-white font-semibold text-sm">
             <Terminal size={16} className="text-indigo-400" /> Export React Component Code
           </div>

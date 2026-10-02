@@ -17,7 +17,7 @@ export default function CreativeTemplate({ portfolioData }) {
         
         {/* Bento Grid Header */}
         <section className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="md:col-span-2 bg-slate-900/50 backdrop-blur-xl border border-slate-800 rounded-3xl p-12 flex flex-col justify-center">
+          <div className="md:col-span-2 bg-slate-900 border border-slate-800 rounded-3xl p-12 flex flex-col justify-center">
             <p className="text-pink-400 font-mono mb-4 text-lg">Hi, {heroSection?.greeting}</p>
             <h1 className="text-5xl md:text-7xl font-black leading-tight mb-6 bg-clip-text text-transparent bg-gradient-to-r from-white to-slate-400">
               {heroSection?.headline}
@@ -25,7 +25,7 @@ export default function CreativeTemplate({ portfolioData }) {
             <p className="text-xl text-slate-400 max-w-xl">{heroSection?.subheadline}</p>
           </div>
           
-          <div className="bg-slate-900/50 backdrop-blur-xl border border-slate-800 rounded-3xl p-8 flex flex-col justify-between">
+          <div className="bg-slate-900 border border-slate-800 rounded-3xl p-8 flex flex-col justify-between">
             <h3 className="text-xl font-bold mb-4">{aboutSection?.bioTitle || "About Me"}</h3>
             <p className="text-slate-400 leading-relaxed mb-6">{aboutSection?.bioDescription}</p>
             <div className="flex gap-4">
@@ -47,7 +47,7 @@ export default function CreativeTemplate({ portfolioData }) {
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {projectsSection?.map((project, i) => (
-              <div key={project.id || i} className={`group relative bg-slate-900/50 backdrop-blur-xl border border-slate-800 rounded-3xl overflow-hidden ${i === 0 ? 'md:col-span-2 h-[500px]' : 'h-[400px]'}`}>
+              <div key={project.id || i} className={`group relative bg-slate-900 border border-slate-800 rounded-3xl overflow-hidden ${i === 0 ? 'md:col-span-2 h-[500px]' : 'h-[400px]'}`}>
                 <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-900/80 to-transparent z-10"></div>
                 <img src={project.thumbnailUrl || 'https://images.unsplash.com/photo-1550745165-9bc0b252726f'} alt={project.title} className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 opacity-60 group-hover:opacity-100" />
                 
@@ -57,7 +57,7 @@ export default function CreativeTemplate({ portfolioData }) {
                   
                   <div className="flex flex-wrap gap-2 mb-6">
                     {project.tags?.slice(0, 3).map(tag => (
-                      <span key={tag} className="text-xs font-mono bg-slate-800/80 backdrop-blur border border-slate-700 px-3 py-1 rounded-full text-pink-300">{tag}</span>
+                      <span key={tag} className="text-xs font-mono bg-slate-800 border border-slate-700 px-3 py-1 rounded-full text-pink-300">{tag}</span>
                     ))}
                   </div>
 
@@ -77,7 +77,7 @@ export default function CreativeTemplate({ portfolioData }) {
         {/* Skills Marquee (Simulated with Bento Cards) */}
         <section className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
            {skillsSection?.categories?.map((cat, i) => (
-             <div key={i} className="bg-slate-900/50 backdrop-blur-xl border border-slate-800 rounded-3xl p-8 hover:border-pink-500/50 transition-colors">
+             <div key={i} className="bg-slate-900 border border-slate-800 rounded-3xl p-8 hover:border-pink-500/50 transition-colors">
                <h4 className="text-lg font-bold mb-6 text-pink-400">{cat.categoryName}</h4>
                <ul className="space-y-3">
                  {cat.skills?.map(skill => (

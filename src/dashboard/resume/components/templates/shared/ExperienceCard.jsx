@@ -1,4 +1,5 @@
 import React from 'react';
+import { sanitizeHtml } from '@/lib/sanitize';
 
 /**
  * Shared experience entry component used across all resume templates.
@@ -48,7 +49,7 @@ const ExperienceCard = React.memo(({ experience, accentColor, variant = 'classic
         <span className={s.meta}>{dateRange}</span>
       </div>
       {description && (
-        <div className={s.description} dangerouslySetInnerHTML={{ __html: description }} />
+        <div className={s.description} dangerouslySetInnerHTML={{ __html: sanitizeHtml(description) }} />
       )}
     </div>
   );

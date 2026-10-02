@@ -1,4 +1,5 @@
 import React from 'react';
+import { sanitizeHtml } from '@/lib/sanitize';
 
 /**
  * Shared education entry component used across all resume templates.
@@ -47,7 +48,7 @@ const EducationCard = React.memo(({ education, accentColor, variant = 'classic' 
         <span className={s.meta}>{graduation_date}</span>
       </div>
       {description && (
-        <div className={s.description} dangerouslySetInnerHTML={{ __html: description }} />
+        <div className={s.description} dangerouslySetInnerHTML={{ __html: sanitizeHtml(description) }} />
       )}
     </div>
   );

@@ -254,7 +254,7 @@ function Experience({handleNext, handlePrev}) {
             <div className='flex justify-between items-center mt-6'>
                 <div className='flex gap-2'>
                     <Button variant="outline" onClick={AddNewExperience} className="text-stitch-primary hover:text-stitch-primary border-stitch-primary/30 hover:bg-stitch-primary/5 rounded-xl h-10 px-4">
-                        <Plus className='w-4 h-4 mr-2' /> Add More Experience
+                        <Plus className='w-4 h-4 mr-1.5' /> Add
                     </Button>
                 </div>
                 

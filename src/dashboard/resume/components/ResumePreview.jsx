@@ -48,4 +48,6 @@ const ResumePreview = React.memo(({ resumeInfo }) => {
     )
 })
 
+ResumePreview.displayName = 'ResumePreview';
+
 export default ResumePreview;

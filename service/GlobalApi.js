@@ -1,153 +1,73 @@
-const getResumesFromStorage = () => {
-    const data = localStorage.getItem('user_resumes');
-    return data ? JSON.parse(data) : [];
+/**
+ * Unified GlobalApi delegating to StorageService with active Firestore cloud sync
+ */
+import StorageService, { migrateResumeSchema, migratePortfolioSchema } from '../src/service/StorageService';
+
+export const GetUserResumes = async (userEmail) => {
+  const data = await StorageService.getUserResumes(userEmail);
+  return { data: { data } };
 };
 
-const saveResumesToStorage = (resumes) => {
-    localStorage.setItem('user_resumes', JSON.stringify(resumes));
+export const GetUserPortfolios = async (userEmail) => {
+  const data = await StorageService.getUserPortfolios(userEmail);
+  return { data: { data } };
 };
 
-const getPortfoliosFromStorage = () => {
-    const data = localStorage.getItem('user_portfolios');
-    return data ? JSON.parse(data) : [];
+export const CreateNewResume = async (payload) => {
+  const created = await StorageService.createResume(payload);
+  return { data: { data: created } };
 };
 
-const savePortfoliosToStorage = (portfolios) => {
-    localStorage.setItem('user_portfolios', JSON.stringify(portfolios));
+export const CreateNewPortfolio = async (payload) => {
+  const created = await StorageService.createPortfolio(payload);
+  return { data: { data: created } };
 };
 
-const CreateNewResume = (data) => {
-    return new Promise((resolve) => {
-        const resumes = getResumesFromStorage();
-        const newResume = {
-            ...data.data,
-            documentId: Date.now().toString() + Math.random().toString(36).substring(2, 9),
-            createdAt: new Date().toISOString()
-        };
-        resumes.push(newResume);
-        saveResumesToStorage(resumes);
-        
-        resolve({ data: { data: newResume } });
-    });
+export const GetResumeById = async (id) => {
+  const resume = await StorageService.getResumeById(id);
+  return { data: { data: resume } };
 };
 
-const GetUserResumes = (userEmail) => {
-    return new Promise((resolve) => {
-        const resumes = getResumesFromStorage();
-        const userResumes = resumes.filter(r => r.userEmail === userEmail);
-        resolve({ data: { data: userResumes } });
-    });
+export const GetPortfolioById = async (id) => {
+  const portfolio = await StorageService.getPortfolioById(id);
+  return { data: { data: portfolio } };
 };
 
-const UpdateResumeDetail = (id, data) => {
-    return new Promise((resolve) => {
-        const resumes = getResumesFromStorage();
-        const index = resumes.findIndex(r => r.documentId === id);
-        if (index !== -1) {
-            resumes[index] = { ...resumes[index], ...data.data };
-            saveResumesToStorage(resumes);
-            resolve({ data: { data: resumes[index] } });
-        } else {
-            resolve({ data: { data: null } });
-        }
-    });
+export const UpdateResumeDetail = async (id, payload) => {
+  const updated = await StorageService.updateResume(id, payload.data);
+  return { data: { data: updated } };
 };
 
-const GetResumeById = (id) => {
-    return new Promise((resolve) => {
-        const resumes = getResumesFromStorage();
-        const resume = resumes.find(r => r.documentId === id);
-        resolve({ data: { data: resume } });
-    });
+export const UpdatePortfolioDetail = async (id, payload) => {
+  const updated = await StorageService.updatePortfolio(id, payload.data);
+  return { data: { data: updated } };
 };
 
-const DeleteResumeById = (id) => {
-    return new Promise((resolve) => {
-        let resumes = getResumesFromStorage();
-        resumes = resumes.filter(r => r.documentId !== id);
-        saveResumesToStorage(resumes);
-        resolve({ data: { data: { success: true } } });
-    });
+export const DeleteResumeById = async (id) => {
+  await StorageService.deleteResume(id);
+  return { data: { data: { success: true } } };
 };
 
-const CreateNewPortfolio = (data) => {
-    return new Promise((resolve) => {
-        const portfolios = getPortfoliosFromStorage();
-        const newPortfolio = {
-            ...data.data,
-            documentId: Date.now().toString() + Math.random().toString(36).substring(2, 9),
-            createdAt: new Date().toISOString()
-        };
-        portfolios.push(newPortfolio);
-        savePortfoliosToStorage(portfolios);
-        resolve({ data: { data: newPortfolio } });
-    });
+export const DeletePortfolioById = async (id) => {
+  await StorageService.deletePortfolio(id);
+  return { data: { data: { success: true } } };
 };
 
-const GetUserPortfolios = (userEmail) => {
-    return new Promise((resolve) => {
-        const portfolios = getPortfoliosFromStorage();
-        const userPortfolios = portfolios.filter(p => p.userEmail === userEmail);
-        resolve({ data: { data: userPortfolios } });
-    });
-};
-
-const UpdatePortfolioDetail = (id, data) => {
-    return new Promise((resolve) => {
-        const portfolios = getPortfoliosFromStorage();
-        const index = portfolios.findIndex(p => p.documentId === id);
-        if (index !== -1) {
-            portfolios[index] = { ...portfolios[index], ...data.data };
-            savePortfoliosToStorage(portfolios);
-            resolve({ data: { data: portfolios[index] } });
-        } else {
-            resolve({ data: { data: null } });
-        }
-    });
-};
-
-const GetPortfolioById = (id) => {
-    return new Promise((resolve) => {
-        const portfolios = getPortfoliosFromStorage();
-        const portfolio = portfolios.find(p => p.documentId === id);
-        resolve({ data: { data: portfolio } });
-    });
-};
-
-const DeletePortfolioById = (id) => {
-    return new Promise((resolve) => {
-        let portfolios = getPortfoliosFromStorage();
-        portfolios = portfolios.filter(p => p.documentId !== id);
-        savePortfoliosToStorage(portfolios);
-        resolve({ data: { data: { success: true } } });
-    });
-};
-
-const IncrementPortfolioViews = (id) => {
-    return new Promise((resolve) => {
-        const portfolios = getPortfoliosFromStorage();
-        const index = portfolios.findIndex(p => p.documentId === id);
-        if (index !== -1) {
-            const currentViews = portfolios[index].views || 0;
-            portfolios[index].views = currentViews + 1;
-            savePortfoliosToStorage(portfolios);
-            resolve({ data: { success: true, views: currentViews + 1 } });
-        } else {
-            resolve({ data: { success: false } });
-        }
-    });
+export const IncrementPortfolioViews = async (id) => {
+  const views = await StorageService.incrementPortfolioViews(id);
+  return { data: { success: true, views } };
 };
 
 export default {
-    CreateNewResume,
-    GetUserResumes,
-    UpdateResumeDetail,
-    GetResumeById,
-    DeleteResumeById,
-    CreateNewPortfolio,
-    GetUserPortfolios,
-    UpdatePortfolioDetail,
-    GetPortfolioById,
-    DeletePortfolioById,
-    IncrementPortfolioViews
+  GetUserResumes,
+  GetUserPortfolios,
+  CreateNewResume,
+  CreateNewPortfolio,
+  GetResumeById,
+  GetPortfolioById,
+  UpdateResumeDetail,
+  UpdatePortfolioDetail,
+  DeleteResumeById,
+  DeletePortfolioById,
+  IncrementPortfolioViews
 };

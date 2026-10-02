@@ -22,22 +22,18 @@ function PersonalDetail({enabledNext, handleNext, handlePrev}) {
     },[resumeInfo])
 
     const handleInputChange=(e)=>{
-        enabledNext(false)
+        enabledNext(false);
         const {name,value}=e.target;
 
-        setFormData(prev => ({
-            ...prev,
-            [name]:value
-        }))
+        setFormData(prev => {
+            const nextData = {
+                ...prev,
+                [name]: value
+            };
+            dispatch(updatePersonalInfo(nextData));
+            return nextData;
+        });
     }
-
-    // Debounced sync to Redux
-    useEffect(() => {
-        const timer = setTimeout(() => {
-                dispatch(updatePersonalInfo(formData));
-        }, 500);
-        return () => clearTimeout(timer); // Cleanup memory leak
-    }, [formData, dispatch]);
 
     const onSave=(e)=>{
         e.preventDefault();

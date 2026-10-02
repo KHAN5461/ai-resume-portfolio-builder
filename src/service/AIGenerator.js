@@ -1,4 +1,4 @@
-import { AIChatSession } from './AIModal';
+import { AIChatSession, extractCleanJson } from './AIModal';
 
 export const validateScaffold = (data) => {
   const requiredKeys = ['siteConfig', 'heroSection', 'aboutSection'];
@@ -81,15 +81,56 @@ export const generatePortfolioScaffold = async (prompt, unstructuredData = '') =
       .replace('{unstructuredData}', unstructuredData);
 
     const result = await AIChatSession.sendMessage(finalPrompt);
-    let responseText = result.response.text(); // AIChatSession returns an object with `response: { text: () => text }`
+    let responseText = result.response.text();
     
-    // Clean up potential markdown code block wrappers
-    responseText = responseText.replace(/```json/g, '').replace(/```/g, '').trim();
+    let parsedData = extractCleanJson(responseText);
     
-    const parsedData = JSON.parse(responseText);
-    
-    if (!validateScaffold(parsedData)) {
-      throw new Error("Invalid scaffold schema returned by AI.");
+    if (!parsedData || !validateScaffold(parsedData)) {
+      console.warn("[AIGenerator] Failed to parse or validate schema, using fallback payload.");
+      parsedData = {
+        siteConfig: {
+          themePreset: "default",
+          accentColor: "#6366f1",
+          themeMode: "light",
+          layout: [
+            { "id": "hero_1", "type": "hero", "visible": true, "name": "Hero" },
+            { "id": "about_1", "type": "about", "visible": true, "name": "About" },
+            { "id": "projects_1", "type": "projects", "visible": true, "name": "Projects" },
+            { "id": "skills_1", "type": "skills", "visible": true, "name": "Skills" },
+            { "id": "contact_1", "type": "contact", "visible": true, "name": "Contact" }
+          ]
+        },
+        heroSection: {
+          greeting: "Hi, I'm a Professional Developer",
+          headline: "Building Modern Web Experiences",
+          subheadline: "Specialized in delivering fast, accessible, and elegant solutions using modern web technologies."
+        },
+        aboutSection: {
+          bioTitle: "About Me",
+          bioDescription: "I am a passionate software developer with extensive experience building user-focused web applications. I focus on clean code, responsive design, and solid architectural principles.",
+          stats: []
+        },
+        projectsSection: [
+          {
+            title: "E-Commerce App",
+            description: "A secure and lightning-fast storefront with automated payments and state management.",
+            technologies: ["React", "Node.js", "Express", "Stripe"],
+            githubUrl: "",
+            liveUrl: ""
+          }
+        ],
+        skillsSection: {
+          categories: [
+            { "name": "Tech Stack", "skills": ["React", "JavaScript", "CSS", "HTML", "Node.js"] }
+          ]
+        },
+        contactSection: {
+          heading: "Get In Touch",
+          subheading: "Ready to take your project to the next level? Drop me an email!",
+          email: "hello@example.com",
+          socialLinks: []
+        }
+      };
     }
     
     return parsedData;

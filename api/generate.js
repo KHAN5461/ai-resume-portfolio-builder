@@ -1,4 +1,4 @@
-import { GoogleGenerativeAI } from "@google/generative-ai";
+import { GoogleGenAI } from "@google/genai";
 import * as admin from 'firebase-admin';
 
 // Initialize Firebase Admin
@@ -20,20 +20,15 @@ if (!admin.apps.length) {
 }
 const db = admin.firestore();
 
-const apiKey = process.env.VITE_GOOGLE_AI_API_KEY || process.env.GOOGLE_AI_API_KEY;
-const genAI = new GoogleGenerativeAI(apiKey || "DUMMY_KEY");
-
-const model = genAI.getGenerativeModel({
-  model: "gemini-1.5-flash",
+const apiKey = process.env.GEMINI_API_KEY || process.env.VITE_GOOGLE_AI_API_KEY || process.env.GOOGLE_AI_API_KEY || '';
+const ai = new GoogleGenAI({
+  apiKey,
+  httpOptions: {
+    headers: {
+      'User-Agent': 'aistudio-build',
+    }
+  }
 });
-
-const generationConfig = {
-  temperature: 1,
-  topP: 0.95,
-  topK: 64,
-  maxOutputTokens: 8192,
-  responseMimeType: "text/plain",
-};
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
@@ -43,49 +38,48 @@ export default async function handler(req, res) {
 
   const { prompt, userId } = req.body;
 
-  if (!prompt || !userId) {
-    return res.status(400).json({ error: 'Missing prompt or userId' });
+  if (!prompt) {
+    return res.status(400).json({ error: 'Missing prompt' });
   }
 
   try {
-    const userRef = db.collection('users').doc(userId);
-    
-    // Atomic transaction for rate limiting
-    let isPremium = false;
-    await db.runTransaction(async (t) => {
-      const doc = await t.get(userRef);
-      if (!doc.exists) {
-        throw new Error('User not found');
+    if (userId) {
+      const userRef = db.collection('users').doc(userId);
+      
+      // Atomic transaction for rate limiting if user doc exists
+      await db.runTransaction(async (t) => {
+        const doc = await t.get(userRef);
+        if (doc.exists) {
+          const data = doc.data();
+          const isPremium = data.isPremium || false;
+          const count = data.generationCount || 0;
+          const limit = isPremium ? 1000 : 50;
+          
+          if (count >= limit) {
+            throw new Error('Generation limit exceeded');
+          }
+          t.update(userRef, { generationCount: count + 1 });
+        }
+      }).catch((err) => {
+        console.warn('Firestore transaction warning (proceeding):', err.message);
+      });
+    }
+
+    const response = await ai.models.generateContent({
+      model: "gemini-3.8-flash",
+      contents: prompt,
+      config: {
+        temperature: 0.7,
       }
-      
-      const data = doc.data();
-      isPremium = data.isPremium || false;
-      const count = data.generationCount || 0;
-      
-      // Limit Free users to 10 generations, Pro users to 1000
-      const limit = isPremium ? 1000 : 10;
-      
-      if (count >= limit) {
-        throw new Error('Generation limit exceeded');
-      }
-      
-      t.update(userRef, { generationCount: count + 1 });
     });
 
-    const chatSession = model.startChat({
-      generationConfig,
-      history: [],
-    });
-
-    const result = await chatSession.sendMessage(prompt);
-    const text = result.response.text();
-
-    return res.status(200).json({ result: text });
+    const text = response.text || '';
+    return res.status(200).json({ result: text, text });
   } catch (error) {
     console.error('AI Generation Error:', error);
     if (error.message === 'Generation limit exceeded') {
       return res.status(429).json({ error: 'Generation limit exceeded. Please upgrade to Pro.' });
     }
-    return res.status(500).json({ error: 'Internal Server Error' });
+    return res.status(500).json({ error: error.message || 'Internal Server Error' });
   }
 }

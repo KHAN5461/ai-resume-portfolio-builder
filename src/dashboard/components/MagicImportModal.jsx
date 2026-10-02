@@ -12,7 +12,7 @@ import { v4 as uuidv4 } from 'uuid';
 import GlobalApi from './../../../service/GlobalApi';
 import { useUser } from '../../auth.jsx';
 import { useNavigate } from 'react-router-dom';
-import { AIChatSession } from '../../../service/AIModal';
+import { AIChatSession, extractCleanJson } from '../../../service/AIModal';
 import { toast } from 'sonner';
 
 const MAGIC_IMPORT_PROMPT = `You are a professional resume writer and data architect. 
@@ -85,9 +85,13 @@ function MagicImportModal({ renderTrigger }) {
       // Clean up response if it contains markdown code blocks
       responseText = responseText.replace(/```json/g, '').replace(/```/g, '').trim();
       
-      const data = JSON.parse(responseText);
-      setParsedData(data);
-      setStep('preview');
+      const data = extractCleanJson(responseText);
+      if (data) {
+        setParsedData(data);
+        setStep('preview');
+      } else {
+        throw new Error("Invalid imported resume structure");
+      }
     } catch (e) {
       console.error(e);
       toast.error("Failed to parse text. Please try again.");

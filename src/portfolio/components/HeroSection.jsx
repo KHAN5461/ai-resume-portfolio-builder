@@ -64,4 +64,6 @@ const HeroSection = React.memo(({ data }) => {
   );
 });
 
+HeroSection.displayName = 'HeroSection';
+
 export default HeroSection;

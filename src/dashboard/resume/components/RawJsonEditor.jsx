@@ -73,6 +73,8 @@ const DEFAULT_TEMPLATE = {
   ]
 };
 
+const ensureArray = (val) => (Array.isArray(val) ? val : []);
+
 export default function RawJsonEditor() {
   const profileInfo = useSelector(state => state.profile.present);
   const resumeInfo = useSelector(state => state.resume.present.resumeData);
@@ -85,6 +87,15 @@ export default function RawJsonEditor() {
   // Initialize the text box by merging Master Profile and visual form data
   useEffect(() => {
     if (!isDirty) {
+      const rawExp = ensureArray(resumeInfo?.Experience);
+      const rawEdu = ensureArray(resumeInfo?.education || resumeInfo?.Education);
+      const rawSkills = ensureArray(resumeInfo?.skills || resumeInfo?.Skills);
+
+      const profileExp = ensureArray(profileInfo?.workExperience);
+      const profileEdu = ensureArray(profileInfo?.education);
+      const profileProjects = ensureArray(profileInfo?.projects);
+      const profileCerts = ensureArray(profileInfo?.certifications);
+
       const constructedProfile = {
         personalInfo: {
           fullName: profileInfo?.personalInfo?.fullName || `${resumeInfo?.firstName || ''} ${resumeInfo?.lastName || ''}`.trim(),
@@ -97,33 +108,33 @@ export default function RawJsonEditor() {
           linkedinUrl: profileInfo?.personalInfo?.linkedinUrl || resumeInfo?.linkedin || ''
         },
         professionalSummary: profileInfo?.professionalSummary || resumeInfo?.summery || resumeInfo?.summary || '',
-        workExperience: profileInfo?.workExperience?.length > 0 ? profileInfo.workExperience : (resumeInfo?.Experience || []).map(exp => ({
-          role: exp.title || '',
-          company: exp.companyName || '',
-          location: exp.city || exp.state ? `${exp.city || ''} ${exp.state || ''}`.trim() : '',
-          startDate: exp.startDate || '',
-          endDate: exp.endDate || '',
-          current: exp.currentlyWorking || false,
-          bullets: exp.workSummery ? exp.workSummery.split('\n') : []
+        workExperience: profileExp.length > 0 ? profileExp : rawExp.map(exp => ({
+          role: exp?.title || '',
+          company: exp?.companyName || '',
+          location: exp?.city || exp?.state ? `${exp?.city || ''} ${exp?.state || ''}`.trim() : '',
+          startDate: exp?.startDate || '',
+          endDate: exp?.endDate || '',
+          current: exp?.currentlyWorking || false,
+          bullets: typeof exp?.workSummery === 'string' ? exp.workSummery.split('\n') : (Array.isArray(exp?.bullets) ? exp.bullets : [])
         })),
-        projects: profileInfo?.projects || [],
-        education: profileInfo?.education?.length > 0 ? profileInfo.education : (resumeInfo?.education || []).map(edu => ({
-          degree: edu.degree || '',
-          institution: edu.universityName || '',
+        projects: profileProjects,
+        education: profileEdu.length > 0 ? profileEdu : rawEdu.map(edu => ({
+          degree: edu?.degree || '',
+          institution: edu?.universityName || '',
           location: '',
-          startDate: edu.startDate || '',
-          endDate: edu.endDate || '',
-          gpaOrHonors: edu.description || ''
+          startDate: edu?.startDate || '',
+          endDate: edu?.endDate || '',
+          gpaOrHonors: edu?.description || ''
         })),
-        skills: profileInfo?.skills?.languages?.length > 0 ? profileInfo.skills : {
-           languages: (resumeInfo?.skills || []).map(s => typeof s === 'string' ? s : s.name),
-           frameworksAndLibraries: [],
-           databasesAndTools: []
+        skills: (profileInfo?.skills && Array.isArray(profileInfo.skills.languages) && profileInfo.skills.languages.length > 0) ? profileInfo.skills : {
+           languages: rawSkills.map(s => typeof s === 'string' ? s : (s?.name || '')).filter(Boolean),
+           frameworksAndLibraries: ensureArray(profileInfo?.skills?.frameworksAndLibraries),
+           databasesAndTools: ensureArray(profileInfo?.skills?.databasesAndTools)
         },
-        certifications: profileInfo?.certifications || []
+        certifications: profileCerts
       };
 
-      const isEmpty = !constructedProfile.personalInfo.fullName && constructedProfile.workExperience.length === 0;
+      const isEmpty = !constructedProfile.personalInfo.fullName && (!Array.isArray(constructedProfile.workExperience) || constructedProfile.workExperience.length === 0);
       
       if (isEmpty) {
         setJsonText(JSON.stringify(DEFAULT_TEMPLATE, null, 2));
@@ -157,29 +168,29 @@ export default function RawJsonEditor() {
         phone: parsed.personalInfo?.phone || '',
         email: parsed.personalInfo?.email || '',
         summery: parsed.professionalSummary || '',
-        Experience: (parsed.workExperience || []).map(exp => ({
-          title: exp.role || '',
-          companyName: exp.company || '',
-          city: exp.location || '',
+        Experience: ensureArray(parsed.workExperience).map(exp => ({
+          title: exp?.role || '',
+          companyName: exp?.company || '',
+          city: exp?.location || '',
           state: '',
-          startDate: exp.startDate || '',
-          endDate: exp.endDate || '',
-          currentlyWorking: exp.current || false,
-          workSummery: (exp.bullets || []).join('\n')
+          startDate: exp?.startDate || '',
+          endDate: exp?.endDate || '',
+          currentlyWorking: exp?.current || false,
+          workSummery: Array.isArray(exp?.bullets) ? exp.bullets.join('\n') : (typeof exp?.workSummery === 'string' ? exp.workSummery : '')
         })),
-        education: (parsed.education || []).map(edu => ({
-          degree: edu.degree || '',
+        education: ensureArray(parsed.education).map(edu => ({
+          degree: edu?.degree || '',
           major: '',
-          universityName: edu.institution || '',
-          startDate: edu.startDate || '',
-          endDate: edu.endDate || '',
-          description: edu.gpaOrHonors || ''
+          universityName: edu?.institution || '',
+          startDate: edu?.startDate || '',
+          endDate: edu?.endDate || '',
+          description: edu?.gpaOrHonors || ''
         })),
         skills: [
-          ...(parsed.skills?.languages || []),
-          ...(parsed.skills?.frameworksAndLibraries || []),
-          ...(parsed.skills?.databasesAndTools || [])
-        ].map(s => ({ name: s, rating: 100 }))
+          ...ensureArray(parsed.skills?.languages),
+          ...ensureArray(parsed.skills?.frameworksAndLibraries),
+          ...ensureArray(parsed.skills?.databasesAndTools)
+        ].map(s => ({ name: typeof s === 'string' ? s : (s?.name || ''), rating: 100 }))
       };
       
       import('@/store/resumeSlice').then(mod => {

@@ -8,7 +8,6 @@ import SkillsForm from './forms/SkillsForm';
 import ContactForm from './forms/ContactForm';
 import { Link, useParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import PortfolioThemeBuilder from './PortfolioThemeBuilder';
 import { useDispatch, useSelector } from 'react-redux';
 import { updatePortfolioData } from '@/store/portfolioSlice';
 import {
@@ -151,10 +150,8 @@ export default function PortfolioFormSection() {
     <div className="flex flex-col h-full">
       <div className='flex flex-col gap-4 mb-6 sticky top-0 bg-surface-container-lowest z-10 pb-4 border-b border-outline-variant/30'>
         <div className='flex justify-between items-center'>
-          <div className="flex items-center gap-2">
-            <PortfolioThemeBuilder />
-          </div>
-          <span className="text-sm font-medium text-on-surface-variant bg-surface-container py-1 px-3 rounded-full">Section Config</span>
+          <span className="text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300">Sections & Layout</span>
+          <span className="text-xs font-medium text-slate-500 dark:text-slate-400 bg-surface-container py-1 px-3 rounded-full">Drag to Reorder</span>
         </div>
         
         {/* Sortable Navigation */}

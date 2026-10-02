@@ -6,8 +6,6 @@ import profileReducer from './profileSlice';
 import syncReducer from './syncSlice';
 import loadingReducer from './loadingSlice';
 import { syncMiddleware } from './syncMiddleware';
-import { auth, db } from '../lib/firebaseConfig';
-import { doc, setDoc } from 'firebase/firestore';
 
 // Safe load from LocalStorage (Fallback)
 const loadState = () => {
@@ -26,9 +24,15 @@ const preloadedState = loadState();
 
 export const store = configureStore({
   reducer: {
-    resume: undoable(resumeReducer, { limit: 50 }),
-    portfolio: undoable(portfolioReducer, { limit: 50 }),
-    profile: undoable(profileReducer, { limit: 50 }),
+    resume: undoable(resumeReducer, { 
+      limit: 25,
+      filter: (action, currentState, previousHistory) => {
+        // Avoid duplicate snapshots of identical states
+        return previousHistory.present !== currentState;
+      }
+    }),
+    portfolio: undoable(portfolioReducer, { limit: 25 }),
+    profile: undoable(profileReducer, { limit: 25 }),
     sync: syncReducer,
     loading: loadingReducer,
   },

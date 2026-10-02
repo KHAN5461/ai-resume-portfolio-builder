@@ -1,233 +1,72 @@
-import { saveToDrive, loadFromDrive, deleteFromDrive } from './DriveService';
-import { store } from '../store/store';
+import StorageService, { migrateResumeSchema, migratePortfolioSchema } from './StorageService';
 
-// Helper to get token safely
-const getToken = () => store.getState().sync.driveToken || 'dummy_token_for_local_fallback';
-
-const CURRENT_SCHEMA_VERSION = 1.1;
-
-// Schema Migration Layer
-const migrateResumeData = (data) => {
-    let migrated = { ...data };
-    const version = migrated.schemaVersion || 1.0;
-    
-    // 1.0 to 1.1: Ensure themeConfig and layout arrays exist
-    if (version < 1.1) {
-        if (!migrated.themeConfig) {
-            migrated.themeConfig = { accentColor: '#000000', fontFamily: 'Inter' };
-        }
-        if (!Array.isArray(migrated.layout)) {
-            migrated.layout = ['summary', 'experience', 'education', 'skills'];
-        }
-        migrated.schemaVersion = CURRENT_SCHEMA_VERSION;
-    }
-    
-    return migrated;
+export const GetUserResumes = async (userEmail) => {
+  const data = await StorageService.getUserResumes(userEmail);
+  return { data: { data } };
 };
 
-const migratePortfolioData = (data) => {
-    let migrated = { ...data };
-    const version = migrated.schemaVersion || 1.0;
-    
-    // 1.0 to 1.1: Ensure siteConfig exists
-    if (version < 1.1) {
-        if (!migrated.siteConfig) {
-            migrated.siteConfig = { themeMode: 'system', accentColor: '#3b82f6' };
-        }
-        migrated.schemaVersion = CURRENT_SCHEMA_VERSION;
-    }
-    
-    return migrated;
+export const GetUserPortfolios = async (userEmail) => {
+  const data = await StorageService.getUserPortfolios(userEmail);
+  return { data: { data } };
 };
 
-const listCache = new Map();
-
-const GetUserResumes = async (userEmail, forceRefresh = false) => {
-    const cacheKey = `resumes_${userEmail}`;
-    if (!forceRefresh && listCache.has(cacheKey)) {
-        const cached = listCache.get(cacheKey);
-        if (Date.now() - cached.timestamp < 60000) {
-            return cached.data;
-        }
-    }
-    // For BYOS, the index is kept locally or in an index.json on Drive.
-    // We will use local storage to simulate the index for now.
-    const local = JSON.parse(localStorage.getItem('local_resumes') || '[]');
-    const result = { data: { data: local.filter(r => r.userEmail === userEmail).map(migrateResumeData) } };
-    listCache.set(cacheKey, { data: result, timestamp: Date.now() });
-    return result;
+export const CreateNewResume = async (payload) => {
+  const created = await StorageService.createResume(payload);
+  return { data: { data: created } };
 };
 
-const GetUserPortfolios = async (userEmail, forceRefresh = false) => {
-    const cacheKey = `portfolios_${userEmail}`;
-    if (!forceRefresh && listCache.has(cacheKey)) {
-        const cached = listCache.get(cacheKey);
-        if (Date.now() - cached.timestamp < 60000) {
-            return cached.data;
-        }
-    }
-    const local = JSON.parse(localStorage.getItem('local_portfolios') || '[]');
-    const result = { data: { data: local.filter(p => p.userEmail === userEmail).map(migratePortfolioData) } };
-    listCache.set(cacheKey, { data: result, timestamp: Date.now() });
-    return result;
+export const CreateNewPortfolio = async (payload) => {
+  const created = await StorageService.createPortfolio(payload);
+  return { data: { data: created } };
 };
 
-const CreateNewResume = async (payload) => {
-    const documentId = payload.data.resumeId || crypto.randomUUID();
-    const newResume = { ...payload.data, documentId };
-    const token = getToken();
-    
-    try {
-        await saveToDrive(token, newResume, `resume_${documentId}.json`, documentId);
-    } catch (e) {
-        console.error("Drive Error:", e);
-    }
-    
-    // Update local index
-    const local = JSON.parse(localStorage.getItem('local_resumes') || '[]');
-    local.push(newResume);
-    localStorage.setItem('local_resumes', JSON.stringify(local));
-    return { data: { data: newResume } };
+export const GetResumeById = async (id) => {
+  const resume = await StorageService.getResumeById(id);
+  return { data: { data: resume } };
 };
 
-const CreateNewPortfolio = async (payload) => {
-    const documentId = payload.data.portfolioId || crypto.randomUUID();
-    const newPortfolio = { ...payload.data, documentId };
-    const token = getToken();
-
-    try {
-        await saveToDrive(token, newPortfolio, `portfolio_${documentId}.json`, documentId);
-    } catch (e) {
-        console.error("Drive Error:", e);
-    }
-
-    const local = JSON.parse(localStorage.getItem('local_portfolios') || '[]');
-    local.push(newPortfolio);
-    localStorage.setItem('local_portfolios', JSON.stringify(local));
-    return { data: { data: newPortfolio } };
+export const GetPortfolioById = async (id) => {
+  const portfolio = await StorageService.getPortfolioById(id);
+  return { data: { data: portfolio } };
 };
 
-const GetResumeById = async (id) => {
-    const token = getToken();
-    try {
-        const driveData = await loadFromDrive(token, id);
-        return { data: { data: migrateResumeData(driveData) } };
-    } catch (error) {
-        console.warn("Drive Load Failed, falling back to local index:", error);
-        const local = JSON.parse(localStorage.getItem('local_resumes') || '[]');
-        const found = local.find(r => r.documentId === id);
-        if (found) return { data: { data: migrateResumeData(found) } };
-        throw new Error("No such document!");
-    }
+export const UpdateResumeDetail = async (id, payload) => {
+  const updated = await StorageService.updateResume(id, payload.data);
+  return { data: { data: updated } };
 };
 
-const GetPortfolioById = async (id) => {
-    const token = getToken();
-    try {
-        const driveData = await loadFromDrive(token, id);
-        return { data: { data: migratePortfolioData(driveData) } };
-    } catch (error) {
-        console.warn("Drive Load Failed, falling back to local index:", error);
-        const local = JSON.parse(localStorage.getItem('local_portfolios') || '[]');
-        const found = local.find(p => p.documentId === id);
-        if (found) return { data: { data: migratePortfolioData(found) } };
-        throw new Error("No such document!");
-    }
+export const UpdatePortfolioDetail = async (id, payload) => {
+  const updated = await StorageService.updatePortfolio(id, payload.data);
+  return { data: { data: updated } };
 };
 
-const UpdateResumeDetail = async (id, payload) => {
-    const token = getToken();
-    
-    // Read existing to merge if necessary, or just rely on payload
-    // We assume payload.data contains the full update for now
-    let dataToSave = payload.data;
-    
-    const local = JSON.parse(localStorage.getItem('local_resumes') || '[]');
-    const idx = local.findIndex(r => r.documentId === id);
-    if(idx !== -1) {
-        local[idx] = { ...local[idx], ...payload.data };
-        localStorage.setItem('local_resumes', JSON.stringify(local));
-        dataToSave = local[idx];
-    }
-
-    try {
-        await saveToDrive(token, dataToSave, `resume_${id}.json`, id);
-    } catch (e) {
-        console.error("Drive Error:", e);
-    }
-
-    return { data: { data: dataToSave } };
+export const DeleteResumeById = async (id) => {
+  await StorageService.deleteResume(id);
+  return { data: { success: true } };
 };
 
-const UpdatePortfolioDetail = async (id, payload) => {
-    const token = getToken();
-    let dataToSave = payload.data;
-
-    const local = JSON.parse(localStorage.getItem('local_portfolios') || '[]');
-    const idx = local.findIndex(p => p.documentId === id);
-    if(idx !== -1) {
-        local[idx] = { ...local[idx], ...payload.data };
-        localStorage.setItem('local_portfolios', JSON.stringify(local));
-        dataToSave = local[idx];
-    }
-
-    try {
-        await saveToDrive(token, dataToSave, `portfolio_${id}.json`, id);
-    } catch (e) {
-        console.error("Drive Error:", e);
-    }
-
-    return { data: { data: dataToSave } };
+export const DeletePortfolioById = async (id) => {
+  await StorageService.deletePortfolio(id);
+  return { data: { success: true } };
 };
 
-const DeleteResumeById = async (id) => {
-    const token = getToken();
-    try {
-        await deleteFromDrive(token, id);
-    } catch (e) {
-        console.error("Drive Error:", e);
-    }
-    const local = JSON.parse(localStorage.getItem('local_resumes') || '[]');
-    localStorage.setItem('local_resumes', JSON.stringify(local.filter(r => r.documentId !== id)));
-    return { data: { success: true } };
-};
-
-const DeletePortfolioById = async (id) => {
-    const token = getToken();
-    try {
-        await deleteFromDrive(token, id);
-    } catch (e) {
-        console.error("Drive Error:", e);
-    }
-    const local = JSON.parse(localStorage.getItem('local_portfolios') || '[]');
-    localStorage.setItem('local_portfolios', JSON.stringify(local.filter(p => p.documentId !== id)));
-    return { data: { success: true } };
-};
-
-const IncrementPortfolioViews = async (id) => {
-    // Avoid heavy Drive writes for simple view increments.
-    // Just update the local index for now.
-    const local = JSON.parse(localStorage.getItem('local_portfolios') || '[]');
-    const idx = local.findIndex(p => p.documentId === id);
-    if(idx !== -1) {
-        const currentViews = local[idx].views || 0;
-        local[idx].views = currentViews + 1;
-        localStorage.setItem('local_portfolios', JSON.stringify(local));
-        return { data: { success: true, views: currentViews + 1 } };
-    }
-    return { data: { success: false } };
+export const IncrementPortfolioViews = async (id) => {
+  const views = await StorageService.incrementPortfolioViews(id);
+  return { data: { success: true, views } };
 };
 
 export default {
-    GetUserResumes,
-    GetUserPortfolios,
-    CreateNewResume,
-    CreateNewPortfolio,
-    GetResumeById,
-    GetPortfolioById,
-    UpdateResumeDetail,
-    UpdatePortfolioDetail,
-    DeleteResumeById,
-    DeletePortfolioById,
-    IncrementPortfolioViews
+  GetUserResumes,
+  GetUserPortfolios,
+  CreateNewResume,
+  CreateNewPortfolio,
+  GetResumeById,
+  GetPortfolioById,
+  UpdateResumeDetail,
+  UpdatePortfolioDetail,
+  DeleteResumeById,
+  DeletePortfolioById,
+  IncrementPortfolioViews,
+  migrateResumeSchema,
+  migratePortfolioSchema
 };

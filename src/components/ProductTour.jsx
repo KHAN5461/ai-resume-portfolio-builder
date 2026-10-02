@@ -68,7 +68,7 @@ export function ProductTour() {
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
-                        className="absolute inset-0 bg-black/40 backdrop-blur-[2px] pointer-events-auto"
+                        className="absolute inset-0 bg-slate-950/75 pointer-events-auto"
                     />
 
                     {/* Tooltip Dialog */}

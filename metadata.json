@@ -1,0 +1,8 @@
+{
+  "name": "AI Resume & Portfolio Builder",
+  "description": "Create, customize, and manage AI-powered resumes and portfolio websites.",
+  "permissions": [],
+  "capabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

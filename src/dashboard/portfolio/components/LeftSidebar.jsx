@@ -9,7 +9,7 @@ export default function LeftSidebar({ activeBlockId, isOpen, onToggle }) {
       initial={false}
       animate={{ width: isOpen ? 340 : 0, opacity: isOpen ? 1 : 0 }}
       transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-      className="h-full bg-surface/80 backdrop-blur-xl border-r border-outline-variant/30 flex flex-col flex-shrink-0 relative z-20 overflow-hidden shadow-soft"
+      className="h-full bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 flex flex-col flex-shrink-0 relative z-20 overflow-hidden shadow-soft"
     >
       <div className="w-[340px] flex flex-col h-full">
         {/* Header */}

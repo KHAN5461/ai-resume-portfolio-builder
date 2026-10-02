@@ -232,7 +232,7 @@ function Education({handleNext, handlePrev}) {
             <div className='flex justify-between items-center mt-6'>
                 <div className='flex gap-2'>
                     <Button variant="outline" onClick={AddNewEducation} className="text-stitch-primary hover:text-stitch-primary border-stitch-primary/30 hover:bg-stitch-primary/5 rounded-xl h-10 px-4">
-                        + Add More Education
+                        + Add
                     </Button>
                 </div>
                 

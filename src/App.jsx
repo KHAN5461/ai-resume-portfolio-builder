@@ -27,6 +27,9 @@ function App() {
   useEffect(() => {
     const fetchUserData = async () => {
       if (isSignedIn && user?.id) {
+        if (typeof navigator !== 'undefined' && !navigator.onLine) {
+          return;
+        }
         try {
           const docRef = doc(db, 'user_data', user.id);
           const docSnap = await getDoc(docRef);
@@ -43,7 +46,13 @@ function App() {
             }
           }
         } catch (error) {
-          console.error("Error fetching user state from Firebase:", error);
+          const errMsg = error instanceof Error ? error.message : String(error);
+          if (error?.code === 'unavailable' || errMsg.includes('offline') || (typeof navigator !== 'undefined' && !navigator.onLine)) {
+            // Normal offline condition: application uses local storage state seamlessly
+            console.warn("Firebase is operating in offline mode. Local state will be used.");
+          } else {
+            console.error("Error fetching user state from Firebase:", error);
+          }
         }
       }
     };
@@ -52,7 +61,7 @@ function App() {
 
   if(!isSignedIn && isLoaded && location.pathname !== '/')
   {
-    return <Navigate to={'/auth/sign-in'} />
+    return <Navigate to={`/auth/sign-in?redirect=${encodeURIComponent(location.pathname)}`} replace />
   }
 
   return (

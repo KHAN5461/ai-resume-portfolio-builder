@@ -22,7 +22,7 @@ const PropertiesPanel = ({ activeBlockId, setActiveBlockId, isOpen, onToggle }) 
     <motion.aside 
       initial={false}
       animate={{ width: isOpen ? 320 : 0, opacity: isOpen ? 1 : 0 }}
-      className="h-full bg-white/95 dark:bg-slate-900/95 backdrop-blur-sm border-l border-gray-200 dark:border-slate-800 flex flex-col flex-shrink-0 relative z-20"
+      className="h-full bg-white dark:bg-slate-900 border-l border-gray-200 dark:border-slate-800 flex flex-col flex-shrink-0 relative z-20"
     >
       {/* Header with Close Button */}
       <div className="px-4 py-3 border-b border-gray-200 dark:border-slate-800 shrink-0 flex items-center justify-between bg-white dark:bg-slate-900">

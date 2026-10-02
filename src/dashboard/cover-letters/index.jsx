@@ -99,7 +99,32 @@ export default function CoverLetterGenerator() {
                     >
                         <h2 className="text-xl font-bold mb-6">Which resume should we base this on?</h2>
                         {resumes.length === 0 ? (
-                            <p className="text-on-surface-variant">No resumes found. Please create a resume first.</p>
+                            <div className="text-center py-8">
+                                <p className="text-on-surface-variant mb-4">No resumes found in your local vault yet.</p>
+                                <div className="flex flex-wrap gap-3 justify-center">
+                                    <Link to="/dashboard/resume/new/ai" className="px-4 py-2 bg-sky-600 hover:bg-sky-700 text-white rounded-xl text-xs font-semibold shadow-sm inline-flex items-center gap-2">
+                                        <Sparkles className="w-3.5 h-3.5" />
+                                        Generate a Quick Resume with AI
+                                    </Link>
+                                    <button
+                                        type="button"
+                                        onClick={() => {
+                                            setSelectedResume({
+                                                title: 'General Professional',
+                                                summary: 'Experienced professional with proven track record of delivering cross-functional impact.',
+                                                skills: [{ name: 'Problem Solving' }, { name: 'Communication' }, { name: 'Leadership' }],
+                                                firstName: user?.fullName?.split(' ')[0] || 'Professional',
+                                                lastName: user?.fullName?.split(' ')[1] || 'Candidate',
+                                                email: user?.primaryEmailAddress?.emailAddress || 'user@example.com'
+                                            });
+                                            setStep(2);
+                                        }}
+                                        className="px-4 py-2 bg-surface-variant hover:bg-surface-variant/80 text-on-surface rounded-xl text-xs font-semibold"
+                                    >
+                                        Use Default Profile Context
+                                    </button>
+                                </div>
+                            </div>
                         ) : (
                             <div className="grid grid-cols-1 gap-4">
                                 {resumes.map((resume, index) => (

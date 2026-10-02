@@ -11,7 +11,7 @@ export const AtsScoreRing = () => {
 
   return (
     <div className="flex flex-col gap-2">
-      <div className="flex items-center gap-3 bg-slate-900/80 backdrop-blur-md border border-slate-800 rounded-full px-4 py-2 shadow-lg">
+      <div className="flex items-center gap-3 bg-slate-900 border border-slate-800 rounded-full px-4 py-2 shadow-lg">
         <div className="relative w-10 h-10 flex items-center justify-center">
           <svg className="w-10 h-10 transform -rotate-90">
             <circle cx="20" cy="20" r="18" className="stroke-slate-800" strokeWidth="4" fill="transparent" />

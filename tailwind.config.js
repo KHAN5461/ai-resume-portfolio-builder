@@ -75,7 +75,6 @@ module.exports = {
         "stitch-background": "var(--stitch-background)",
         "primary-container": "var(--primary-container)",
         "on-primary-container": "var(--on-primary-container)",
-        "surface": "var(--color-surface)",
       },
       fontFamily: {
         sans: ["Inter", "sans-serif"],

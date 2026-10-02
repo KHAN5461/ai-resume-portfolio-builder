@@ -53,7 +53,7 @@ export function WelcomeModal() {
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
-                        className="fixed inset-0 bg-black/40 backdrop-blur-sm z-[100] flex items-center justify-center p-4"
+                        className="fixed inset-0 bg-slate-950/75 z-[100] flex items-center justify-center p-4"
                         onClick={handleClose}
                     >
                         <motion.div 
@@ -61,7 +61,7 @@ export function WelcomeModal() {
                             animate={{ scale: 1, opacity: 1, y: 0 }}
                             exit={{ scale: 0.9, opacity: 0, y: 20 }}
                             transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-                            className="bg-surface-container-lowest rounded-3xl shadow-2xl max-w-md w-full overflow-hidden relative"
+                            className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl shadow-2xl max-w-md w-full overflow-hidden relative"
                             onClick={(e) => e.stopPropagation()}
                         >
                             <button 

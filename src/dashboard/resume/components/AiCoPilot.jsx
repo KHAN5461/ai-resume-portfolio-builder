@@ -73,12 +73,12 @@ export function AiCoPilot() {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 50, scale: 0.9 }}
             transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-            className="fixed bottom-6 right-6 w-[380px] h-[550px] max-h-[80vh] bg-surface-container-lowest rounded-3xl shadow-[0_20px_60px_rgba(0,0,0,0.15)] flex flex-col z-50 overflow-hidden border border-outline-variant/30"
+            className="fixed bottom-6 right-6 w-[380px] h-[550px] max-h-[80vh] bg-white dark:bg-slate-900 rounded-3xl shadow-[0_20px_60px_rgba(0,0,0,0.15)] flex flex-col z-50 overflow-hidden border border-slate-200 dark:border-slate-800"
           >
             {/* Header */}
             <div className="px-5 py-4 bg-gradient-to-r from-stitch-primary to-purple-600 text-white flex justify-between items-center shadow-md z-10">
               <div className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center backdrop-blur-sm">
+                <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center">
                   <Bot className="w-5 h-5 text-white" />
                 </div>
                 <div>
@@ -94,8 +94,14 @@ export function AiCoPilot() {
               </button>
             </div>
 
-            {/* Chat Area */}
-            <div className="flex-1 overflow-y-auto p-5 flex flex-col gap-4 bg-surface-container-low/30 relative custom-scrollbar">
+            {/* Chat Area with Accessibility Live Region */}
+            <div 
+              className="flex-1 overflow-y-auto p-5 flex flex-col gap-4 bg-surface-container-low/30 relative custom-scrollbar"
+              role="log"
+              aria-live="polite"
+              aria-atomic="false"
+              aria-label="AI Co-Pilot conversation"
+            >
                 {/* Decorative background blur */}
                 <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-48 h-48 bg-stitch-primary/5 rounded-full blur-3xl pointer-events-none"></div>
                 

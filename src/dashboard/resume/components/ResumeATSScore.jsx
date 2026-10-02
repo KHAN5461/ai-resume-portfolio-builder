@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useSelector } from 'react-redux';
-import { AIChatSession } from '../../../service/AIModal';
+import { AIChatSession, extractCleanJson } from '../../../service/AIModal';
 import { Loader2, ChevronDown, ChevronUp, AlertCircle, CheckCircle2, ListMinus, Sparkles } from 'lucide-react';
 
 const ATS_PROMPT = `You are an advanced, strict ATS evaluation matrix. Analyze the following resume data and provide a strict JSON response containing:
@@ -103,11 +103,12 @@ export const ResumeATSScore = () => {
             const result = await AIChatSession.sendMessage(prompt, 'resume');
             let responseText = await result.response.text();
             
-            // Clean up potentially wrapped markdown JSON
-            responseText = responseText.replace(/```json/g, '').replace(/```/g, '').trim();
-            
-            const parsed = JSON.parse(responseText);
-            setAtsReport(parsed);
+            const parsed = extractCleanJson(responseText);
+            if (parsed) {
+                setAtsReport(parsed);
+            } else {
+                throw new Error("Could not parse ATS evaluation");
+            }
         } catch (err) {
             console.error("ATS Analysis failed:", err);
             setError("Failed to analyze resume. Please try again.");

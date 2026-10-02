@@ -9,6 +9,7 @@ import ResumePreview from '@/dashboard/resume/components/ResumePreview';
 import { Share2, Download, Printer, Link2, X, Globe, FileText } from 'lucide-react';
 import { toast } from 'sonner';
 import { motion, AnimatePresence } from 'framer-motion';
+import { sanitizeHtml } from '@/lib/sanitize';
 
 export default function ResumeViewPage() {
   const { resumeId } = useParams();
@@ -100,7 +101,7 @@ export default function ResumeViewPage() {
 
   if (loadingData) return (
     <div className="min-h-screen bg-surface-container-low pb-20">
-      <div className="fixed top-0 left-0 w-full z-50 bg-surface-container-lowest/80 backdrop-blur-xl border-b border-outline-variant/30 h-[88px] flex items-center">
+      <div className="fixed top-0 left-0 w-full z-50 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 h-[88px] flex items-center">
         <div className="max-w-5xl mx-auto px-6 w-full flex justify-between items-center">
             <div className="flex flex-col gap-2">
                 <div className="w-48 h-6 bg-surface-variant/50 rounded animate-pulse"></div>
@@ -133,10 +134,30 @@ export default function ResumeViewPage() {
     </div>
   );
 
+  if (!loadingData && (!resumeData || !resumeData.title)) {
+    return (
+      <div className="min-h-screen bg-surface-container-low flex flex-col items-center justify-center p-6 text-center">
+        <div className="w-16 h-16 rounded-2xl bg-amber-500/10 flex items-center justify-center mb-4 text-amber-600">
+          <FileText className="w-8 h-8" />
+        </div>
+        <h2 className="text-xl font-bold text-slate-900 dark:text-white mb-2">Resume Not Found or Private</h2>
+        <p className="text-sm text-slate-500 max-w-md mb-6">
+          The requested document could not be located or may be restricted. Please verify the URL or request the author to grant public access.
+        </p>
+        <button
+          onClick={() => window.location.href = '/dashboard'}
+          className="px-5 py-2.5 bg-slate-900 text-white rounded-xl font-medium text-xs shadow-sm hover:bg-slate-800 transition-colors"
+        >
+          Return to Dashboard
+        </button>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-surface-container-low pb-20">
       {/* Action Bar */}
-      <div id="no-print" className="fixed top-0 left-0 w-full z-50 bg-surface-container-lowest/80 backdrop-blur-xl border-b border-outline-variant/30 shadow-sm transition-all">
+      <div id="no-print" className="fixed top-0 left-0 w-full z-50 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 shadow-sm transition-all">
         <div className="max-w-5xl mx-auto px-6 py-4 flex flex-col sm:flex-row justify-between items-center gap-4">
           <div>
             <h1 className="font-headline-sm text-2xl font-bold text-on-surface flex items-center gap-2">
@@ -192,12 +213,12 @@ export default function ResumeViewPage() {
 
       <AnimatePresence>
         {isExportModalOpen && (
-          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm">
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-950/75">
             <motion.div 
               initial={{ scale: 0.95, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.95, opacity: 0 }}
-              className="bg-surface-container-lowest w-full max-w-lg rounded-3xl p-8 shadow-2xl relative"
+              className="bg-white dark:bg-slate-900 w-full max-w-lg rounded-3xl p-8 shadow-2xl border border-slate-200 dark:border-slate-800 relative"
             >
               <button 
                   onClick={() => setIsExportModalOpen(false)}
@@ -258,12 +279,12 @@ export default function ResumeViewPage() {
 
       <AnimatePresence>
         {isShareModalOpen && (
-          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm">
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-950/75">
             <motion.div 
               initial={{ scale: 0.95, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.95, opacity: 0 }}
-              className="bg-surface-container-lowest w-full max-w-lg rounded-3xl p-8 shadow-2xl relative"
+              className="bg-white dark:bg-slate-900 w-full max-w-lg rounded-3xl p-8 shadow-2xl border border-slate-200 dark:border-slate-800 relative"
             >
               <button 
                   onClick={() => setIsShareModalOpen(false)}
@@ -307,7 +328,7 @@ export default function ResumeViewPage() {
       {/* Visual Resume Canvas - Add top margin to account for fixed header */}
       {viewMode === 'document' ? (
         <div id="print-area" className="max-w-[850px] mx-auto mt-32 bg-white shadow-xl rounded-sm overflow-hidden min-h-[1100px] border border-outline-variant/20">
-          <ResumePreview />
+          <ResumePreview resumeInfo={resumeData} />
         </div>
       ) : (
         <div className="max-w-4xl mx-auto mt-32 p-8 bg-surface-container-lowest rounded-3xl shadow-lg border border-outline-variant/20 text-center">
@@ -319,7 +340,7 @@ export default function ResumeViewPage() {
                     <div key={idx} className="bg-surface rounded-xl p-6 shadow-sm border border-outline-variant/30 text-left hover:-translate-y-1 transition-transform">
                         <h3 className="font-headline-md font-bold">{exp.title}</h3>
                         <p className="font-body-md text-stitch-primary mb-4">{exp.companyName}</p>
-                        <div className="font-body-sm text-on-surface-variant" dangerouslySetInnerHTML={{__html: exp.workSummery}} />
+                        <div className="font-body-sm text-on-surface-variant" dangerouslySetInnerHTML={{__html: sanitizeHtml(exp.workSummery)}} />
                     </div>
                 ))}
             </div>

@@ -2,7 +2,6 @@
 // Handles Google Drive BYOS logic
 
 const DRIVE_UPLOAD_URL = 'https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart';
-const FOLDER_NAME = 'AI_Resume_Portfolio_App';
 
 // Cache ETags to prevent data-races
 const etagCache = new Map();

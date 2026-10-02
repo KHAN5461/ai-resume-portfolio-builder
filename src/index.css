@@ -18,25 +18,40 @@
   -webkit-font-smoothing: antialiased;
 }
 
-@media print{
-  #no-print{
-    display: none;
+@media print {
+  #no-print, header, nav, footer, .no-print {
+    display: none !important;
   }
 
-  #print-area{
-    display: block;
+  #print-area {
+    display: block !important;
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    box-shadow: none !important;
   }
 
-  body{
-    margin: 0;
-    padding: 0;
-    box-shadow: none;
+  body {
+    margin: 0 !important;
+    padding: 0 !important;
+    background: #ffffff !important;
+    color: #000000 !important;
+    box-shadow: none !important;
+  }
+
+  /* Prevent awkward page cuts in resume items */
+  .break-inside-avoid,
+  .resume-section-item,
+  article,
+  section {
+    break-inside: avoid !important;
+    page-break-inside: avoid !important;
   }
 }
 
-@page{
-  size: auto;
-  margin: 0mm;
+@page {
+  size: A4;
+  margin: 10mm;
 }
 
 .rsw-ce ul {
@@ -136,7 +151,58 @@ input, textarea, select {
   }
 
   .dark {
-    /* Retaining light mode emphasis */
+    /* Colors - Deep Slate / Modern Dark Theme */
+    --color-surface: #090d16;
+    --color-surface-muted: #0f172a;
+    --color-primary: #38bdf8;
+    --color-primary-muted: #0284c7;
+    --color-primary-foreground: #040812;
+    --color-text: #f8fafc;
+    --color-text-muted: #94a3b8;
+    
+    --color-border: #1e293b;
+    --color-border-hover: #334155;
+    
+    /* Shadows for Dark Depth */
+    --shadow-soft: 0 4px 20px -2px rgba(0, 0, 0, 0.45);
+    --shadow-hover: 0 10px 30px -4px rgba(0, 0, 0, 0.65);
+
+    /* Shadcn original vars mapped for dark mode */
+    --background: var(--color-surface);
+    --foreground: var(--color-text);
+    --card: #0f172a;
+    --card-foreground: var(--color-text);
+    --popover: #0f172a;
+    --popover-foreground: var(--color-text);
+    --primary: var(--color-primary);
+    --primary-foreground: var(--color-primary-foreground);
+    --secondary: #1e293b;
+    --secondary-foreground: #f8fafc;
+    --muted: #1e293b;
+    --muted-foreground: var(--color-text-muted);
+    --accent: #1e293b;
+    --accent-foreground: #f8fafc;
+    --destructive: #f87171;
+    --destructive-foreground: #090d16;
+    --border: var(--color-border);
+    --input: var(--color-border);
+    --ring: var(--color-primary);
+
+    /* Legacy MD3 / Custom mappings for dark mode */
+    --surface-container-lowest: #05080f;
+    --surface-container-low: #0c121e;
+    --surface-container: #141d2e;
+    --surface-container-high: #1e293b;
+    --surface-container-highest: #334155;
+    --on-surface: #f8fafc;
+    --on-surface-variant: #cbd5e1;
+    --outline: #64748b;
+    --outline-variant: #1e293b;
+    --stitch-primary: #38bdf8;
+    --stitch-secondary: #94a3b8;
+    --stitch-background: #090d16;
+    --primary-container: #141d2e;
+    --on-primary-container: #38bdf8;
   }
 }
 
@@ -149,6 +215,7 @@ input, textarea, select {
     color: var(--color-text);
     overflow-y: scroll;
     font-family: 'Inter', sans-serif;
+    transition: background-color 0.25s ease, color 0.25s ease;
   }
 }
 

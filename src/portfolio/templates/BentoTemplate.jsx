@@ -82,9 +82,9 @@ export default function BentoTemplate({ portfolioData }) {
             </div>
           </div>
           <div className="flex gap-4 mt-6">
-            <a href="#" className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center hover:bg-white/30 transition-colors backdrop-blur-sm"><Github className="w-5 h-5" /></a>
-            <a href="#" className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center hover:bg-white/30 transition-colors backdrop-blur-sm"><Linkedin className="w-5 h-5" /></a>
-            <a href="#" className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center hover:bg-white/30 transition-colors backdrop-blur-sm"><Twitter className="w-5 h-5" /></a>
+            <a href="#" className="w-10 h-10 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center hover:bg-slate-700 transition-colors text-white"><Github className="w-5 h-5" /></a>
+            <a href="#" className="w-10 h-10 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center hover:bg-slate-700 transition-colors text-white"><Linkedin className="w-5 h-5" /></a>
+            <a href="#" className="w-10 h-10 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center hover:bg-slate-700 transition-colors text-white"><Twitter className="w-5 h-5" /></a>
           </div>
         </motion.div>
 
@@ -95,7 +95,7 @@ export default function BentoTemplate({ portfolioData }) {
             {projectsSection[0].thumbnailUrl && <img src={projectsSection[0].thumbnailUrl} alt={projectsSection[0].title} className="absolute inset-0 w-full h-full object-cover opacity-50 group-hover:scale-105 transition-transform duration-700" />}
             
             <div className="relative z-20 mb-12">
-              <span className="bg-white/20 backdrop-blur-md px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider">Featured Project</span>
+              <span className="bg-slate-800 border border-slate-700 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider text-slate-200">Featured Project</span>
             </div>
             <div className="relative z-20">
               <h3 className="text-3xl font-bold mb-2 group-hover:text-[var(--accent)] transition-colors">{projectsSection[0].title}</h3>

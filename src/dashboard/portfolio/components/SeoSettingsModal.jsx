@@ -38,12 +38,12 @@ export default function SeoSettingsModal({ isOpen, onClose }) {
     <AnimatePresence>
       {isOpen && (
         <>
-          <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm" onClick={onClose}></div>
+          <div className="fixed inset-0 z-50 bg-slate-950/75" onClick={onClose}></div>
           <motion.div 
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.95 }}
-            className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-50 w-full max-w-lg bg-surface-container-lowest rounded-xl shadow-2xl border border-outline-variant/30 p-6"
+            className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-50 w-full max-w-lg bg-white dark:bg-slate-900 rounded-xl shadow-2xl border border-slate-200 dark:border-slate-800 p-6"
           >
             <div className="flex justify-between items-center mb-6">
               <div className="flex items-center gap-2 text-stitch-primary">

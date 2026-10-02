@@ -35,7 +35,7 @@ const SkillsSection = React.memo(({ data }) => {
           >
             <h3 className="text-xl font-semibold text-slate-900 dark:text-white flex items-center gap-3">
               <div className="w-1.5 h-1.5 rounded-full bg-indigo-600 dark:bg-indigo-400" />
-              {category.categoryName}
+              {category.categoryName || category.name || "Skills"}
             </h3>
             
             <div className="flex flex-wrap gap-2">
@@ -55,5 +55,7 @@ const SkillsSection = React.memo(({ data }) => {
     </section>
   );
 });
+
+SkillsSection.displayName = 'SkillsSection';
 
 export default SkillsSection;

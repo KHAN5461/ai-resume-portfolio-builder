@@ -97,4 +97,6 @@ const AboutSection = React.memo(({ data }) => {
   );
 });
 
+AboutSection.displayName = 'AboutSection';
+
 export default AboutSection;

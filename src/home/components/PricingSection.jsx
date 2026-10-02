@@ -40,7 +40,7 @@ export const PricingSection = ({ onUpgrade }) => {
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8 relative z-20">
         {/* Tier 1: Starter */}
-        <div className="bg-slate-900/60 backdrop-blur-xl border border-slate-800/80 rounded-3xl p-8 flex flex-col hover:border-slate-700 transition-colors">
+        <div className="bg-slate-900 border border-slate-800 rounded-3xl p-8 flex flex-col hover:border-slate-700 transition-colors">
           <h3 className="text-xl font-bold text-slate-50 mb-2">Starter</h3>
           <p className="text-sm text-slate-400 mb-6">Perfect for students and job-seekers just starting out.</p>
           <div className="text-4xl font-extrabold text-slate-50 mb-8">$0<span className="text-lg text-slate-500 font-medium">/mo</span></div>
@@ -60,7 +60,7 @@ export const PricingSection = ({ onUpgrade }) => {
         </div>
 
         {/* Tier 2: Pro */}
-        <div className="bg-slate-900/80 backdrop-blur-xl border border-indigo-500/80 shadow-[0_0_40px_rgba(99,102,241,0.15)] rounded-3xl p-8 flex flex-col relative transform md:-translate-y-4">
+        <div className="bg-slate-900 border border-indigo-500 shadow-[0_0_40px_rgba(99,102,241,0.15)] rounded-3xl p-8 flex flex-col relative transform md:-translate-y-4">
           <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 px-3 py-1 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full text-xs font-bold text-white shadow-lg flex items-center gap-1">
             <span className="material-symbols-outlined text-[14px]">local_fire_department</span> Most Popular
           </div>
@@ -95,7 +95,7 @@ export const PricingSection = ({ onUpgrade }) => {
         </div>
 
         {/* Tier 3: Enterprise */}
-        <div className="bg-slate-900/60 backdrop-blur-xl border border-slate-800/80 rounded-3xl p-8 flex flex-col hover:border-slate-700 transition-colors">
+        <div className="bg-slate-900 border border-slate-800 rounded-3xl p-8 flex flex-col hover:border-slate-700 transition-colors">
           <h3 className="text-xl font-bold text-slate-50 mb-2">Enterprise</h3>
           <p className="text-sm text-slate-400 mb-6">Power users, freelancers, and small agencies.</p>
           <div className="text-4xl font-extrabold text-slate-50 mb-8">
